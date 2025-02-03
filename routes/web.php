@@ -7,9 +7,8 @@ use Illuminate\Support\Facades\Auth;
 
 // Root route pointing to the login page
 Route::get('/', function () {
-    return view('login'); // Use login.blade.php as the login page
+    return view('login'); // This points to login.blade.php (no change needed here)
 })->name('login');
-
 
 // POST route to handle login form submission
 Route::post('/', [AuthController::class, 'login'])->name('login.post');
@@ -20,7 +19,7 @@ Route::post('/signup', [AuthController::class, 'signup'])->name('signup.post'); 
 
 // Protected Home Route (redirect here after login)
 Route::get('/admindashboard', function () {
-    return view('admindashboard');
+    return view('admin.admindashboard'); // Updated to point to 'admin/admindashboard.blade.php'
 })->name('admindashboard')->middleware('auth'); // Add middleware to protect the home page
 
 // Logout Route
@@ -29,9 +28,8 @@ Route::post('/logout', function () {
     return redirect()->route('login');
 })->name('logout');
 
-//Admin Route
+// Admin Routes (Admin management pages)
 Route::get('/adminmanage', [AdminManageController::class, 'index'])->name('adminmanage');
 Route::get('/adminmanage/edit/{id}', [AdminManageController::class, 'edit'])->name('adminmanage.edit');
 Route::delete('/adminmanage/delete/{id}', [AdminManageController::class, 'destroy'])->name('adminmanage.delete');
 Route::put('/adminmanage/edit/{id}', [AdminManageController::class, 'update'])->name('adminmanage.update');
-

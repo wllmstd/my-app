@@ -10,7 +10,7 @@ class AdminManageController extends Controller
     public function index()
     {
         $users = User::all(); // Fetch all data from the table
-        return view('adminmanage', compact('users'));
+        return view('admin.adminmanage', compact('users'));
     }
 
     public function edit($id)

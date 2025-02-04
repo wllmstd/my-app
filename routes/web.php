@@ -25,8 +25,11 @@ Route::get('/admindashboard', function () {
 // Logout Route
 Route::post('/logout', function () {
     Auth::logout();
-    return redirect()->route('login');
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/');
 })->name('logout');
+
 
 // Admin Routes (Admin management pages)
 Route::get('/adminmanage', [AdminManageController::class, 'index'])->name('adminmanage');

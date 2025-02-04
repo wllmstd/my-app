@@ -10,11 +10,6 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // Show the sign-up form
-    public function showSignup()
-    {
-        return view('signup');  // This assumes you have a signup.blade.php file
-    }
 
     // Handle the login request
     public function login(Request $request)

@@ -14,13 +14,6 @@ class AdminManageController extends Controller
         return view('admin.adminmanage', compact('users'));
     }
 
-    public function edit($id)
-    {
-        $user = User::findOrFail($id);
-        return response()->json($user);
-    }    
-
-
     public function destroy($id)
     {
         $user = User::findOrFail($id);
@@ -34,7 +27,7 @@ class AdminManageController extends Controller
         // Find the user by ID
         $user = User::findOrFail($id);
     
-        // Validate the input (optional but recommended)
+        // Validate the input
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -44,25 +37,22 @@ class AdminManageController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
     
-        // Update the user's details
+        // Update user fields
         $user->first_name = $request->input('first_name');
         $user->last_name = $request->input('last_name');
         $user->department = $request->input('department');
         $user->email = $request->input('email');
     
-        // If a new password is provided, hash and update it
+        // Handle password update
         if ($request->filled('password')) {
             $user->password = Hash::make($request->input('password'));
         }
     
-        // Handle image upload if a new image is provided
+        // Handle image upload
         if ($request->hasFile('image')) {
-            // Delete the old image if it exists
             if ($user->image) {
-                Storage::disk('public')->delete($user->image); // Remove old image
+                Storage::disk('public')->delete($user->image);
             }
-    
-            // Store the new image
             $imagePath = $request->file('image')->store('profile_images', 'public');
             $user->image = $imagePath;
         }
@@ -71,8 +61,9 @@ class AdminManageController extends Controller
         $user->save();
     
         // Redirect with success message
-        return redirect()->route('adminmanage')->with('success', 'User updated successfully.');
-    }
+        return redirect()->route('adminmanage')->with('success', 'User updated successfully!');
+    }    
+    
 
 
     public function store(Request $request)

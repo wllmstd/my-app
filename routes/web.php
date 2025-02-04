@@ -33,3 +33,5 @@ Route::get('/adminmanage', [AdminManageController::class, 'index'])->name('admin
 Route::get('/adminmanage/edit/{id}', [AdminManageController::class, 'edit'])->name('adminmanage.edit');
 Route::delete('/adminmanage/delete/{id}', [AdminManageController::class, 'destroy'])->name('adminmanage.delete');
 Route::put('/adminmanage/edit/{id}', [AdminManageController::class, 'update'])->name('adminmanage.update');
+//Adding the User
+Route::post('/adminmanage/store', [AdminManageController::class, 'store'])->name('adminmanage.store');

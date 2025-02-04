@@ -113,11 +113,6 @@
             </div>
         </form>
 
-        <!-- Sign Up Link -->
-        <div class="signup-link">
-            Don't have an account? <a href="{{ route('signup') }}">Sign up</a>
-        </div>
-
         @if(session('error')) <!-- Display login error message -->
             <div style="color: red; text-align: center;">{{ session('error') }}</div>
         @endif

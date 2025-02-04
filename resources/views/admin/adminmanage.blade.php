@@ -55,6 +55,7 @@
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>
+
                     </td>
                 </tr>
                 @endforeach
@@ -143,7 +144,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                <form id="editUserForm" method="POST" action="{{ url('/adminmanage/update/' . $user->id) }}" enctype="multipart/form-data">
+                    <!-- Form for Editing User -->
+                    <form id="editUserForm" method="POST" action="" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <input type="hidden" id="editUserId" name="id">
@@ -196,20 +198,32 @@
         </div>
     </div>
 
+
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- JavaScript to Populate Edit Modal -->
     <script>
             function openEditModal(user) {
-                document.getElementById('editUserForm').action = '/adminmanage/update/' + user.id;
-                document.getElementById('editUserId').value = user.id;
-                document.getElementById('editFirstName').value = user.first_name;
-                document.getElementById('editLastName').value = user.last_name;
-                document.getElementById('editDepartment').value = user.department;
-                document.getElementById('editEmail').value = user.email;
-                document.getElementById('editProfileImage').src = user.image ? `/storage/${user.image}` : 'https://via.placeholder.com/150';
-            }
+    // Open the edit modal
+        $('#editUserModal').modal('show');
+
+        // Set the form action URL for the save-edited route
+        document.getElementById('editUserForm').action = '/adminmanage/save-edited/' + user.id;
+
+        // Set the hidden ID field
+        document.getElementById('editUserId').value = user.id;
+
+        // Populate the form fields with the current user data
+        document.getElementById('editFirstName').value = user.first_name;
+        document.getElementById('editLastName').value = user.last_name;
+        document.getElementById('editDepartment').value = user.department;
+        document.getElementById('editEmail').value = user.email;
+
+        // Set the profile image (if it exists)
+        document.getElementById('editProfileImage').src = user.image ? '/storage/' + user.image : 'https://via.placeholder.com/150';
+    }
+
 
     </script>
 

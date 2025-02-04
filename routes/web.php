@@ -34,6 +34,7 @@ Route::post('/logout', function () {
 // Admin Routes (Admin management pages)
 Route::get('/adminmanage', [AdminManageController::class, 'index'])->name('adminmanage');
 Route::delete('/adminmanage/delete/{id}', [AdminManageController::class, 'destroy'])->name('adminmanage.delete');
-Route::put('/adminmanage/update/{id}', [AdminManageController::class, 'update'])->name('adminmanage.update');
+Route::get('/adminmanage/edit/{id}', [AdminManageController::class, 'edit'])->name('adminmanage.edit');
+Route::put('/adminmanage/save-edited/{id}', [AdminManageController::class, 'saveEdited'])->name('adminmanage.saveEdited');
 //Adding the User
 Route::post('/adminmanage/store', [AdminManageController::class, 'store'])->name('adminmanage.store');

@@ -31,56 +31,7 @@ class AuthController extends Controller
             'email' => 'The provided credentials do not match our records.',
         ])->withInput();
     }
-
-    // Handle the sign-up request
-    public function signup(Request $request)
-    {
-        \Log::info('Received signup data:', $request->all()); // Debugging: Log request data
-    
-        // Validate the input
-        $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'department' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email|max:255',
-            'password' => 'required|string|min:8|confirmed',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-    
-        if ($validator->fails()) {
-            return redirect()->route('signup')
-                             ->withErrors($validator)
-                             ->withInput();
-        }
-    
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('profile_images', 'public');
-        }
-    
-        try {
-            // Explicitly ensure all required fields are inserted
-            $user = User::create([
-                'first_name' => $request->input('first_name'),
-                'last_name' => $request->input('last_name'),
-                'department' => $request->input('department'),
-                'email' => $request->input('email'),
-                'password' => Hash::make($request->input('password')),
-                'image' => $imagePath,
-            ]);
-    
-            if ($user) {
-                \Log::info('User successfully created:', $user->toArray());
-                return redirect()->route('login')->with('success', 'Account created successfully. Please log in.');
-            } else {
-                throw new \Exception('Failed to create user.');
-            }
-        } catch (\Exception $e) {
-            \Log::error('Error creating user: ' . $e->getMessage());
-            return redirect()->route('signup')->with('error', 'Failed to create the account. Please try again.');
-        }
-    }
-    
-
-
 }
+
+
+//Updated

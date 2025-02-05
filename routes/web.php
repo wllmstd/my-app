@@ -2,25 +2,37 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\SupportDashboardController;
+use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\AdminManageController;
 use Illuminate\Support\Facades\Auth;
 
 // Root route pointing to the login page
 Route::get('/', function () {
-    return view('login'); // This points to login.blade.php (no change needed here)
+    return view('login');
 })->name('login');
 
-// POST route to handle login form submission
+// Handle login request
 Route::post('/', [AuthController::class, 'login'])->name('login.post');
 
 // Registration Routes
-Route::get('/signup', [AuthController::class, 'showSignup'])->name('signup'); // Show the registration form
-Route::post('/signup', [AuthController::class, 'signup'])->name('signup.post'); // Handle registration submission
+Route::get('/signup', [AuthController::class, 'showSignup'])->name('signup');
+Route::post('/signup', [AuthController::class, 'signup'])->name('signup.post');
 
-// Protected Home Route (redirect here after login)
+// Dashboard routes for different user roles
 Route::get('/admindashboard', function () {
-    return view('admin.admindashboard'); // Updated to point to 'admin/admindashboard.blade.php'
-})->name('admindashboard')->middleware('auth'); // Add middleware to protect the home page
+    return view('admin.admindashboard');
+})->name('admindashboard')->middleware('auth');
+
+Route::get('/supportdashboard', function () {
+    return view('support.supportdashboard');
+})->name('supportdashboard')->middleware('auth');
+
+Route::get('/userdashboard', function () {
+    return view('user.userdashboard');
+})->name('userdashboard')->middleware('auth');
+
 
 // Logout Route
 Route::post('/logout', function () {
@@ -30,11 +42,11 @@ Route::post('/logout', function () {
     return redirect('/');
 })->name('logout');
 
-
 // Admin Routes (Admin management pages)
-Route::get('/adminmanage', [AdminManageController::class, 'index'])->name('adminmanage');
-Route::delete('/adminmanage/delete/{id}', [AdminManageController::class, 'destroy'])->name('adminmanage.delete');
-Route::get('/adminmanage/edit/{id}', [AdminManageController::class, 'edit'])->name('adminmanage.edit');
-Route::put('/adminmanage/save-edited/{id}', [AdminManageController::class, 'saveEdited'])->name('adminmanage.saveEdited');
-//Adding the User
-Route::post('/adminmanage/store', [AdminManageController::class, 'store'])->name('adminmanage.store');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/adminmanage', [AdminManageController::class, 'index'])->name('adminmanage');
+    Route::delete('/adminmanage/delete/{id}', [AdminManageController::class, 'destroy'])->name('adminmanage.delete');
+    Route::get('/adminmanage/edit/{id}', [AdminManageController::class, 'edit'])->name('adminmanage.edit');
+    Route::put('/adminmanage/save-edited/{id}', [AdminManageController::class, 'saveEdited'])->name('adminmanage.saveEdited');
+    Route::post('/adminmanage/store', [AdminManageController::class, 'store'])->name('adminmanage.store');
+});

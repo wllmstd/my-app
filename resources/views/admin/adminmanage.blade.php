@@ -50,11 +50,12 @@
                     <td>
                         <!-- Edit button that opens the Edit Modal -->
                         <button class="btn btn-warning btn-sm" onclick="openEditModal({{ json_encode($user) }})" data-bs-toggle="modal" data-bs-target="#editUserModal">Edit</button>
-                        <form action="{{ route('adminmanage.delete', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirmDelete();">
+                        <form action="{{ route('adminmanage.delete', $user->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="openDeleteConfirmationModal({{ $user->id }})">Delete</button>
                         </form>
+
 
                     </td>
                 </tr>
@@ -99,12 +100,12 @@
                                 <!-- Email -->
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email" required>
+                                    <input type="email" class="form-control" id="email" name="email" required autocomplete="new-password">
                                 </div>
                                 <!-- Password -->
                                 <div class="mb-3">
                                     <label for="password" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password" required>
+                                    <input type="password" class="form-control" id="password" name="password" required autocomplete="new-password">
                                 </div>
                                 <!-- Confirm Password -->
                                 <div class="mb-3">
@@ -164,8 +165,13 @@
                                 <!-- Department -->
                                 <div class="mb-3">
                                     <label for="editDepartment" class="form-label">Department</label>
-                                    <input type="text" class="form-control" id="editDepartment" name="department" required>
+                                    <select class="form-select" id="editDepartment" name="department" required>
+                                        <option value="Admin" {{ old('department', $user->department) == 'Admin' ? 'selected' : '' }}>Admin</option>
+                                        <option value="Profiler" {{ old('department', $user->department) == 'Profiler' ? 'selected' : '' }}>Profiler</option>
+                                        <option value="Talent Acquisition" {{ old('department', $user->department) == 'Talent Acquisition' ? 'selected' : '' }}>Talent Acquisition</option>
+                                    </select>
                                 </div>
+
                                 <!-- Email -->
                                 <div class="mb-3">
                                     <label for="editEmail" class="form-label">Email</label>
@@ -198,34 +204,111 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal (Centered with Bootstrap classes) -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered"> <!-- Added modal-dialog-centered class -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    Are you sure you want to delete this user?<br>This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- JavaScript to Populate Edit Modal -->
+
+    <!-- JavaScript to Reset Form Fields When Modal Opens -->
     <script>
-            function openEditModal(user) {
-    // Open the edit modal
-        $('#editUserModal').modal('show');
-
-        // Set the form action URL for the save-edited route
-        document.getElementById('editUserForm').action = '/adminmanage/save-edited/' + user.id;
-
-        // Set the hidden ID field
-        document.getElementById('editUserId').value = user.id;
-
-        // Populate the form fields with the current user data
-        document.getElementById('editFirstName').value = user.first_name;
-        document.getElementById('editLastName').value = user.last_name;
-        document.getElementById('editDepartment').value = user.department;
-        document.getElementById('editEmail').value = user.email;
-
-        // Set the profile image (if it exists)
-        document.getElementById('editProfileImage').src = user.image ? '/storage/' + user.image : 'https://via.placeholder.com/150';
-    }
-
-
+        // Disable Autofill for Email and Password Fields
+        $(document).ready(function () {
+            $('#addEmail, #addPassword').on('focus', function() {
+                $(this).val('');  // Clear the fields on focus
+            });
+        });
     </script>
+
+    <script>
+        // Function to preview image before upload (used in both Add and Edit modals)
+        function previewImage(input, imgElementId) {
+            const file = input.files[0]; // Get the selected file
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById(imgElementId).src = e.target.result;
+                    document.getElementById(imgElementId).style.display = "block"; // Ensure the image is visible
+                };
+                reader.readAsDataURL(file); // Read the file as a Data URL
+            } else {
+                document.getElementById(imgElementId).src = ''; // Clear the image if no file selected
+                document.getElementById(imgElementId).style.display = "none";
+            }
+        }
+
+        // Attach event listeners for both Add and Edit modals
+        document.getElementById("image").addEventListener("change", function () {
+            previewImage(this, "profileImage");
+        });
+
+        document.getElementById("editImage").addEventListener("change", function () {
+            previewImage(this, "editProfileImage");
+        });
+
+        // Function to open the Edit Modal and populate fields
+        function openEditModal(user) {
+            $('#editUserModal').modal('show');
+
+            // Set form action
+            document.getElementById('editUserForm').action = '/adminmanage/save-edited/' + user.id;
+
+            // Populate fields
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editFirstName').value = user.first_name;
+            document.getElementById('editLastName').value = user.last_name;
+            document.getElementById('editDepartment').value = user.department;
+            document.getElementById('editEmail').value = user.email;
+
+            // Set profile image if available
+            let imageUrl = user.image ? '/storage/' + user.image : 'https://via.placeholder.com/150';
+            document.getElementById('editProfileImage').src = imageUrl;
+            document.getElementById('editProfileImage').style.display = "block"; // Ensure image is visible
+        }
+    </script>
+
+
+    <!-- JavaScript to Handle Modal Behavior -->
+    <script>
+        // Function to open the delete confirmation modal and pass the user ID
+        function openDeleteConfirmationModal(userId) {
+            // Set the form action dynamically to target the correct user
+            const form = document.querySelector('form[action*="delete"]'); // Find the correct form
+            form.action = '/adminmanage/delete/' + userId; // Update form action with the user ID
+
+            // Show the delete confirmation modal
+            $('#deleteConfirmationModal').modal('show');
+        }
+
+        // Confirm the deletion when the "Delete" button in the modal is clicked
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            // Submit the form to delete the user
+            const form = document.querySelector('form[action*="delete"]');
+            form.submit();
+        });
+    </script>
+
+
+
 
 
 </body>

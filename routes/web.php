@@ -8,6 +8,8 @@ use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\AdminManageController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\SupportManageController;
+use App\Http\Controllers\UserManageController;
+
 
 // Root route pointing to the login page
 Route::get('/', function () {

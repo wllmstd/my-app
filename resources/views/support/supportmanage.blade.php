@@ -4,48 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Users</title>
+    <title>Manage Profiles</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Bundle (JS & Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- jQuery (if needed) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script><!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <!-- Bootstrap Icons CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 </head>
 
 <body>
 
-    @include('admin.admin_navbar') <!-- Include the navbar here -->
+    @include('support.support_navbar') <!-- Include the navbar here -->
     <div class="container mt-4">
-        <h2 class="text-center mb-4">Manage Users</h2>
+        <h2 class="text-center mb-4">Manage Profiles</h2>
 
         <!-- Add User Button -->
         <div class="d-flex justify-content-end mb-3">
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
                 <i class="bi bi-person-plus"></i> Add User
             </button>
-
         </div>
 
         <!-- User Management Table -->
-        <table class="table table-bordered table-striped" id="userTable">
+        <table class="table table-bordered">
             <thead class="table-dark">
                 <tr>
                     <th>#</th>
+                    <th>Status</th>
                     <th>First Name</th>
                     <th>Last Name</th>
-                    <th>Department</th>
-                    <th>Email</th>
-                    <th>Actions</th>
+                    <th>Nationality</th>
+                    <th>Location</th>
+                    <th>Format</th>
+                    <th>Date Created</th>
+                    <th>Updated Time</th>
+                    <th>Options</th>
                 </tr>
             </thead>
             <tbody>
@@ -59,18 +54,12 @@
                         <td>
                             <!-- Edit button that opens the Edit Modal -->
                             <button class="btn btn-warning btn-sm" onclick="openEditModal({{ json_encode($user) }})"
-                                data-bs-toggle="modal" data-bs-target="#editUserModal">
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
-
-                            <form action="{{ route('adminmanage.delete', $user->id) }}" method="POST" class="d-inline">
+                                data-bs-toggle="modal" data-bs-target="#editUserModal">Edit</button>
+                            <form action="{{ route('supportmanage.delete', $user->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="button" class="btn btn-danger btn-sm"
-                                    onclick="openDeleteConfirmationModal({{ $user->id }})">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-
+                                    onclick="openDeleteConfirmationModal({{ $user->id }})">Delete</button>
                             </form>
 
 
@@ -90,7 +79,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('adminmanage.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('supportmanage.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
@@ -296,7 +285,7 @@
             $('#editUserModal').modal('show');
 
             // Set form action
-            document.getElementById('editUserForm').action = '/adminmanage/save-edited/' + user.id;
+            document.getElementById('editUserForm').action = '/supportmanage/save-edited/' + user.id;
 
             // Populate fields
             document.getElementById('editUserId').value = user.id;
@@ -319,7 +308,7 @@
         function openDeleteConfirmationModal(userId) {
             // Set the form action dynamically to target the correct user
             const form = document.querySelector('form[action*="delete"]'); // Find the correct form
-            form.action = '/adminmanage/delete/' + userId; // Update form action with the user ID
+            form.action = '/supportmanage/delete/' + userId; // Update form action with the user ID
 
             // Show the delete confirmation modal
             $('#deleteConfirmationModal').modal('show');
@@ -332,18 +321,7 @@
             form.submit();
         });
     </script>
-</body>
 
-<script>
-    $(document).ready(function () {
-        $('#userTable').DataTable({
-            "paging": true,          // Enable pagination
-            "searching": true,       // Enable search
-            "ordering": true,        // Enable sorting
-            "info": true,            // Show information (entries count)
-            "lengthMenu": [5, 10, 25, 50], // Dropdown for entries per page
-        });
-    });
-</script>
+</body>
 
 </html>

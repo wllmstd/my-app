@@ -63,6 +63,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/supportmanage/edit/{id}', [SupportManageController::class, 'edit'])->name('supportmanage.edit');
     Route::put('/supportmanage/save-edited/{id}', [SupportManageController::class, 'saveEdited'])->name('supportmanage.saveEdited');
     Route::post('/supportmanage/store', [SupportManageController::class, 'store'])->name('supportmanage.store');
+
+    Route::get('/supportmanage/addprofile', [SupportManageController::class, 'create'])->name('support.addprofile');
 });
 
 

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Request extends Model
+class UserRequest extends Model
 {
     use HasFactory;
 
@@ -24,7 +24,7 @@ class Request extends Model
         'Date_Created',
         'Updated_Time',
         'Users_ID',
-    ];
+    ];    
 
     // Relationship: Each request belongs to a user
     public function user()

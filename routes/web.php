@@ -9,6 +9,8 @@ use App\Http\Controllers\AdminManageController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\SupportManageController;
 use App\Http\Controllers\UserManageController;
+use App\Http\Controllers\RequestController;
+
 
 
 // Root route pointing to the login page
@@ -64,9 +66,16 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-
 // User Routes (User management pages)
 Route::middleware(['auth'])->group(function () {
     Route::get('/usermanage', [UserManageController::class, 'index'])->name('usermanage');
     Route::get('/usermanage/addrequest', [UserManageController::class, 'create'])->name('user.addrequest');
+    Route::post('/requests', [RequestController::class, 'store'])->name('requests.store');
 });
+
+
+// Request Routes
+Route::get('/requests', [RequestController::class, 'index'])->name('requestmanage');
+Route::get('/requests/edit/{id}', [RequestController::class, 'edit'])->name('requests.edit');
+Route::post('/requests/update/{id}', [RequestController::class, 'saveEdited'])->name('requests.update');
+Route::delete('/requests/delete/{id}', [RequestController::class, 'destroy'])->name('requests.destroy');

@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Request as RequestModel; 
+use App\Models\UserRequest; 
 
 class UserManageController extends Controller
 {
     public function index()
     {
-        $requests = RequestModel::all();
+        $requests = UserRequest::all();
         return view('user.usermanage', compact('requests'));
 
     }

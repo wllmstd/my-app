@@ -10,7 +10,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- jQuery (if needed) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script><!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <!-- Bootstrap Icons CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+
 
 </head>
 
@@ -25,10 +33,11 @@
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
                 <i class="bi bi-person-plus"></i> Add User
             </button>
+
         </div>
 
         <!-- User Management Table -->
-        <table class="table table-bordered">
+        <table class="table table-bordered table-striped" id="userTable">
             <thead class="table-dark">
                 <tr>
                     <th>#</th>
@@ -41,24 +50,32 @@
             </thead>
             <tbody>
                 @foreach($users as $user)
-                <tr>
-                    <td>{{ $loop->iteration }}</td> <!-- Display the iteration number -->
-                    <td>{{ $user->first_name }}</td>
-                    <td>{{ $user->last_name }}</td>
-                    <td>{{ $user->department }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>
-                        <!-- Edit button that opens the Edit Modal -->
-                        <button class="btn btn-warning btn-sm" onclick="openEditModal({{ json_encode($user) }})" data-bs-toggle="modal" data-bs-target="#editUserModal">Edit</button>
-                        <form action="{{ route('adminmanage.delete', $user->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" class="btn btn-danger btn-sm" onclick="openDeleteConfirmationModal({{ $user->id }})">Delete</button>
-                        </form>
+                    <tr>
+                        <td>{{ $loop->iteration }}</td> <!-- Display the iteration number -->
+                        <td>{{ $user->first_name }}</td>
+                        <td>{{ $user->last_name }}</td>
+                        <td>{{ $user->department }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>
+                            <!-- Edit button that opens the Edit Modal -->
+                            <button class="btn btn-warning btn-sm" onclick="openEditModal({{ json_encode($user) }})"
+                                data-bs-toggle="modal" data-bs-target="#editUserModal">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+
+                            <form action="{{ route('adminmanage.delete', $user->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="btn btn-danger btn-sm"
+                                    onclick="openDeleteConfirmationModal({{ $user->id }})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </form>
 
 
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
@@ -91,26 +108,29 @@
                                 <div class="mb-3">
                                     <label for="department" class="form-label">Department</label>
                                     <select class="form-select" id="department" name="department" required>
-                                    <option value="" disabled selected>Select Department</option>
-                                    <option value="Profiler">Profiler</option>
-                                    <option value="Talent Acquisition">Talent Acquisition</option>
-                                    <option value="Admin">Admin</option>
-                                </select>
+                                        <option value="" disabled selected>Select Department</option>
+                                        <option value="Profiler">Profiler</option>
+                                        <option value="Talent Acquisition">Talent Acquisition</option>
+                                        <option value="Admin">Admin</option>
+                                    </select>
                                 </div>
                                 <!-- Email -->
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email" required autocomplete="new-password">
+                                    <input type="email" class="form-control" id="email" name="email" required
+                                        autocomplete="new-password">
                                 </div>
                                 <!-- Password -->
                                 <div class="mb-3">
                                     <label for="password" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password" required autocomplete="new-password">
+                                    <input type="password" class="form-control" id="password" name="password" required
+                                        autocomplete="new-password">
                                 </div>
                                 <!-- Confirm Password -->
                                 <div class="mb-3">
                                     <label for="password_confirmation" class="form-label">Confirm Password</label>
-                                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                                    <input type="password" class="form-control" id="password_confirmation"
+                                        name="password_confirmation" required>
                                 </div>
                             </div>
 
@@ -119,7 +139,8 @@
                                 <div class="mb-3 text-center">
                                     <label for="image" class="form-label">Profile Image</label>
                                     <div class="d-flex justify-content-center">
-                                        <img id="profileImage" src="" class="rounded-circle img-fluid mt-3 mb-3" style="width: 300px; height: 300px; object-fit: cover; display: none;">
+                                        <img id="profileImage" src="" class="rounded-circle img-fluid mt-3 mb-3"
+                                            style="width: 300px; height: 300px; object-fit: cover; display: none;">
                                     </div>
                                     <input type="file" class="form-control" id="image" name="image" accept="image/*">
                                 </div>
@@ -155,7 +176,8 @@
                                 <!-- First Name -->
                                 <div class="mb-3">
                                     <label for="editFirstName" class="form-label">First Name</label>
-                                    <input type="text" class="form-control" id="editFirstName" name="first_name" required>
+                                    <input type="text" class="form-control" id="editFirstName" name="first_name"
+                                        required>
                                 </div>
                                 <!-- Last Name -->
                                 <div class="mb-3">
@@ -168,7 +190,8 @@
                                     <select class="form-select" id="editDepartment" name="department" required>
                                         <option value="Admin" {{ old('department', $user->department) == 'Admin' ? 'selected' : '' }}>Admin</option>
                                         <option value="Profiler" {{ old('department', $user->department) == 'Profiler' ? 'selected' : '' }}>Profiler</option>
-                                        <option value="Talent Acquisition" {{ old('department', $user->department) == 'Talent Acquisition' ? 'selected' : '' }}>Talent Acquisition</option>
+                                        <option value="Talent Acquisition" {{ old('department', $user->department) == 'Talent Acquisition' ? 'selected' : '' }}>Talent
+                                            Acquisition</option>
                                     </select>
                                 </div>
 
@@ -188,8 +211,10 @@
                                 <!-- Image -->
                                 <div class="mb-3 text-center">
                                     <label for="editImage" class="form-label">Profile Image</label>
-                                    <img id="editProfileImage" src="" class="rounded-circle img-fluid mt-3" style="width: 300px; height: 300px; object-fit: cover;">
-                                    <input type="file" class="form-control" id="editImage" name="image" accept="image/*">
+                                    <img id="editProfileImage" src="" class="rounded-circle img-fluid mt-3"
+                                        style="width: 300px; height: 300px; object-fit: cover;">
+                                    <input type="file" class="form-control" id="editImage" name="image"
+                                        accept="image/*">
                                 </div>
                             </div>
                         </div>
@@ -205,7 +230,8 @@
     </div>
 
     <!-- Delete Confirmation Modal (Centered with Bootstrap classes) -->
-    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered"> <!-- Added modal-dialog-centered class -->
             <div class="modal-content">
                 <div class="modal-header">
@@ -233,7 +259,7 @@
     <script>
         // Disable Autofill for Email and Password Fields
         $(document).ready(function () {
-            $('#addEmail, #addPassword').on('focus', function() {
+            $('#addEmail, #addPassword').on('focus', function () {
                 $(this).val('');  // Clear the fields on focus
             });
         });
@@ -300,16 +326,24 @@
         }
 
         // Confirm the deletion when the "Delete" button in the modal is clicked
-        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
             // Submit the form to delete the user
             const form = document.querySelector('form[action*="delete"]');
             form.submit();
         });
     </script>
-
-
-
-
-
 </body>
+
+<script>
+    $(document).ready(function () {
+        $('#userTable').DataTable({
+            "paging": true,          // Enable pagination
+            "searching": true,       // Enable search
+            "ordering": true,        // Enable sorting
+            "info": true,            // Show information (entries count)
+            "lengthMenu": [5, 10, 25, 50], // Dropdown for entries per page
+        });
+    });
+</script>
+
 </html>

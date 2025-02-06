@@ -1,10 +1,11 @@
 <?php
 
+// database/seeders/DatabaseSeeder.php
+
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Request;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +14,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Other seeding logic can be added here as well
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Seeding the requests directly here
+        Request::create([
+            'Status' => 'Pending',
+            'First_Name' => 'Alice',
+            'Last_Name' => 'Smith',
+            'Nationality' => 'Canadian',
+            'Location' => 'Toronto',
+            'Format' => 'DOCX',
+            'Attachment' => 'file.docx',
+            'Date_Created' => now(),
+            'Updated_Time' => now(),
+            'Users_ID' => 7, // Make sure user with ID 7 exists
         ]);
+        
+        // Add more Request::create() calls if you want more data
+
+        // You can add other model seeders here if needed
     }
 }

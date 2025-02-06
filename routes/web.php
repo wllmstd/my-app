@@ -7,6 +7,7 @@ use App\Http\Controllers\SupportDashboardController;
 use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\AdminManageController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\SupportManageController;
 
 // Root route pointing to the login page
 Route::get('/', function () {
@@ -50,3 +51,13 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/adminmanage/save-edited/{id}', [AdminManageController::class, 'saveEdited'])->name('adminmanage.saveEdited');
     Route::post('/adminmanage/store', [AdminManageController::class, 'store'])->name('adminmanage.store');
 });
+
+// Support Routes (Support management pages)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/supportmanage', [SupportManageController::class, 'index'])->name('supportmanage');
+    Route::delete('/supportmanage/delete/{id}', [SupportManageController::class, 'destroy'])->name('supportmanage.delete');
+    Route::get('/supportmanage/edit/{id}', [SupportManageController::class, 'edit'])->name('supportmanage.edit');
+    Route::put('/supportmanage/save-edited/{id}', [SupportManageController::class, 'saveEdited'])->name('supportmanage.saveEdited');
+    Route::post('/supportmanage/store', [SupportManageController::class, 'store'])->name('supportmanage.store');
+});
+

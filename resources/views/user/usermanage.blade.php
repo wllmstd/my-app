@@ -114,10 +114,14 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="attachment" class="form-label">Attachment (PDF, DOCX)</label>
-                            <input type="file" class="form-control" id="attachment" name="attachment"
-                                accept=".pdf,.doc,.docx">
+                            <label for="attachment" class="form-label">Attachments (PDF, DOCX)</label>
+                            <input type="file" class="form-control" id="attachment" name="attachments[]"
+                                accept=".pdf,.doc,.docx" multiple>
                         </div>
+
+                        <!-- File Preview Section -->
+                        <div id="fileList" class="mt-2"></div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -156,3 +160,35 @@
         {{ session('success') }}
     </div>
 @endif
+
+
+<script>
+    document.getElementById('attachment').addEventListener('change', function(event) {
+        const fileList = document.getElementById('fileList');
+        fileList.innerHTML = '';
+
+        Array.from(event.target.files).forEach((file, index) => {
+            const fileDiv = document.createElement('div');
+            fileDiv.classList.add('d-flex', 'align-items-center', 'border', 'p-2', 'mb-1', 'rounded');
+            fileDiv.innerHTML = `
+                <span class="me-auto">${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+                <button type="button" class="btn btn-sm btn-danger" onclick="removeFile(${index})">
+                    <i class="bi bi-x"></i>
+                </button>
+            `;
+            fileDiv.dataset.index = index;
+            fileList.appendChild(fileDiv);
+        });
+    });
+
+    function removeFile(index) {
+        const fileList = document.getElementById('attachment');
+        const newFiles = Array.from(fileList.files).filter((_, i) => i !== index);
+
+        const dataTransfer = new DataTransfer();
+        newFiles.forEach(file => dataTransfer.items.add(file));
+        fileList.files = dataTransfer.files;
+
+        document.querySelector(`div[data-index="${index}"]`).remove();
+    }
+</script>

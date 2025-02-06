@@ -20,19 +20,22 @@ class RequestController extends Controller
 
     public function destroy($id)
     {
-        // Find the request by ID
         $request = UserRequest::findOrFail($id);
 
-        // Delete the attached file if exists
+        // Delete attached files
         if ($request->Attachment) {
-            Storage::disk('public')->delete('attachments/' . $request->Attachment);
+            $files = json_decode($request->Attachment, true);
+            foreach ($files as $file) {
+                Storage::disk('public')->delete('attachments/' . $file);
+            }
         }
 
-        // Delete the request record
+        // Delete request record
         $request->delete();
 
         return redirect()->route('requests.index')->with('success', 'Request deleted successfully.');
     }
+
 
     public function edit($id)
     {
@@ -52,38 +55,42 @@ class RequestController extends Controller
             'nationality' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'format' => 'required|string|in:Geco Standard,Geco New Date,Geco New Rate,Blind,HTD,STD,PCX',
-            'attachment' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
-        // Find the request by ID
         $userRequest = UserRequest::findOrFail($id);
-
-        // Update fields
         $userRequest->First_Name = $request->first_name;
         $userRequest->Last_Name = $request->last_name;
         $userRequest->Nationality = $request->nationality;
         $userRequest->Location = $request->location;
         $userRequest->Format = $request->format;
 
-        // Handle file upload if provided
-        if ($request->hasFile('attachment')) {
-            // Delete old file if exists
-            if ($userRequest->Attachment) {
-                Storage::delete('public/attachments/' . $userRequest->Attachment);
+        // Handle file uploads
+        $uploadedFiles = json_decode($userRequest->Attachment, true) ?? [];
+
+        if ($request->hasFile('attachments')) {
+            // Delete old files
+            foreach ($uploadedFiles as $file) {
+                Storage::delete('public/attachments/' . $file);
             }
 
-            // Store new file and update path
-            $filename = time() . '.' . $request->file('attachment')->getClientOriginalExtension();
-            $request->file('attachment')->storeAs('attachments', $filename, 'public');
-            $userRequest->Attachment = $filename;
+            // Store new files
+            $uploadedFiles = [];
+            foreach ($request->file('attachments') as $file) {
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->storeAs('attachments', $filename, 'public');
+                $uploadedFiles[] = $filename;
+            }
         }
 
-        // Update timestamps
+        // Update attachments in database
+        $userRequest->Attachment = json_encode($uploadedFiles);
         $userRequest->Updated_Time = now();
         $userRequest->save();
 
         return redirect()->route('requests.index')->with('success', 'Request updated successfully.');
     }
+
 
     public function store(Request $request)
     {
@@ -94,14 +101,16 @@ class RequestController extends Controller
             'nationality' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'format' => 'required|string|in:Geco Standard,Geco New Date,Geco New Rate,Blind,HTD,STD,PCX',
-            'attachment' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
-        // Handle file upload if provided
-        $filename = null;
-        if ($request->hasFile('attachment')) {
-            $filename = time() . '.' . $request->file('attachment')->getClientOriginalExtension();
-            $request->file('attachment')->storeAs('attachments', $filename, 'public');
+        $uploadedFiles = [];
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->storeAs('attachments', $filename, 'public');
+                $uploadedFiles[] = $filename;
+            }
         }
 
         // Create new request
@@ -111,14 +120,13 @@ class RequestController extends Controller
             'Nationality' => $request->nationality,
             'Location' => $request->location,
             'Format' => $request->format,
-            'Attachment' => $filename,
-            'Status' => 'Pending', // Default status
+            'Attachment' => json_encode($uploadedFiles), // Store as JSON
+            'Status' => 'Pending',
             'Date_Created' => now(),
             'Updated_Time' => now(),
-            'Users_ID' => Auth::id(), // Ensure Users_ID is provided
+            'Users_ID' => Auth::id(),
         ]);
 
         return redirect()->route('requests.index')->with('success', 'Request added successfully.');
     }
-
 }

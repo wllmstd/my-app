@@ -61,3 +61,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/supportmanage/store', [SupportManageController::class, 'store'])->name('supportmanage.store');
 });
 
+
+
+// User Routes (User management pages)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/usermanage', [UserManageController::class, 'index'])->name('usermanage');
+    Route::get('/usermanage/addrequest', [UserManageController::class, 'create'])->name('user.addrequest');
+});

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\UserRequest;
+use Carbon\Carbon;
 
 use Illuminate\Support\Facades\Log;
 
@@ -48,7 +49,6 @@ class RequestController extends Controller
 
     public function saveEdited(Request $request, $id)
     {
-        // Validate the request data
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -65,16 +65,13 @@ class RequestController extends Controller
         $userRequest->Location = $request->location;
         $userRequest->Format = $request->format;
 
-        // Handle file uploads
         $uploadedFiles = json_decode($userRequest->Attachment, true) ?? [];
 
         if ($request->hasFile('attachments')) {
-            // Delete old files
             foreach ($uploadedFiles as $file) {
                 Storage::delete('public/attachments/' . $file);
             }
 
-            // Store new files
             $uploadedFiles = [];
             foreach ($request->file('attachments') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();
@@ -83,9 +80,8 @@ class RequestController extends Controller
             }
         }
 
-        // Update attachments in database
         $userRequest->Attachment = json_encode($uploadedFiles);
-        $userRequest->Updated_Time = now();
+        $userRequest->Updated_Time = Carbon::now('Asia/Manila'); // Ensure correct timezone
         $userRequest->save();
 
         return redirect()->route('requests.index')->with('success', 'Request updated successfully.');
@@ -94,7 +90,6 @@ class RequestController extends Controller
 
     public function store(Request $request)
     {
-        // Validate the incoming request data
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -113,20 +108,20 @@ class RequestController extends Controller
             }
         }
 
-        // Create new request
         UserRequest::create([
             'First_Name' => $request->first_name,
             'Last_Name' => $request->last_name,
             'Nationality' => $request->nationality,
             'Location' => $request->location,
             'Format' => $request->format,
-            'Attachment' => json_encode($uploadedFiles), // Store as JSON
+            'Attachment' => json_encode($uploadedFiles),
             'Status' => 'Pending',
-            'Date_Created' => now(),
-            'Updated_Time' => now(),
+            'Date_Created' => Carbon::now('Asia/Manila'), // Set timezone explicitly
+            'Updated_Time' => Carbon::now('Asia/Manila'),
             'Users_ID' => Auth::id(),
         ]);
 
         return redirect()->route('requests.index')->with('success', 'Request added successfully.');
     }
+
 }

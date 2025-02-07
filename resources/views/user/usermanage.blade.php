@@ -48,26 +48,39 @@
             </thead>
             <tbody>
                 @foreach ($requests as $index => $request)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $request->Status }}</td>
-                        <td>{{ $request->First_Name }}</td>
-                        <td>{{ $request->Last_Name }}</td>
-                        <td>{{ $request->Nationality }}</td>
-                        <td>{{ $request->Location }}</td>
-                        <td>{{ $request->Format }}</td>
-                        <td>{{ $request->Attachment }}</td>
-                        <td>{{ $request->Date_Created }}</td>
-                        <td>{{ $request->Updated_Time }}</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
-                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $request->Status }}</td>
+                                    <td>{{ $request->First_Name }}</td>
+                                    <td>{{ $request->Last_Name }}</td>
+                                    <td>{{ $request->Nationality }}</td>
+                                    <td>{{ $request->Location }}</td>
+                                    <td>{{ $request->Format }}</td>
+                                    <!-- FIXED ATTACHMENT COUNT LOGIC -->
+                                    <td>
+                                        @php
+                                            $attachments = json_decode($request->Attachment, true); // Decode JSON array
+                                            if (is_array($attachments) && !empty($attachments)) {
+                                                $fileCount = count($attachments); // Count files in array
+                                            } elseif (!empty($request->Attachment)) {
+                                                $fileCount = 1; // Single file stored as string
+                                            } else {
+                                                $fileCount = 0; // No file uploaded
+                                            }
+                                        @endphp
+                                        {{ $fileCount }} file{{ $fileCount > 1 ? 's' : '' }}
+                                    </td>
+                                    <td>{{ $request->Date_Created }}</td>
+                                    <td>{{ $request->Updated_Time }}</td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
                 @endforeach
             </tbody>
         </table>
@@ -163,7 +176,7 @@
 
 
 <script>
-    document.getElementById('attachment').addEventListener('change', function(event) {
+    document.getElementById('attachment').addEventListener('change', function (event) {
         const fileList = document.getElementById('fileList');
         fileList.innerHTML = '';
 

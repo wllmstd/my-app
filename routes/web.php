@@ -25,10 +25,12 @@ Route::post('/', [AuthController::class, 'login'])->name('login.post');
 Route::get('/signup', [AuthController::class, 'showSignup'])->name('signup');
 Route::post('/signup', [AuthController::class, 'signup'])->name('signup.post');
 
-// Dashboard routes for different user roles
-Route::get('/admindashboard', function () {
-    return view('admin.admindashboard');
-})->name('admindashboard')->middleware('auth');
+Route::get('/admindashboard', [AdminDashboardController::class, 'index'])
+    ->name('admindashboard')
+    ->middleware('auth');
+
+
+
 
 Route::get('/supportdashboard', function () {
     return view('support.supportdashboard');
@@ -55,6 +57,12 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/adminmanage/save-edited/{id}', [AdminManageController::class, 'saveEdited'])->name('adminmanage.saveEdited');
     Route::post('/adminmanage/store', [AdminManageController::class, 'store'])->name('adminmanage.store');
 });
+
+Route::get('/admin/users/count', [AdminDashboardController::class, 'getUserCount'])
+    ->name('admin.users.count')
+    ->middleware('auth');
+Route::get('/admin/users/department-count', [AdminDashboardController::class, 'getDepartmentCounts']);
+
 
 // Support Routes (Support management pages)
 Route::middleware(['auth'])->group(function () {

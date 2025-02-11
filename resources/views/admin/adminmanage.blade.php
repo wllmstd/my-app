@@ -24,7 +24,8 @@
 
 <body>
 
-    @include('admin.admin_navbar') <!-- Include the navbar here -->
+    @include('admin.admin_navbar')
+    <!-- Include the navbar here -->
     <div class="container mt-4">
         <h2 class="text-center mb-4">Manage Users</h2>
 
@@ -50,32 +51,32 @@
             </thead>
             <tbody>
                 @foreach($users as $user)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td> <!-- Display the iteration number -->
-                        <td>{{ $user->first_name }}</td>
-                        <td>{{ $user->last_name }}</td>
-                        <td>{{ $user->department }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>
-                            <!-- Edit button that opens the Edit Modal -->
-                            <button class="btn btn-warning btn-sm" onclick="openEditModal({{ json_encode($user) }})"
-                                data-bs-toggle="modal" data-bs-target="#editUserModal">
-                                <i class="bi bi-pencil-square"></i>
+                <tr>
+                    <td>{{ $loop->iteration }}</td> <!-- Display the iteration number -->
+                    <td>{{ $user->first_name }}</td>
+                    <td>{{ $user->last_name }}</td>
+                    <td>{{ $user->department }}</td>
+                    <td>{{ $user->email }}</td>
+                    <td>
+                        <!-- Edit button that opens the Edit Modal -->
+                        <button class="btn btn-warning btn-sm" onclick="openEditModal({{ json_encode($user) }})"
+                            data-bs-toggle="modal" data-bs-target="#editUserModal">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+
+                        <form action="{{ route('adminmanage.delete', $user->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="button" class="btn btn-danger btn-sm"
+                                onclick="openDeleteConfirmationModal({{ $user->id }})">
+                                <i class="bi bi-trash"></i>
                             </button>
 
-                            <form action="{{ route('adminmanage.delete', $user->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" class="btn btn-danger btn-sm"
-                                    onclick="openDeleteConfirmationModal({{ $user->id }})">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-
-                            </form>
+                        </form>
 
 
-                        </td>
-                    </tr>
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
         </table>
@@ -188,9 +189,15 @@
                                 <div class="mb-3">
                                     <label for="editDepartment" class="form-label">Department</label>
                                     <select class="form-select" id="editDepartment" name="department" required>
-                                        <option value="Admin" {{ old('department', $user->department) == 'Admin' ? 'selected' : '' }}>Admin</option>
-                                        <option value="Profiler" {{ old('department', $user->department) == 'Profiler' ? 'selected' : '' }}>Profiler</option>
-                                        <option value="Talent Acquisition" {{ old('department', $user->department) == 'Talent Acquisition' ? 'selected' : '' }}>Talent
+                                        <option value="Admin"
+                                            {{ old('department', $user->department) == 'Admin' ? 'selected' : '' }}>
+                                            Admin</option>
+                                        <option value="Profiler"
+                                            {{ old('department', $user->department) == 'Profiler' ? 'selected' : '' }}>
+                                            Profiler</option>
+                                        <option value="Talent Acquisition"
+                                            {{ old('department', $user->department) == 'Talent Acquisition' ? 'selected' : '' }}>
+                                            Talent
                                             Acquisition</option>
                                     </select>
                                 </div>
@@ -232,7 +239,8 @@
     <!-- Delete Confirmation Modal (Centered with Bootstrap classes) -->
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered"> <!-- Added modal-dialog-centered class -->
+        <div class="modal-dialog modal-dialog-centered">
+            <!-- Added modal-dialog-centered class -->
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
@@ -257,93 +265,93 @@
 
     <!-- JavaScript to Reset Form Fields When Modal Opens -->
     <script>
-        // Disable Autofill for Email and Password Fields
-        $(document).ready(function () {
-            $('#addEmail, #addPassword').on('focus', function () {
-                $(this).val('');  // Clear the fields on focus
-            });
+    // Disable Autofill for Email and Password Fields
+    $(document).ready(function() {
+        $('#addEmail, #addPassword').on('focus', function() {
+            $(this).val(''); // Clear the fields on focus
         });
+    });
     </script>
 
     <script>
-        // Function to preview image before upload (used in both Add and Edit modals)
-        function previewImage(input, imgElementId) {
-            const file = input.files[0]; // Get the selected file
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById(imgElementId).src = e.target.result;
-                    document.getElementById(imgElementId).style.display = "block"; // Ensure the image is visible
-                };
-                reader.readAsDataURL(file); // Read the file as a Data URL
-            } else {
-                document.getElementById(imgElementId).src = ''; // Clear the image if no file selected
-                document.getElementById(imgElementId).style.display = "none";
-            }
+    // Function to preview image before upload (used in both Add and Edit modals)
+    function previewImage(input, imgElementId) {
+        const file = input.files[0]; // Get the selected file
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById(imgElementId).src = e.target.result;
+                document.getElementById(imgElementId).style.display = "block"; // Ensure the image is visible
+            };
+            reader.readAsDataURL(file); // Read the file as a Data URL
+        } else {
+            document.getElementById(imgElementId).src = ''; // Clear the image if no file selected
+            document.getElementById(imgElementId).style.display = "none";
         }
+    }
 
-        // Attach event listeners for both Add and Edit modals
-        document.getElementById("image").addEventListener("change", function () {
-            previewImage(this, "profileImage");
-        });
+    // Attach event listeners for both Add and Edit modals
+    document.getElementById("image").addEventListener("change", function() {
+        previewImage(this, "profileImage");
+    });
 
-        document.getElementById("editImage").addEventListener("change", function () {
-            previewImage(this, "editProfileImage");
-        });
+    document.getElementById("editImage").addEventListener("change", function() {
+        previewImage(this, "editProfileImage");
+    });
 
-        // Function to open the Edit Modal and populate fields
-        function openEditModal(user) {
-            $('#editUserModal').modal('show');
+    // Function to open the Edit Modal and populate fields
+    function openEditModal(user) {
+        $('#editUserModal').modal('show');
 
-            // Set form action
-            document.getElementById('editUserForm').action = '/adminmanage/save-edited/' + user.id;
+        // Set form action
+        document.getElementById('editUserForm').action = '/adminmanage/save-edited/' + user.id;
 
-            // Populate fields
-            document.getElementById('editUserId').value = user.id;
-            document.getElementById('editFirstName').value = user.first_name;
-            document.getElementById('editLastName').value = user.last_name;
-            document.getElementById('editDepartment').value = user.department;
-            document.getElementById('editEmail').value = user.email;
+        // Populate fields
+        document.getElementById('editUserId').value = user.id;
+        document.getElementById('editFirstName').value = user.first_name;
+        document.getElementById('editLastName').value = user.last_name;
+        document.getElementById('editDepartment').value = user.department;
+        document.getElementById('editEmail').value = user.email;
 
-            // Set profile image if available
-            let imageUrl = user.image ? '/storage/' + user.image : 'https://via.placeholder.com/150';
-            document.getElementById('editProfileImage').src = imageUrl;
-            document.getElementById('editProfileImage').style.display = "block"; // Ensure image is visible
-        }
+        // Set profile image if available
+        let imageUrl = user.image ? '/storage/' + user.image : 'https://via.placeholder.com/150';
+        document.getElementById('editProfileImage').src = imageUrl;
+        document.getElementById('editProfileImage').style.display = "block"; // Ensure image is visible
+    }
     </script>
 
 
     <!-- JavaScript to Handle Modal Behavior -->
     <script>
-        // Function to open the delete confirmation modal and pass the user ID
-        function openDeleteConfirmationModal(userId) {
-            // Set the form action dynamically to target the correct user
-            const form = document.querySelector('form[action*="delete"]'); // Find the correct form
-            form.action = '/adminmanage/delete/' + userId; // Update form action with the user ID
+    // Function to open the delete confirmation modal and pass the user ID
+    function openDeleteConfirmationModal(userId) {
+        // Set the form action dynamically to target the correct user
+        const form = document.querySelector('form[action*="delete"]'); // Find the correct form
+        form.action = '/adminmanage/delete/' + userId; // Update form action with the user ID
 
-            // Show the delete confirmation modal
-            $('#deleteConfirmationModal').modal('show');
-        }
+        // Show the delete confirmation modal
+        $('#deleteConfirmationModal').modal('show');
+    }
 
-        // Confirm the deletion when the "Delete" button in the modal is clicked
-        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
-            // Submit the form to delete the user
-            const form = document.querySelector('form[action*="delete"]');
-            form.submit();
-        });
+    // Confirm the deletion when the "Delete" button in the modal is clicked
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        // Submit the form to delete the user
+        const form = document.querySelector('form[action*="delete"]');
+        form.submit();
+    });
     </script>
 </body>
 
 <script>
-    $(document).ready(function () {
-        $('#userTable').DataTable({
-            "paging": true,          // Enable pagination
-            "searching": true,       // Enable search
-            "ordering": true,        // Enable sorting
-            "info": true,            // Show information (entries count)
-            "lengthMenu": [5, 10, 25, 50], // Dropdown for entries per page
-        });
+$(document).ready(function() {
+    $('#userTable').DataTable({
+        "paging": true, // Enable pagination
+        "searching": true, // Enable search
+        "ordering": true, // Enable sorting
+        "info": true, // Show information (entries count)
+        "lengthMenu": [5, 10, 25, 50], // Dropdown for entries per page
     });
+});
 </script>
 
 </html>

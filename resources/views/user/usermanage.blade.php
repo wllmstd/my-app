@@ -73,9 +73,11 @@
                                     <td>{{ $request->Date_Created }}</td>
                                     <td>{{ $request->Updated_Time }}</td>
                                     <td>
-                                        <button class="btn btn-warning btn-sm">
-                                            <i class="bi bi-pencil-square"></i>
+                                        <button class="btn btn-primary btn-sm viewRequestBtn" data-id="{{ $request->id }}"
+                                            data-bs-toggle="modal" data-bs-target="#viewRequestModal">
+                                            <i class="bi bi-eye"></i>
                                         </button>
+
                                         <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -145,6 +147,88 @@
         </div>
     </div>
 
+    <!-- View Request Modal -->
+    <div class="modal fade" id="viewRequestModal" tabindex="-1" aria-labelledby="viewRequestModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewRequestModalLabel">View & Edit Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="updateRequestForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT') <!-- Laravel requires this for update requests -->
+                    <input type="hidden" id="request_id" name="id"> <!-- Hidden field for ID -->
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="edit_first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="edit_first_name" name="first_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="edit_last_name" name="last_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_nationality" class="form-label">Nationality</label>
+                            <input type="text" class="form-control" id="edit_nationality" name="nationality" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="edit_location" name="location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_format" class="form-label">Format</label>
+                            <select class="form-select" id="edit_format" name="format" required>
+                                <option value="Geco Standard">Geco Standard</option>
+                                <option value="Geco New Date">Geco New Date</option>
+                                <option value="Geco New Rate">Geco New Rate</option>
+                                <option value="Blind">Blind</option>
+                                <option value="HTD">HTD</option>
+                                <option value="STD">STD</option>
+                                <option value="PCX">PCX</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_attachments" class="form-label">Attachments</label>
+                            <input type="file" class="form-control" id="edit_attachments" name="attachments[]" multiple>
+                        </div>
+
+                        <!-- Existing Attachments -->
+                        <div id="existingAttachments" class="mt-2">
+                            @if ($request->Attachment)
+                                                        @php
+                                                            $attachments = json_decode($request->Attachment, true);
+                                                        @endphp
+                                                        @foreach ($attachments as $file)
+                                                            <div class="d-flex align-items-center border p-2 mb-1 rounded">
+                                                                <span class="me-auto">{{ $file }}</span>
+                                                                <button type="button" class="btn btn-sm btn-danger delete-file-btn"
+                                                                    data-file="{{ $file }}">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                            </div>
+                                                        @endforeach
+                            @else
+                                <p>No attachments found.</p>
+                            @endif
+                        </div>
+
+                        <!-- Hidden Input for Deleted Files -->
+                        <input type="hidden" name="deleted_files[]" id="deletedFilesInput">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -204,4 +288,110 @@
 
         document.querySelector(`div[data-index="${index}"]`).remove();
     }
+
+    //View and Edit Form
+    $(document).ready(function () {
+        // Handle View Button Click
+        $(".viewRequestBtn").on("click", function () {
+            let requestId = $(this).data("id");
+
+            // Fetch Request Details
+            $.ajax({
+                url: `/requests/${requestId}/edit`,  // Fetch request details
+                type: "GET",
+                success: function (response) {
+                    // Populate Form Fields
+                    $("#request_id").val(response.id);
+                    $("#edit_first_name").val(response.First_Name);
+                    $("#edit_last_name").val(response.Last_Name);
+                    $("#edit_nationality").val(response.Nationality);
+                    $("#edit_location").val(response.Location);
+                    $("#edit_format").val(response.Format);
+
+                    // Populate Existing Attachments
+                    let attachments = JSON.parse(response.Attachment || "[]");
+                    let attachmentsHtml = '<h6>Existing Attachments:</h6>';
+                    if (attachments.length > 0) {
+                        attachments.forEach((file, index) => {
+                            attachmentsHtml += `
+                                <div class="d-flex align-items-center border p-2 mb-1 rounded">
+                                    <span class="me-auto">${file}</span>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteAttachment(${response.id}, '${file}')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        attachmentsHtml += '<p>No attachments found.</p>';
+                    }
+                    $("#existingAttachments").html(attachmentsHtml);
+
+                    // Set Form Action
+                    $("#updateRequestForm").attr("action", `/requests/update/${response.id}`);
+                }
+            });
+        });
+
+        // Handle Form Submission
+        $("#updateRequestForm").on("submit", function (e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        alert("Request updated successfully!");
+                        location.reload(); // Reload the page to reflect changes
+                    } else {
+                        alert("Failed to update request.");
+                    }
+                }
+            });
+        });
+    });
+
+    // Function to Delete an Attachment
+    function deleteAttachment(requestId, fileName) {
+        if (confirm("Are you sure you want to delete this attachment?")) {
+            $.ajax({
+                url: `/requests/${requestId}/delete-attachment`,
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    file_name: fileName
+                },
+                success: function (response) {
+                    if (response.success) {
+                        alert("Attachment deleted successfully!");
+                        location.reload(); // Reload the page to reflect changes
+                    } else {
+                        alert("Failed to delete attachment.");
+                    }
+                }
+            });
+        }
+    }
+
+    $(document).ready(function () {
+        // Handle File Deletion
+        $(".delete-file-btn").on("click", function () {
+            let fileToDelete = $(this).data("file");
+            let deletedFilesInput = $("#deletedFilesInput");
+
+            // Add file to deleted files array
+            let deletedFiles = deletedFilesInput.val() ? JSON.parse(deletedFilesInput.val()) : [];
+            deletedFiles.push(fileToDelete);
+            deletedFilesInput.val(JSON.stringify(deletedFiles));
+
+            // Remove the file from the UI
+            $(this).closest("div").remove(); 
+        });
+    });
+</script>
 </script>

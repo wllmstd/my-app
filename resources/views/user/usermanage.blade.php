@@ -17,7 +17,7 @@
 <body>
 
     <!-- Include the navbar here -->
-    @include('user.user_navbar') 
+    @include('user.user_navbar')
 
     <div class="container mt-4">
         <h2>User Requests</h2>
@@ -48,41 +48,46 @@
             </thead>
             <tbody>
                 @foreach ($requests as $index => $request)
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $request->Status }}</td>
-                                    <td>{{ $request->First_Name }}</td>
-                                    <td>{{ $request->Last_Name }}</td>
-                                    <td>{{ $request->Nationality }}</td>
-                                    <td>{{ $request->Location }}</td>
-                                    <td>{{ $request->Format }}</td>
-                                    <!-- FIXED ATTACHMENT COUNT LOGIC -->
-                                    <td>
-                                        @php
-                                            $attachments = json_decode($request->Attachment, true); // Decode JSON array
-                                            if (is_array($attachments) && !empty($attachments)) {
-                                                $fileCount = count($attachments); // Count files in array
-                                            } elseif (!empty($request->Attachment)) {
-                                                $fileCount = 1; // Single file stored as string
-                                            } else {
-                                                $fileCount = 0; // No file uploaded
-                                            }
-                                        @endphp
-                                        {{ $fileCount }} file{{ $fileCount > 1 ? 's' : '' }}
-                                    </td>
-                                    <td>{{ $request->Date_Created }}</td>
-                                    <td>{{ $request->Updated_Time }}</td>
-                                    <td>
-                                        <button class="btn btn-primary btn-sm viewRequestBtn" data-id="{{ $request->id }}"
-                                            data-bs-toggle="modal" data-bs-target="#viewRequestModal">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $request->Status }}</td>
+                    <td>{{ $request->First_Name }}</td>
+                    <td>{{ $request->Last_Name }}</td>
+                    <td>{{ $request->Nationality }}</td>
+                    <td>{{ $request->Location }}</td>
+                    <td>{{ $request->Format }}</td>
+                    <!-- FIXED ATTACHMENT COUNT LOGIC -->
+                    <td>
+                        @php
+                        $attachments = json_decode($request->Attachment, true);
+                        @endphp
 
-                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                        @if (!empty($attachments) && is_array($attachments))
+                        {{ count($attachments) }} files
+                        @elseif (!empty($request->Attachment) && is_string($request->Attachment))
+                        1 file
+                        @else
+                        No attachment
+                        @endif
+                    </td>
+
+
+                    <td>{{ $request->Date_Created }}</td>
+                    <td>{{ $request->Updated_Time }}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm viewRequestBtn" data-id="{{ $request->id }}"
+                            data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
+                            data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
+                            data-format="{{ $request->Format }}" data-attachments="{{ $request->Attachment }}"
+                            data-bs-toggle="modal" data-bs-target="#viewRequestModal">
+                            <i class="bi bi-eye"></i>
+                        </button>
+
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
         </table>
@@ -159,7 +164,8 @@
                 </div>
                 <form id="updateRequestForm" method="POST" enctype="multipart/form-data">
                     @csrf
-                    @method('PUT') <!-- Laravel requires this for update requests -->
+                    @method('PUT')
+                    <!-- Laravel requires this for update requests -->
                     <input type="hidden" id="request_id" name="id"> <!-- Hidden field for ID -->
 
                     <div class="modal-body">
@@ -187,8 +193,9 @@
                                 <option value="Geco New Rate">Geco New Rate</option>
                                 <option value="Blind">Blind</option>
                                 <option value="HTD">HTD</option>
-                                <option value="STD">STD</option>
+                                <option value="SAP">SAP</option>
                                 <option value="PCX">PCX</option>
+                                <option value="Accenture">Accenture</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -198,22 +205,7 @@
 
                         <!-- Existing Attachments -->
                         <div id="existingAttachments" class="mt-2">
-                            @if ($request->Attachment)
-                                                        @php
-                                                            $attachments = json_decode($request->Attachment, true);
-                                                        @endphp
-                                                        @foreach ($attachments as $file)
-                                                            <div class="d-flex align-items-center border p-2 mb-1 rounded">
-                                                                <span class="me-auto">{{ $file }}</span>
-                                                                <button type="button" class="btn btn-sm btn-danger delete-file-btn"
-                                                                    data-file="{{ $file }}">
-                                                                    <i class="bi bi-trash"></i>
-                                                                </button>
-                                                            </div>
-                                                        @endforeach
-                            @else
-                                <p>No attachments found.</p>
-                            @endif
+                            <p>No attachments found.</p>
                         </div>
 
                         <!-- Hidden Input for Deleted Files -->
@@ -227,7 +219,6 @@
                 </form>
             </div>
         </div>
-    </div>
     </div>
 
     <!-- Delete Confirmation Modal -->
@@ -254,145 +245,163 @@
 </html>
 
 @if (session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
+<div class="alert alert-success">
+    {{ session('success') }}
+</div>
 @endif
 
 
 <script>
-    document.getElementById('attachment').addEventListener('change', function (event) {
-        const fileList = document.getElementById('fileList');
-        fileList.innerHTML = '';
+document.getElementById('attachment').addEventListener('change', function(event) {
+    const fileList = document.getElementById('fileList');
+    fileList.innerHTML = '';
 
-        Array.from(event.target.files).forEach((file, index) => {
-            const fileDiv = document.createElement('div');
-            fileDiv.classList.add('d-flex', 'align-items-center', 'border', 'p-2', 'mb-1', 'rounded');
-            fileDiv.innerHTML = `
+    Array.from(event.target.files).forEach((file, index) => {
+        const fileDiv = document.createElement('div');
+        fileDiv.classList.add('d-flex', 'align-items-center', 'border', 'p-2', 'mb-1', 'rounded');
+        fileDiv.innerHTML = `
                 <span class="me-auto">${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
                 <button type="button" class="btn btn-sm btn-danger" onclick="removeFile(${index})">
                     <i class="bi bi-x"></i>
                 </button>
             `;
-            fileDiv.dataset.index = index;
-            fileList.appendChild(fileDiv);
-        });
+        fileDiv.dataset.index = index;
+        fileList.appendChild(fileDiv);
     });
+});
 
-    function removeFile(index) {
-        const fileList = document.getElementById('attachment');
-        const newFiles = Array.from(fileList.files).filter((_, i) => i !== index);
+function removeFile(index) {
+    const fileList = document.getElementById('attachment');
+    const newFiles = Array.from(fileList.files).filter((_, i) => i !== index);
 
-        const dataTransfer = new DataTransfer();
-        newFiles.forEach(file => dataTransfer.items.add(file));
-        fileList.files = dataTransfer.files;
+    const dataTransfer = new DataTransfer();
+    newFiles.forEach(file => dataTransfer.items.add(file));
+    fileList.files = dataTransfer.files;
 
-        document.querySelector(`div[data-index="${index}"]`).remove();
-    }
+    document.querySelector(`div[data-index="${index}"]`).remove();
+}
 
-    //View and Edit Form
-    $(document).ready(function () {
-        // Handle View Button Click
-        $(".viewRequestBtn").on("click", function () {
-            let requestId = $(this).data("id");
+//View and Edit Form
+$(document).ready(function() {
+    // Handle View Button Click
+    $(".viewRequestBtn").on("click", function() {
+    // Debugging
+    console.log("Button Data Attributes:", $(this).data());
 
-            // Fetch Request Details
-            $.ajax({
-                url: `/requests/${requestId}/edit`,  // Fetch request details
-                type: "GET",
-                success: function (response) {
-                    // Populate Form Fields
-                    $("#request_id").val(response.id);
-                    $("#edit_first_name").val(response.First_Name);
-                    $("#edit_last_name").val(response.Last_Name);
-                    $("#edit_nationality").val(response.Nationality);
-                    $("#edit_location").val(response.Location);
-                    $("#edit_format").val(response.Format);
+    // Get values using .attr() for better reliability
+    let requestId = $(this).attr("data-id");
+    let firstName = $(this).attr("data-first-name");
+    let lastName = $(this).attr("data-last-name");
+    let nationality = $(this).attr("data-nationality");
+    let location = $(this).attr("data-location");
+    let format = $(this).attr("data-format");
+    let attachments = $(this).attr("data-attachments");
 
-                    // Populate Existing Attachments
-                    let attachments = JSON.parse(response.Attachment || "[]");
-                    let attachmentsHtml = '<h6>Existing Attachments:</h6>';
-                    if (attachments.length > 0) {
-                        attachments.forEach((file, index) => {
-                            attachmentsHtml += `
-                                <div class="d-flex align-items-center border p-2 mb-1 rounded">
-                                    <span class="me-auto">${file}</span>
-                                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteAttachment(${response.id}, '${file}')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            `;
-                        });
-                    } else {
-                        attachmentsHtml += '<p>No attachments found.</p>';
-                    }
-                    $("#existingAttachments").html(attachmentsHtml);
+    console.log("Request ID:", requestId);
+    console.log("First Name:", firstName);
+    console.log("Last Name:", lastName);
+    console.log("Nationality:", nationality);
+    console.log("Location:", location);
+    console.log("Format:", format);
 
-                    // Set Form Action
-                    $("#updateRequestForm").attr("action", `/requests/update/${response.id}`);
-                }
+    // Populate Form Fields
+    $("#request_id").val(requestId);
+    $("#edit_first_name").val(firstName);
+    $("#edit_last_name").val(lastName);
+    $("#edit_nationality").val(nationality);
+    $("#edit_location").val(location);
+    $("#edit_format").val(format);
+
+    // Populate Existing Attachments
+    let attachmentsHtml = '<h6>Existing Attachments:</h6>';
+    try {
+        let attachmentsArray = attachments ? JSON.parse(attachments) : [];
+        if (attachmentsArray.length > 0) {
+            attachmentsArray.forEach((file) => {
+                let fileName = file.split('/').pop();
+                let fileUrl = `/uploads/${fileName}`;
+                attachmentsHtml += `
+                    <div class="d-flex align-items-center border p-2 mb-1 rounded">
+                        <a href="${fileUrl}" target="_blank" class="me-auto">${fileName}</a>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteAttachment(${requestId}, '${file}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
             });
-        });
-
-        // Handle Form Submission
-        $("#updateRequestForm").on("submit", function (e) {
-            e.preventDefault();
-            let formData = new FormData(this);
-
-            $.ajax({
-                url: $(this).attr("action"),
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    if (response.success) {
-                        alert("Request updated successfully!");
-                        location.reload(); // Reload the page to reflect changes
-                    } else {
-                        alert("Failed to update request.");
-                    }
-                }
-            });
-        });
-    });
-
-    // Function to Delete an Attachment
-    function deleteAttachment(requestId, fileName) {
-        if (confirm("Are you sure you want to delete this attachment?")) {
-            $.ajax({
-                url: `/requests/${requestId}/delete-attachment`,
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    file_name: fileName
-                },
-                success: function (response) {
-                    if (response.success) {
-                        alert("Attachment deleted successfully!");
-                        location.reload(); // Reload the page to reflect changes
-                    } else {
-                        alert("Failed to delete attachment.");
-                    }
-                }
-            });
+        } else {
+            attachmentsHtml += '<p>No attachments found.</p>';
         }
+    } catch (error) {
+        console.error("Error parsing attachments:", error);
+        attachmentsHtml += '<p>Error loading attachments.</p>';
     }
+    $("#existingAttachments").html(attachmentsHtml);
 
-    $(document).ready(function () {
-        // Handle File Deletion
-        $(".delete-file-btn").on("click", function () {
-            let fileToDelete = $(this).data("file");
-            let deletedFilesInput = $("#deletedFilesInput");
+    // Set Form Action
+    $("#updateRequestForm").attr("action", `/requests/update/${requestId}`);
+});
 
-            // Add file to deleted files array
-            let deletedFiles = deletedFilesInput.val() ? JSON.parse(deletedFilesInput.val()) : [];
-            deletedFiles.push(fileToDelete);
-            deletedFilesInput.val(JSON.stringify(deletedFiles));
 
-            // Remove the file from the UI
-            $(this).closest("div").remove(); 
+    // Handle Form Submission
+    $("#updateRequestForm").on("submit", function(e) {
+        e.preventDefault();
+        let formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr("action"),
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    alert("Request updated successfully!");
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    alert("Failed to update request.");
+                }
+            }
         });
     });
+});
+
+// Function to Delete an Attachment
+function deleteAttachment(requestId, fileName) {
+    if (confirm("Are you sure you want to delete this attachment?")) {
+        $.ajax({
+            url: `/requests/${requestId}/delete-attachment`,
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                file_name: fileName
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert("Attachment deleted successfully!");
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    alert("Failed to delete attachment.");
+                }
+            }
+        });
+    }
+}
+
+$(document).ready(function() {
+    // Handle File Deletion
+    $(".delete-file-btn").on("click", function() {
+        let fileToDelete = $(this).data("file");
+        let deletedFilesInput = $("#deletedFilesInput");
+
+        // Add file to deleted files array
+        let deletedFiles = deletedFilesInput.val() ? JSON.parse(deletedFilesInput.val()) : [];
+        deletedFiles.push(fileToDelete);
+        deletedFilesInput.val(JSON.stringify(deletedFiles));
+
+        // Remove the file from the UI
+        $(this).closest("div").remove();
+    });
+});
 </script>
 </script>

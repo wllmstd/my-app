@@ -124,7 +124,7 @@
                                 <option value="Geco New Rate">Geco New Rate</option>
                                 <option value="Blind">Blind</option>
                                 <option value="HTD">HTD</option>
-                                <option value="STD">STD</option>
+                                <option value="STD">SAP</option>
                                 <option value="PCX">PCX</option>
                             </select>
                         </div>

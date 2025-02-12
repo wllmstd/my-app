@@ -319,7 +319,7 @@ $(document).ready(function() {
         if (attachmentsArray.length > 0) {
             attachmentsArray.forEach((file) => {
                 let fileName = file.split('/').pop();
-                let fileUrl = `/uploads/${fileName}`;
+                let fileUrl = `/storage/attachments/${fileName}`;
                 attachmentsHtml += `
                     <div class="d-flex align-items-center border p-2 mb-1 rounded">
                         <a href="${fileUrl}" target="_blank" class="me-auto">${fileName}</a>

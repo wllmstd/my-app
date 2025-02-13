@@ -54,7 +54,7 @@ class RequestController extends Controller
             'last_name' => 'required|string|max:255',
             'nationality' => 'required|string|max:255',
             'location' => 'required|string|max:255',
-            'format' => 'required|string|in:Geco Standard,Geco New Date,Geco New Rate,Blind,HTD,STD,PCX',
+            'format' => 'required|string|in:Geco Standard,Geco New Date,Geco New Rate,Blind,HTD,SAP,PCX, Accenture',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
@@ -95,7 +95,7 @@ class RequestController extends Controller
             'last_name' => 'required|string|max:255',
             'nationality' => 'required|string|max:255',
             'location' => 'required|string|max:255',
-            'format' => 'required|string|in:Geco Standard,Geco New Date,Geco New Rate,Blind,HTD,STD,PCX',
+            'format' => 'required|string|in:Geco Standard,Geco New Date,Geco New Rate,Blind,HTD,SAP,PCX,Accenture',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 

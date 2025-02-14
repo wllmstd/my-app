@@ -23,19 +23,23 @@ class RequestController extends Controller
     {
         $request = UserRequest::findOrFail($id);
 
-        // Delete attached files
-        if ($request->Attachment) {
+        // Delete attached files if any
+        if (!empty($request->Attachment)) {
             $files = json_decode($request->Attachment, true);
-            foreach ($files as $file) {
-                Storage::disk('public')->delete('attachments/' . $file);
+
+            if (is_array($files)) {
+                foreach ($files as $file) {
+                    Storage::disk('public')->delete('attachments/' . $file);
+                }
             }
         }
 
         // Delete request record
         $request->delete();
 
-        return redirect()->route('requests.index')->with('success', 'Request deleted successfully.');
+        return response()->json(['success' => 'Request deleted successfully']);
     }
+
 
 
     public function edit($id)

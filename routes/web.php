@@ -89,3 +89,4 @@ Route::get('/requests/edit/{id}', [RequestController::class, 'edit'])->name('req
 Route::post('/requests/update/{id}', [RequestController::class, 'saveEdited'])->name('requests.update');
 Route::delete('/requests/delete/{id}', [RequestController::class, 'destroy'])->name('requests.destroy');
 Route::get('/requests', [RequestController::class, 'index'])->name('requests.index');
+Route::delete('/requests/{id}', [RequestController::class, 'destroy'])->name('requests.destroy');

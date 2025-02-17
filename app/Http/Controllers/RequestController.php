@@ -40,28 +40,26 @@ class RequestController extends Controller
         return response()->json(['success' => 'Request deleted successfully']);
     }
 
-
-
     public function edit($id)
     {
-        // Find the request by ID
-        $request = UserRequest::findOrFail($id);
-
-        // Return the edit form with the request data
-        return view('user.edit_request', compact('request'));
+        $userRequest = UserRequest::findOrFail($id);
+        return view('user.edit_request', compact('userRequest')); // Pass it to the view
     }
+
 
     public function saveEdited(Request $request, $id)
     {
+        // Validate input fields and files
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'nationality' => 'required|string|max:255',
             'location' => 'required|string|max:255',
-            'format' => 'required|string|in:Geco Standard,Geco New Date,Geco New Rate,Blind,HTD,SAP,PCX, Accenture',
+            'format' => 'required|string|in:Geco Standard,Geco New Date,Geco New Rate,Blind,HTD,SAP,PCX,Accenture',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
+        // Find the request record
         $userRequest = UserRequest::findOrFail($id);
         $userRequest->First_Name = $request->first_name;
         $userRequest->Last_Name = $request->last_name;
@@ -69,27 +67,30 @@ class RequestController extends Controller
         $userRequest->Location = $request->location;
         $userRequest->Format = $request->format;
 
-        $uploadedFiles = json_decode($userRequest->Attachment, true) ?? [];
+        // Decode existing attachments or set an empty array
+        $existingAttachments = json_decode($userRequest->Attachment, true) ?? [];
 
+        // Handle new attachments (add without deleting old ones)
         if ($request->hasFile('attachments')) {
-            foreach ($uploadedFiles as $file) {
-                Storage::delete('public/attachments/' . $file);
-            }
-
-            $uploadedFiles = [];
             foreach ($request->file('attachments') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();
                 $file->storeAs('attachments', $filename, 'public');
-                $uploadedFiles[] = $filename;
+                $existingAttachments[] = $filename; // Add new files to the existing list
             }
         }
 
-        $userRequest->Attachment = json_encode($uploadedFiles);
-        $userRequest->Updated_Time = Carbon::now('Asia/Manila'); // Ensure correct timezone
+        // Update the attachment field (keeping old and new files)
+        $userRequest->Attachment = json_encode($existingAttachments);
+
+        // Update timestamp
+        $userRequest->Updated_Time = Carbon::now('Asia/Manila');
+
+        // Save the updated record
         $userRequest->save();
 
         return redirect()->route('requests.index')->with('success', 'Request updated successfully.');
     }
+
 
 
     public function store(Request $request)
@@ -127,5 +128,29 @@ class RequestController extends Controller
 
         return redirect()->route('requests.index')->with('success', 'Request added successfully.');
     }
+
+    //Deletes attachments from the request
+    public function deleteAttachment(Request $request, $id)
+    {
+        $userRequest = UserRequest::findOrFail($id);
+        $existingAttachments = json_decode($userRequest->Attachment, true) ?? [];
+
+        if (($key = array_search($request->file_name, $existingAttachments)) !== false) {
+            // Delete file from storage
+            Storage::disk('public')->delete('attachments/' . $request->file_name);
+
+            // Remove file from array
+            unset($existingAttachments[$key]);
+
+            // Save updated attachment list
+            $userRequest->Attachment = json_encode(array_values($existingAttachments));
+            $userRequest->save();
+
+            return response()->json(['success' => 'Attachment deleted successfully']);
+        }
+
+        return response()->json(['error' => 'File not found'], 404);
+    }
+
 
 }

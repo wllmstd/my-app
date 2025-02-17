@@ -86,7 +86,8 @@ Route::middleware(['auth'])->group(function () {
 
 // Request Routes
 Route::get('/requests/edit/{id}', [RequestController::class, 'edit'])->name('requests.edit');
-Route::post('/requests/update/{id}', [RequestController::class, 'saveEdited'])->name('requests.update');
+Route::match(['PUT', 'POST'], '/requests/update/{id}', [RequestController::class, 'saveEdited'])->name('requests.update');
 Route::delete('/requests/delete/{id}', [RequestController::class, 'destroy'])->name('requests.destroy');
 Route::get('/requests', [RequestController::class, 'index'])->name('requests.index');
 Route::delete('/requests/{id}', [RequestController::class, 'destroy'])->name('requests.destroy');
+Route::post('/requests/{id}/delete-attachment', [RequestController::class, 'deleteAttachment'])->name('requests.deleteAttachment');

@@ -361,7 +361,6 @@ $(document).ready(function() {
 
 
         $("#request_id").val(requestId);
-        console.log("✅ Request ID Set in Form:", requestId);
 
         // Set Form Action
         $("#updateRequestForm").attr("action", `/requests/update/${requestId}`);

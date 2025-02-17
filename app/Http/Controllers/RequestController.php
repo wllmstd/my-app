@@ -56,7 +56,7 @@ class RequestController extends Controller
             'nationality' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'format' => 'required|string|in:Geco Standard,Geco New Date,Geco New Rate,Blind,HTD,SAP,PCX,Accenture',
-            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx|max:1024000',
         ]);
 
         // Find the request record
@@ -101,7 +101,7 @@ class RequestController extends Controller
             'nationality' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'format' => 'required|string|in:Geco Standard,Geco New Date,Geco New Rate,Blind,HTD,SAP,PCX,Accenture',
-            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx|max:1024000',
         ]);
 
         $uploadedFiles = [];

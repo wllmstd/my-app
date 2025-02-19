@@ -1,0 +1,78 @@
+/* Ensures consistent height */
+.equal-height {
+    min-height: 350px;
+    /* Adjust this value as needed */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Card Design */
+.stat-card {
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    background: white;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    min-height: 300px;
+}
+
+.stat-card:hover {
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+    font-size: 70px;
+    color: #007bff;
+    margin-right: 20px;
+}
+
+.stat-number {
+    font-size: 50px;
+    font-weight: bold;
+    color: #333;
+}
+
+.stat-card i {
+    font-size: 150px;
+    /* Adjust size as needed */
+    color: #007bff;
+    /* Change color if needed */
+}
+
+.stat-card .stat-number {
+    font-size: 120px;
+    /* Adjust size for larger numbers */
+    font-weight: bold;
+    /* Make it bold */
+    color: #333;
+    /* Adjust color */
+}
+
+.stat-card .text-muted {
+    margin-top: -30px;
+    font-size: 25px;
+}
+
+.stat-card h5 {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.department-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.department-label span {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    margin-right: 10px;
+    border-radius: 50%;
+}

@@ -260,6 +260,27 @@
         </div>
     </div>
 
+    <!-- Delete Attachment Confirmation Modal -->
+    <div class="modal fade" id="deleteAttachmentModal" tabindex="-1" aria-labelledby="deleteAttachmentModalLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAttachmentModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this attachment?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 </body>
 
 </html>
@@ -423,6 +444,7 @@ $(document).ready(function() {
         }
     }
 
+    
     $(document).ready(function() {
         // Handle File Deletion
         $(".delete-file-btn").on("click", function() {
@@ -474,24 +496,50 @@ $(document).ready(function() {
     });
 });
 
-//Handles the file deletetion in the form
+// Store the request ID and file name globally
+let deleteRequestId = null;
+let deleteFileName = null;
+
+// Function to switch from the View Modal to the Delete Confirmation Modal
 function deleteAttachment(requestId, fileName) {
-    if (confirm("Are you sure you want to delete this attachment?")) {
-        $.ajax({
-            url: `/requests/${requestId}/delete-attachment`,
-            type: "POST",
-            data: {
-                _token: '{{ csrf_token() }}',
-                file_name: fileName
-            },
-            success: function(response) {
-                alert(response.success);
-                location.reload(); // Refresh the page after deletion
-            },
-            error: function(xhr) {
-                alert("Error deleting attachment: " + xhr.responseJSON.error);
-            }
-        });
-    }
+    deleteRequestId = requestId;
+    deleteFileName = fileName;
+
+    $("#viewRequestModal").modal("hide"); // Hide the view modal
+    setTimeout(() => {
+        $("#deleteAttachmentModal").modal("show"); // Show delete modal after transition
+    }, 300); // Small delay for smooth transition
 }
+
+// Handle Cancel - Switch Back to the View Modal
+$("#deleteAttachmentModal").on("hidden.bs.modal", function () {
+    if (!deleteConfirmed) {
+        $("#viewRequestModal").modal("show"); // Reopen view modal if not deleted
+    }
+});
+
+// Handle Confirm Delete
+let deleteConfirmed = false;
+$("#confirmDeleteBtn").on("click", function () {
+    deleteConfirmed = true; // Mark as confirmed
+
+    $.ajax({
+        url: `/requests/${deleteRequestId}/delete-attachment`,
+        type: "POST",
+        data: {
+            _token: '{{ csrf_token() }}',
+            file_name: deleteFileName
+        },
+        success: function (response) {
+            $("#deleteAttachmentModal").modal("hide"); // Close delete modal
+                location.reload(); // Reload to reflect changes
+
+        },
+        error: function (xhr) {
+            alert("Error deleting attachment: " + xhr.responseJSON.error);
+        }
+    });
+});
+
+
 </script>

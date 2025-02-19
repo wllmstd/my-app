@@ -58,11 +58,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/adminmanage/store', [AdminManageController::class, 'store'])->name('adminmanage.store');
 });
 
+//Charts for Admin
 Route::get('/admin/users/count', [AdminDashboardController::class, 'getUserCount'])
     ->name('admin.users.count')
     ->middleware('auth');
 Route::get('/admin/users/department-count', [AdminDashboardController::class, 'getDepartmentCounts']);
 
+//Charts for Users/TAs
+Route::get('/user/request-counts', [UserDashboardController::class, 'getRequestCounts'])->name('user.request.counts');
+Route::get('/user/request-status-counts', [UserDashboardController::class, 'getRequestStatusCounts'])
+    ->name('user.request.status.counts');
 
 // Support Routes (Support management pages)
 Route::middleware(['auth'])->group(function () {

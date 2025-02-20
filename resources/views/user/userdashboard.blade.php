@@ -29,7 +29,7 @@
             <!-- Total Requests Card -->
             <div class="col-md-6 d-flex equal-height">
                 <div class="stat-card w-100">
-                    <i class="fa-solid fa-file-lines stat-icon"></i> <!-- Paper Icon -->
+                    <i class="fa-solid  fa-thumbtack  stat-icon"></i> <!-- Changed to Hand Icon -->
                     <div>
                         <div class="stat-number" id="requestCount">0</div>
                         <p class="text-muted">Total Requests</p>
@@ -40,16 +40,11 @@
             <!-- Pending Status Card -->
             <div class="col-md-6 d-flex equal-height">
                 <div class="stat-card w-100 d-flex flex-column">
-                    <!-- Header -->
                     <h5 class="text-center mb-3">Request Status</h5>
-
                     <div class="d-flex w-100" style="flex-grow: 1; align-items: center;">
-                        <!-- Chart on the Left -->
                         <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
                             <canvas id="statusChart" style="max-width: 200px; max-height: 200px;"></canvas>
                         </div>
-
-                        <!-- Status Legend with Numbers on the Right -->
                         <div style="flex: 1; padding-left: 20px;">
                             <ul class="list-unstyled" id="statusDetails">
                                 <li><span
@@ -66,46 +61,67 @@
                     </div>
                 </div>
             </div>
+            <!-- Format Distribution Card with Bar Chart -->
+            <div class="col-md-6 d-flex equal-height">
+                <div class="stat-card w-100 d-flex flex-column align-items-center justify-content-between"
+                    style="padding: 20px; text-align: center; min-height: 100%;">
+                    <h5 class="mb-3">Format Distribution</h5>
+                    <div
+                        style="width: 100%; max-width: 100%; height: 300px; display: flex; align-items: center; justify-content: center;">
+                        <canvas id="formatChart"
+                            style="width: 100% !important; height: 100% !important; display: block;"></canvas>
+                    </div>
+                </div>
+            </div>
 
-
+            <!-- Total Attachments Card -->
+            <div class="col-md-6 d-flex equal-height">
+                <div class="stat-card w-100">
+                    <i class="fa-solid fa-file-alt stat-icon"></i> <!-- Note Icon -->
+                    <div>
+                        <div class="stat-number" id="attachmentCount">0</div>
+                        <p class="text-muted">Total Attachments</p>
+                    </div>
+                </div>
+            </div>
 
 
         </div>
+
+
+
     </div>
 
 
+
+
+
     <script>
+    // Total Requests Count
     document.addEventListener("DOMContentLoaded", function() {
         fetch("{{ route('user.request.counts') }}")
             .then(response => response.json())
             .then(data => {
-                console.log("Total Requests:", data.totalRequests); // Debugging
-                document.getElementById("requestCount").textContent = data.totalRequests; // Update number
+                document.getElementById("requestCount").textContent = data.totalRequests;
             })
             .catch(error => console.error("Error fetching total requests:", error));
     });
 
-
-
+    // Request Status Pie Chart
     document.addEventListener("DOMContentLoaded", function() {
         fetch("{{ route('user.request.status.counts') }}")
             .then(response => response.json())
             .then(data => {
-                console.log("Status Counts:", data); // Debugging
-
-                // Update the numbers in the legend
                 document.getElementById("pendingCount").textContent = data.pending;
                 document.getElementById("inProgressCount").textContent = data.in_progress;
                 document.getElementById("completedCount").textContent = data.completed;
 
                 let ctx = document.getElementById("statusChart").getContext("2d");
-
                 new Chart(ctx, {
                     type: "pie",
                     data: {
                         labels: ["Pending", "In Progress", "Completed"],
                         datasets: [{
-                            label: "Request Status",
                             data: [data.pending, data.in_progress, data.completed],
                             backgroundColor: ["#ffc107", "#17a2b8", "#28a745"],
                             borderColor: "#fff",
@@ -116,7 +132,7 @@
                         responsive: true,
                         plugins: {
                             legend: {
-                                display: false // Hide default legend since we are using a custom one
+                                display: false // Hide default legend since a custom one is used
                             }
                         }
                     }
@@ -124,11 +140,55 @@
             })
             .catch(error => console.error("Error fetching request status counts:", error));
     });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch("{{ route('user.request.format.counts') }}")
+            .then(response => response.json())
+            .then(data => {
+                let allFormats = ["Geco Standard", "Geco New Date", "Geco New Rate", "Blind", "HTD", "SAP",
+                    "PCX", "Accenture"
+                ];
+                let formatData = allFormats.map(format => data.formats.labels.includes(format) ? data
+                    .formats.counts[data.formats.labels.indexOf(format)] : 0);
+
+                let ctx = document.getElementById("formatChart").getContext("2d");
+                new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: allFormats,
+                        datasets: [{
+                            label: "Format Count",
+                            data: formatData,
+                            backgroundColor: "#007bff"
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1, // Ensures only whole numbers are shown
+                                    precision: 0 // Removes decimal places
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error("Error fetching format counts:", error));
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+    fetch("{{ route('user.request.attachments.count') }}")
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("attachmentCount").textContent = data.totalAttachments;
+        })
+        .catch(error => console.error("Error fetching total attachments:", error));
+});
+
     </script>
-
-
-
-
 </body>
 
 </html>

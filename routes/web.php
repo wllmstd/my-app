@@ -68,6 +68,8 @@ Route::get('/admin/users/department-count', [AdminDashboardController::class, 'g
 Route::get('/user/request-counts', [UserDashboardController::class, 'getRequestCounts'])->name('user.request.counts');
 Route::get('/user/request-status-counts', [UserDashboardController::class, 'getRequestStatusCounts'])
     ->name('user.request.status.counts');
+Route::get('/user/format-counts', [UserDashboardController::class, 'getFormatCounts'])->name('user.request.format.counts');
+Route::get('/user/attachments-count', [UserDashboardController::class, 'getTotalAttachments'])->name('user.request.attachments.count');
 
 // Support Routes (Support management pages)
 Route::middleware(['auth'])->group(function () {

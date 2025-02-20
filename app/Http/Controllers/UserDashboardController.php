@@ -36,7 +36,33 @@ class UserDashboardController extends Controller
             'completed' => $statusCounts['Completed'] ?? 0
         ]);
     }
-    
+
+
+    public function getFormatCounts()
+{
+    $formatCounts = UserRequest::selectRaw("Format, COUNT(*) as count")
+        ->groupBy('Format')
+        ->pluck('count', 'Format');
+
+    return response()->json([
+        'formats' => [
+            'labels' => $formatCounts->keys(),
+            'counts' => $formatCounts->values()
+        ]
+    ]);
+}
+
+public function getTotalAttachments()
+{
+    $totalAttachments = UserRequest::whereNotNull('Attachment')
+        ->get()
+        ->sum(function ($request) {
+            return count(json_decode($request->Attachment, true) ?? []);
+        });
+
+    return response()->json(['totalAttachments' => $totalAttachments]);
+}
+
 
     
 }

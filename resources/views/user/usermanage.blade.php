@@ -261,24 +261,59 @@
     </div>
 
     <!-- Delete Attachment Confirmation Modal -->
-    <div class="modal fade" id="deleteAttachmentModal" tabindex="-1" aria-labelledby="deleteAttachmentModalLabel" aria-hidden="true" data-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteAttachmentModalLabel">Confirm Deletion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete this attachment?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Yes, Delete</button>
+    <div class="modal fade" id="deleteAttachmentModal" tabindex="-1" aria-labelledby="deleteAttachmentModalLabel"
+        aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAttachmentModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this attachment?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Yes, Delete</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">Success</h5>
+                </div>
+                <div class="modal-body text-center">
+                    <p id="successMessage">Request updated successfully!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Okay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Failed Modal -->
+    <div class="modal fade" id="failedModal" tabindex="-1" aria-labelledby="failedModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="failedModalLabel">Update Failed</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p id="failedMessage">Failed to update the request. Please try again.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Okay</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 </body>
@@ -393,33 +428,56 @@ $(document).ready(function() {
         $("#updateRequestForm").on("submit", function(e) {
             e.preventDefault(); // Prevent full-page reload
 
-            let requestId = $("#request_id").val()
-        .trim(); // Get request ID and ensure it's not empty
+            let requestId = $("#request_id").val().trim();
             if (!requestId) {
                 alert("Error: Missing request ID.");
                 return;
             }
 
             let formData = new FormData(this);
-            formData.append("_method", "PUT"); // Tell Laravel this is a PUT request
+            formData.append("_method", "PUT");
 
             $.ajax({
-                url: "/requests/update/" + requestId, // Ensure request ID is added
-                type: "POST", // Laravel handles `_method: PUT`
+                url: "/requests/update/" + requestId,
+                type: "POST",
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function(response) {
-                    alert("Request updated successfully!");
-                    location.reload(); // Reload to see changes
+                    // Hide View/Edit Modal
+                    $("#viewRequestModal").modal("hide");
+
+                    // Show Success Modal after a slight delay
+                    setTimeout(() => {
+                        $("#successMessage").text(
+                            "Request updated successfully!");
+                        $("#successModal").modal("show");
+                    }, 300);
+
+                    // Reload after closing success modal
+                    $("#successModal").on("hidden.bs.modal", function() {
+                        location.reload();
+                    });
                 },
                 error: function(xhr) {
                     console.error("Error:", xhr.responseText);
-                    alert("Failed to update request.");
+
+                    // Hide View/Edit Modal first
+                    $("#viewRequestModal").modal("hide");
+
+                    // Show Failure Modal after a slight delay
+                    setTimeout(() => {
+                        $("#failedMessage").text(
+                            "Failed to update the request. Please try again."
+                            );
+                        $("#failedModal").modal("show");
+                    }, 300);
                 }
             });
         });
     });
+
+
 
 
     // Function to Delete an Attachment
@@ -444,7 +502,7 @@ $(document).ready(function() {
         }
     }
 
-    
+
     $(document).ready(function() {
         // Handle File Deletion
         $(".delete-file-btn").on("click", function() {
@@ -512,7 +570,7 @@ function deleteAttachment(requestId, fileName) {
 }
 
 // Handle Cancel - Switch Back to the View Modal
-$("#deleteAttachmentModal").on("hidden.bs.modal", function () {
+$("#deleteAttachmentModal").on("hidden.bs.modal", function() {
     if (!deleteConfirmed) {
         $("#viewRequestModal").modal("show"); // Reopen view modal if not deleted
     }
@@ -520,7 +578,7 @@ $("#deleteAttachmentModal").on("hidden.bs.modal", function () {
 
 // Handle Confirm Delete
 let deleteConfirmed = false;
-$("#confirmDeleteBtn").on("click", function () {
+$("#confirmDeleteBtn").on("click", function() {
     deleteConfirmed = true; // Mark as confirmed
 
     $.ajax({
@@ -530,16 +588,14 @@ $("#confirmDeleteBtn").on("click", function () {
             _token: '{{ csrf_token() }}',
             file_name: deleteFileName
         },
-        success: function (response) {
+        success: function(response) {
             $("#deleteAttachmentModal").modal("hide"); // Close delete modal
-                location.reload(); // Reload to reflect changes
+            location.reload(); // Reload to reflect changes
 
         },
-        error: function (xhr) {
+        error: function(xhr) {
             alert("Error deleting attachment: " + xhr.responseJSON.error);
         }
     });
 });
-
-
 </script>

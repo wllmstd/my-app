@@ -457,18 +457,40 @@
             formData.append("_method", "PUT"); // Tell Laravel this is a PUT request
 
             $.ajax({
-                url: "/requests/update/" + requestId, // Ensure request ID is added
-                type: "POST", // Laravel handles `_method: PUT`
+                url: "/requests/update/" + requestId,
+                type: "POST",
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function(response) {
-                    alert("Request updated successfully!");
-                    location.reload(); // Reload to see changes
+                    // Hide View/Edit Modal
+                    $("#viewRequestModal").modal("hide");
+
+                    // Show Success Modal after a slight delay
+                    setTimeout(() => {
+                        $("#successMessage").text(
+                            "Request updated successfully!");
+                        $("#successModal").modal("show");
+                    }, 300);
+
+                    // Reload after closing success modal
+                    $("#successModal").on("hidden.bs.modal", function() {
+                        location.reload();
+                    });
                 },
                 error: function(xhr) {
                     console.error("Error:", xhr.responseText);
-                    alert("Failed to update request.");
+
+                    // Hide View/Edit Modal first
+                    $("#viewRequestModal").modal("hide");
+
+                    // Show Failure Modal after a slight delay
+                    setTimeout(() => {
+                        $("#failedMessage").text(
+                            "Failed to update the request. Please try again."
+                            );
+                        $("#failedModal").modal("show");
+                    }, 300);
                 }
             });
         });

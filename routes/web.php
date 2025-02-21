@@ -82,6 +82,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/supportmanage/addprofile', [SupportManageController::class, 'create'])->name('support.addprofile');
 });
 
+Route::post('/requests/accept/{id}', [SupportManageController::class, 'acceptRequest']);
+
+
 
 // User Routes (User management pages)
 Route::middleware(['auth'])->group(function () {

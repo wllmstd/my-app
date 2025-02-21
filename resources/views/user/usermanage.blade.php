@@ -379,7 +379,7 @@
     //View and Edit Form
     $(document).ready(function () {
         // Handle View Button Click
-        $(".viewRequestBtn").on("click", function () {
+        $(document).on("click", ".viewRequestBtn", function () {
             // Debugging
             console.log("Button Data Attributes:", $(this).data());
 

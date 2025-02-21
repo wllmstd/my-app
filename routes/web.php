@@ -83,6 +83,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::post('/requests/accept/{id}', [SupportManageController::class, 'acceptRequest']);
+Route::post('/requests/upload', [SupportManageController::class, 'uploadFiles'])->name('requests.upload');
 
 
 

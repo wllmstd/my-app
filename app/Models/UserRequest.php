@@ -25,11 +25,23 @@ class UserRequest extends Model
         'Date_Created',
         'Updated_Time',
         'Users_ID',
+        'Accepted_By', // New column
     ];    
 
     // Relationship: Each request belongs to a user
     public function user()
     {
         return $this->belongsTo(User::class, 'Users_ID');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'Users_ID');
+    }
+
+    // Relationship: The user who accepted the request
+    public function accepter()
+    {
+        return $this->belongsTo(User::class, 'Accepted_By');
     }
 }

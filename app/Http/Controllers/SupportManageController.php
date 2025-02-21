@@ -10,9 +10,16 @@ class SupportManageController extends Controller
 {
     public function index()
     {
-        // Fetch all requests (profiles) from the database
-        $profiles = UserRequest::all(); // You can add additional conditions if needed
-        return view('support.supportmanage', compact('profiles'));
+        $userId = auth()->id(); // Get logged-in user's ID
+    
+        // Get requests accepted by the logged-in profiler
+        $myAcceptedRequests = UserRequest::where('Accepted_By', $userId)
+        ->orderBy('Updated_Time', 'asc') // Sort by latest accepted request
+        ->get();
+        // Get all requests that are still pending
+        $profiles = UserRequest::whereNull('Accepted_By')->orWhere('Status', 'Pending')->get();
+    
+        return view('support.supportmanage', compact('myAcceptedRequests', 'profiles'));
     }
 
     public function acceptRequest($id)
@@ -31,8 +38,10 @@ class SupportManageController extends Controller
         \Log::info("Old Status: " . $request->Status);
     
         // Try updating using the update() method instead of save()
-        $updated = UserRequest::where('Request_ID', $id)->update(['Status' => 'In Progress']);
-    
+        $updated = UserRequest::where('Request_ID', $id)->update([
+            'Status' => 'In Progress',
+            'Accepted_By' => auth()->id(), // Store the ID of the logged-in profiler
+        ]);    
         if ($updated) {
             \Log::info("Status updated to 'In Progress' successfully!");
         } else {
@@ -42,5 +51,30 @@ class SupportManageController extends Controller
         return response()->json(['success' => 'Request accepted successfully', 'status' => 'In Progress']);
     }
     
+    public function uploadFiles(Request $request)
+{
+    $request->validate([
+        'request_id' => 'required|exists:user_requests,Request_ID',
+        'files.*' => 'file|max:2048', // Max file size 2MB
+    ]);
+
+    $userRequest = UserRequest::where('Request_ID', $request->request_id)->first();
+    $existingAttachments = json_decode($userRequest->Attachment, true) ?? [];
+    
+    $newAttachments = [];
+    if ($request->hasFile('files')) {
+        foreach ($request->file('files') as $file) {
+            $path = $file->store('attachments', 'public'); // Store in `storage/app/public/attachments`
+            $newAttachments[] = $path;
+        }
+    }
+
+    // Merge new files with existing ones
+    $userRequest->Attachment = json_encode(array_merge($existingAttachments, $newAttachments));
+    $userRequest->save();
+
+    return response()->json(['message' => 'Files uploaded successfully!', 'files' => $newAttachments]);
+}
+
     
 }

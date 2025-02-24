@@ -154,4 +154,25 @@ class RequestController extends Controller
     }
 
 
+    public function markAsDone(Request $request, $id)
+    {
+        $userRequest = UserRequest::findOrFail($id);
+        $userRequest->Status = "Completed";
+        $userRequest->Feedback = $request->feedback; // Store user feedback
+        $userRequest->save();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function requestRevision(Request $request, $id)
+    {
+        $userRequest = UserRequest::findOrFail($id);
+        $userRequest->Status = "Needs Revision";
+        $userRequest->Feedback = $request->feedback; // Store user feedback
+        $userRequest->save();
+
+        return response()->json(['success' => true]);
+    }
+
+
 }

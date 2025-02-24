@@ -81,16 +81,28 @@
                                     <td>{{ $request->Date_Created }}</td>
                                     <td>{{ $request->Updated_Time }}</td>
                                     <td>
+                                        <!-- View Request Button -->
                                         <button class="btn btn-primary btn-sm viewRequestBtn" data-id="{{ $request->Request_ID }}"
                                             data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
                                             data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
                                             data-format="{{ $request->Format }}" data-attachments="{{ $request->Attachment }}"
                                             data-bs-toggle="modal" data-bs-target="#viewRequestModal">
-                                            <i class="bi bi-eye"></i>
+                                            <i class="bi bi-eye"></i> View
                                         </button>
+
+                                        <!-- Delete Request Button -->
                                         <button class="btn btn-danger btn-sm deleteRequestBtn" data-id="{{ $request->Request_ID }}"
                                             data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                            <i class="bi bi-trash"></i>
+                                            <i class="bi bi-trash"></i> Delete
+                                        </button>
+
+                                        <!-- Review Submission Button -->
+                                        <button class="btn btn-warning btn-sm reviewSubmissionBtn" data-id="{{ $request->Request_ID }}"
+                                            data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
+                                            data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
+                                            data-format="{{ $request->Format }}" data-uploaded-format="{{ $request->uploaded_format }}"
+                                            data-profiler="{{ $request->Profiler_Name }}">
+                                            <i class="bi bi-file-earmark-check"></i> Review Submission
                                         </button>
                                     </td>
                                 </tr>
@@ -319,6 +331,36 @@
         </div>
     </div>
 
+    <!-- Review Submission Modal -->
+    <div class="modal fade" id="reviewSubmissionModal" tabindex="-1" aria-labelledby="reviewSubmissionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reviewSubmissionModalLabel">Review Submission</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Profiled by:</strong> <span id="reviewProfiler"></span></p>
+                    <p><strong>Requester:</strong> <span id="reviewRequester"></span></p>
+                    <p><strong>Request Details:</strong> <span id="reviewDetails"></span></p>
+
+                    <p><strong>Submitted File:</strong></p>
+                    <div id="reviewUploadedFormat"></div>
+
+                    <label for="reviewFeedback">Feedback:</label>
+                    <textarea id="reviewFeedback" class="form-control" rows="3"
+                        placeholder="Provide feedback..."></textarea>
+
+                    <div class="mt-3">
+                        <button id="markAsDoneBtn" class="btn btn-success">Mark as Done</button>
+                        <button id="reviseBtn" class="btn btn-danger">Request Revision</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 </body>
 
@@ -463,15 +505,15 @@
                     processData: false,
                     contentType: false,
                     success: function (response) {
-                        // Hide View/Edit Modal
-                        $("#viewRequestModal").modal("hide");
+                        // Show success message inside the View/Edit modal instead of closing it
+                        $("#successMessage").text("Request updated successfully!");
+                        $("#successModal").modal("show");
 
-                        // Show Success Modal after a slight delay
+                        // Update fields dynamically without closing the modal
                         setTimeout(() => {
-                            $("#successMessage").text(
-                                "Request updated successfully!");
-                            $("#successModal").modal("show");
-                        }, 300);
+                            $("#successModal").modal("hide");
+                        }, 1000); // Auto-hide success modal after 1 second (adjust if needed)
+
 
                         // Reload after closing success modal
                         $("#successModal").on("hidden.bs.modal", function () {
@@ -485,12 +527,12 @@
                         $("#viewRequestModal").modal("hide");
 
                         // Show Failure Modal after a slight delay
-                        setTimeout(() => {
-                            $("#failedMessage").text(
-                                "Failed to update the request. Please try again."
-                            );
-                            $("#failedModal").modal("show");
-                        }, 300);
+
+                        $("#failedMessage").text(
+                            "Failed to update the request. Please try again."
+                        );
+                        $("#failedModal").modal("show");
+                        ;
                     }
                 });
             });
@@ -615,6 +657,88 @@
             error: function (xhr) {
                 alert("Error deleting attachment: " + xhr.responseJSON.error);
             }
+        });
+    });
+
+    //Handles the Review Submission Modal
+    $(document).ready(function () {
+        $(".reviewSubmissionBtn").on("click", function () {
+            let requestId = $(this).data("id");
+            let firstName = $(this).data("first-name");
+            let lastName = $(this).data("last-name");
+            let format = $(this).data("format");
+            let uploadedFormat = $(this).data("uploaded-format");
+
+            // Fill modal fields
+            $("#reviewRequester").text(firstName + " " + lastName);
+            $("#reviewDetails").text(format);
+
+            // Display uploaded file
+            if (uploadedFormat) {
+                $("#reviewUploadedFormat").html(
+                    `<a href="/storage/submitted_files/${uploadedFormat}" target="_blank">${uploadedFormat}</a>`
+                );
+            } else {
+                $("#reviewUploadedFormat").html("<p>No submitted file available</p>");
+            }
+
+            // Show the modal
+            $("#reviewSubmissionModal").modal("show");
+
+            // Handle "Mark as Done" Button Click
+            $("#markAsDoneBtn").off("click").on("click", function () {
+                $.ajax({
+                    url: `/requests/${requestId}/complete`,
+                    type: "POST",
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr("content"),
+                        status: "Completed",
+                        feedback: $("#reviewFeedback").val()
+                    },
+                    success: function () {
+                        alert("Request marked as complete!");
+                        $("#reviewSubmissionModal").modal("hide");
+                        location.reload(); // Refresh table
+                    },
+                    error: function () {
+                        alert("Error updating request status.");
+                    }
+                });
+            });
+
+            // Handle "Request Revision" Button Click
+            $("#reviseBtn").off("click").on("click", function () {
+                $.ajax({
+                    url: `/requests/${requestId}/revise`,
+                    type: "POST",
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr("content"),
+                        status: "Needs Revision",
+                        feedback: $("#reviewFeedback").val()
+                    },
+                    success: function () {
+                        alert("Request sent back for revision.");
+                        $("#reviewSubmissionModal").modal("hide");
+                        location.reload(); // Refresh table
+                    },
+                    error: function () {
+                        alert("Error updating request status.");
+                    }
+                });
+            });
+        });
+    });
+
+    //Load Profiler Name in the Review Submission Modal
+    $(document).ready(function () {
+        $(".reviewSubmissionBtn").on("click", function () {
+            let profiler = $(this).data("profiler"); // Get Profiler Name
+
+            // Fill modal fields
+            $("#reviewProfiler").text(profiler || "Not Assigned"); // Show Profiler Name or Default Text
+
+            // Show the modal
+            $("#reviewSubmissionModal").modal("show");
         });
     });
 

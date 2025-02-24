@@ -220,10 +220,10 @@
                                     <div class="d-flex align-items-center border p-2 mb-1 rounded">
                                         <a href="{{ asset('storage/attachments/' . $file) }}" target="_blank"
                                             class="me-auto">{{ $file }}</a>
-                                        <button type="button" class="btn btn-sm btn-danger"
-                                            onclick="deleteAttachment({{ $request->Request_ID }}, '{{ $file }}')">
+                                        <<button type="button" class="btn btn-sm btn-danger delete-attachment-btn"
+                                            data-request-id="{{ $request->Request_ID }}" data-file-name="{{ $file }}">
                                             <i class="bi bi-trash"></i>
-                                        </button>
+                                            </button>
                                     </div>
                                 @endforeach
                             @else
@@ -446,55 +446,55 @@
             $("#updateRequestForm").on("submit", function (e) {
                 e.preventDefault(); // Prevent full-page reload
 
-            let requestId = $("#request_id").val()
-        .trim(); // Get request ID and ensure it's not empty
-            if (!requestId) {
-                alert("Error: Missing request ID.");
-                return;
-            }
-
-            let formData = new FormData(this);
-            formData.append("_method", "PUT"); // Tell Laravel this is a PUT request
-
-            $.ajax({
-                url: "/requests/update/" + requestId,
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    // Hide View/Edit Modal
-                    $("#viewRequestModal").modal("hide");
-
-                    // Show Success Modal after a slight delay
-                    setTimeout(() => {
-                        $("#successMessage").text(
-                            "Request updated successfully!");
-                        $("#successModal").modal("show");
-                    }, 300);
-
-                    // Reload after closing success modal
-                    $("#successModal").on("hidden.bs.modal", function() {
-                        location.reload();
-                    });
-                },
-                error: function(xhr) {
-                    console.error("Error:", xhr.responseText);
-
-                    // Hide View/Edit Modal first
-                    $("#viewRequestModal").modal("hide");
-
-                    // Show Failure Modal after a slight delay
-                    setTimeout(() => {
-                        $("#failedMessage").text(
-                            "Failed to update the request. Please try again."
-                            );
-                        $("#failedModal").modal("show");
-                    }, 300);
+                let requestId = $("#request_id").val()
+                    .trim(); // Get request ID and ensure it's not empty
+                if (!requestId) {
+                    alert("Error: Missing request ID.");
+                    return;
                 }
+
+                let formData = new FormData(this);
+                formData.append("_method", "PUT"); // Tell Laravel this is a PUT request
+
+                $.ajax({
+                    url: "/requests/update/" + requestId,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        // Hide View/Edit Modal
+                        $("#viewRequestModal").modal("hide");
+
+                        // Show Success Modal after a slight delay
+                        setTimeout(() => {
+                            $("#successMessage").text(
+                                "Request updated successfully!");
+                            $("#successModal").modal("show");
+                        }, 300);
+
+                        // Reload after closing success modal
+                        $("#successModal").on("hidden.bs.modal", function () {
+                            location.reload();
+                        });
+                    },
+                    error: function (xhr) {
+                        console.error("Error:", xhr.responseText);
+
+                        // Hide View/Edit Modal first
+                        $("#viewRequestModal").modal("hide");
+
+                        // Show Failure Modal after a slight delay
+                        setTimeout(() => {
+                            $("#failedMessage").text(
+                                "Failed to update the request. Please try again."
+                            );
+                            $("#failedModal").modal("show");
+                        }, 300);
+                    }
+                });
             });
         });
-    });
 
 
 
@@ -521,12 +521,12 @@
             }
         }
 
-    
-    $(document).ready(function() {
-        // Handle File Deletion
-        $(".delete-file-btn").on("click", function() {
-            let fileToDelete = $(this).data("file");
-            let deletedFilesInput = $("#deletedFilesInput");
+
+        $(document).ready(function () {
+            // Handle File Deletion
+            $(".delete-file-btn").on("click", function () {
+                let fileToDelete = $(this).data("file");
+                let deletedFilesInput = $("#deletedFilesInput");
 
                 // Add file to deleted files array
                 let deletedFiles = deletedFilesInput.val() ? JSON.parse(deletedFilesInput.val()) :
@@ -588,35 +588,35 @@
         }, 300); // Small delay for smooth transition
     }
 
-// Handle Cancel - Switch Back to the View Modal
-$("#deleteAttachmentModal").on("hidden.bs.modal", function () {
-    if (!deleteConfirmed) {
-        $("#viewRequestModal").modal("show"); // Reopen view modal if not deleted
-    }
-});
-
-// Handle Confirm Delete
-let deleteConfirmed = false;
-$("#confirmDeleteBtn").on("click", function () {
-    deleteConfirmed = true; // Mark as confirmed
-
-    $.ajax({
-        url: `/requests/${deleteRequestId}/delete-attachment`,
-        type: "POST",
-        data: {
-            _token: '{{ csrf_token() }}',
-            file_name: deleteFileName
-        },
-        success: function (response) {
-            $("#deleteAttachmentModal").modal("hide"); // Close delete modal
-                location.reload(); // Reload to reflect changes
-
-        },
-        error: function (xhr) {
-            alert("Error deleting attachment: " + xhr.responseJSON.error);
+    // Handle Cancel - Switch Back to the View Modal
+    $("#deleteAttachmentModal").on("hidden.bs.modal", function () {
+        if (!deleteConfirmed) {
+            $("#viewRequestModal").modal("show"); // Reopen view modal if not deleted
         }
     });
-});
+
+    // Handle Confirm Delete
+    let deleteConfirmed = false;
+    $("#confirmDeleteBtn").on("click", function () {
+        deleteConfirmed = true; // Mark as confirmed
+
+        $.ajax({
+            url: `/requests/${deleteRequestId}/delete-attachment`,
+            type: "POST",
+            data: {
+                _token: '{{ csrf_token() }}',
+                file_name: deleteFileName
+            },
+            success: function (response) {
+                $("#deleteAttachmentModal").modal("hide"); // Close delete modal
+                location.reload(); // Reload to reflect changes
+
+            },
+            error: function (xhr) {
+                alert("Error deleting attachment: " + xhr.responseJSON.error);
+            }
+        });
+    });
 
 
 </script>

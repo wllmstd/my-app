@@ -22,7 +22,6 @@
     @include('support.support_navbar')
 
     <div class="container mt-4">
-
         <!-- Table 1: My Accepted Requests -->
         <h2>My Accepted Requests</h2>
         <table class="table table-bordered">
@@ -36,14 +35,35 @@
                     <th>Location</th>
                     <th>Format</th>
                     <th>Date Accepted</th>
-                    <th>Actions</th> <!-- New Column -->
+                    <th>Attachments</th>
+                    <th>Uploads</th>
+                    <th>Actions</th>
+
                 </tr>
             </thead>
             <tbody>
                 @foreach ($myAcceptedRequests as $index => $request)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td><span class="badge bg-success">{{ $request->Status }}</span></td>
+                    <td>
+                        @if($request->Status === 'Pending')
+                        <span class="badge bg-warning text-dark">{{ $request->Status }}</span> <!-- Yellow -->
+                        @elseif($request->Status === 'In Progress')
+                        <span class="badge bg-primary">{{ $request->Status }}</span> <!-- Blue -->
+                        @elseif($request->Status === 'Under Review')
+                        <span class="badge"
+                            style="background-color: orange; color: black;">{{ $request->Status }}</span>
+                        <!-- Orange -->
+                        @elseif($request->Status === 'Under Revision')
+                        <span class="badge bg-danger">{{ $request->Status }}</span> <!-- Red -->
+                        @elseif($request->Status === 'Completed')
+                        <span class="badge bg-success">{{ $request->Status }}</span> <!-- Green -->
+                        @else
+                        <span class="badge bg-secondary">{{ $request->Status }}</span> <!-- Default (Gray) -->
+                        @endif
+                    </td>
+
+
                     <td>{{ $request->First_Name }}</td>
                     <td>{{ $request->Last_Name }}</td>
                     <td>{{ $request->Nationality }}</td>
@@ -54,22 +74,37 @@
                         <button class="btn btn-info btn-sm viewAttachmentsBtn"
                             data-attachments='@json(json_decode($request->Attachment, true))' data-bs-toggle="modal"
                             data-bs-target="#attachmentsModal">
-                            Attachments
+                            View Attachments
                         </button>
 
 
+                    </td>
+
+                    <!-- ✅ Display Uploaded Format -->
+
+                    <td id="uploadedFormat-{{ $request->Request_ID }}">
                         <!-- Upload Button - Opens Upload Modal -->
-                        <button class="btn btn-success btn-sm openUploadModalBtn" data-id="{{ $request->Request_ID }}"
+                        <button class="btn btn-warning btn-sm openUploadModalBtn" data-id="{{ $request->Request_ID }}"
+                            data-files='@json(json_decode($request->uploaded_format, true) ?? [])'
                             {{ $request->Status === 'In Progress' ? '' : 'disabled' }} data-bs-toggle="modal"
                             data-bs-target="#uploadModal">
-                            Upload
+                            Edit & Upload
                         </button>
                     </td>
+                    <td>
+                        <button class="btn btn-success btn-sm forwardRequestBtn" data-id="{{ $request->Request_ID }}"
+                            {{ $request->Status === 'In Progress' ? '' : 'disabled' }}>
+                            Forward
+                        </button>
+                    </td>
+
+
+
+
                 </tr>
                 @endforeach
             </tbody>
         </table>
-
 
         <!-- Table 2: Pending Requests -->
         <h2>All Pending Requests</h2>
@@ -181,23 +216,51 @@
                     <h5 class="modal-title" id="uploadModalLabel">Upload Attachment</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <input type="hidden" id="upload_request_id"> <!-- Store Request ID -->
+                <form id="uploadForm" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" id="upload_request_id" name="request_id"> <!-- Store Request ID -->
 
-                    <div class="mb-3">
+                    <div class="modal-body">
+                        <h6>Existing Files:</h6>
+                        <div id="existingUploadedFiles" class="mb-3"></div> <!-- ✅ Files + Trash Buttons Here -->
+
                         <label for="fileUpload" class="form-label">Select File(s)</label>
-                        <input type="file" class="form-control" id="fileUpload" multiple>
-                    </div>
+                        <input type="file" class="form-control" id="fileUpload" name="uploaded_format[]" multiple>
 
-                    <div id="uploadFeedback" class="text-danger d-none">Please select at least one file.</div>
+                        <div id="uploadFeedback" class="text-danger d-none">Please select at least one file.</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Forward Confirmation Modal -->
+    <div class="modal fade" id="forwardConfirmModal" tabindex="-1" aria-labelledby="forwardConfirmLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forwardConfirmLabel">Confirm Forwarding</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to forward this request? This action cannot be undone.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="uploadFilesBtn">Upload</button>
+                    <button type="button" class="btn btn-success" id="confirmForwardBtn">Yes, Forward</button>
                 </div>
             </div>
         </div>
     </div>
+
+
+
 
     <!-- Attachments Modal -->
     <div class="modal fade" id="attachmentsModal" tabindex="-1" aria-labelledby="attachmentsModalLabel"
@@ -331,52 +394,127 @@
 
 
     $(document).ready(function() {
-        // Open Upload Modal & Store Request ID
-        $(".openUploadModalBtn").click(function() {
+        // ✅ Open Upload Modal & Load Existing Files
+        $(".openUploadModalBtn").on("click", function() {
             let requestId = $(this).data("id");
-            $("#upload_request_id").val(requestId);
-            $("#fileUpload").val(""); // Clear previous file selection
-            $("#uploadFeedback").addClass("d-none"); // Hide error message
+            let existingFiles = $(this).data("files") || [];
+
+            $("#upload_request_id").val(requestId); // Set ID
+
+            let filesContainer = $("#existingUploadedFiles");
+            filesContainer.html(""); // Clear previous content
+
+            if (existingFiles.length > 0) {
+                existingFiles.forEach(file => {
+                    let fileUrl = `/storage/uploads/${file}`;
+                    let fileHtml = `
+                    <div class="d-flex align-items-center border p-2 mb-1 rounded">
+                        <a href="${fileUrl}" target="_blank" class="me-auto">${file}</a>
+                        <button class="btn btn-sm btn-danger deleteFileBtn" data-id="${requestId}" data-file="${file}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+                    filesContainer.append(fileHtml);
+                });
+            } else {
+                filesContainer.html("<p>No uploaded files yet.</p>");
+            }
         });
 
-        // Handle File Upload
-        $("#uploadFilesBtn").click(function() {
+        // ✅ Delete File Functionality
+        $(document).on("click", ".deleteFileBtn", function() {
+            let fileName = $(this).data("file"); // Get file name
+            let requestId = $(this).data("id"); // Get request ID
+
+            if (!confirm("Are you sure you want to delete this file?")) return;
+
+            $.ajax({
+                url: "/requests/delete-file/" + requestId,
+                type: "POST",
+                data: {
+                    file_name: fileName,
+                    _token: $('meta[name="csrf-token"]').attr("content") // CSRF token
+                },
+                success: function(response) {
+                    alert(response.success); // ✅ Show success message
+
+                    // ✅ Hide the modal first
+                    $("#viewUploadedFilesModal").modal("hide");
+
+                    // ✅ Reload the page after a short delay
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500); // Delay of 500ms before reloading
+                },
+                error: function(xhr) {
+                    console.error("Error:", xhr.responseText);
+                    alert("Failed to delete file. Please try again.");
+                }
+            });
+        });
+
+
+
+
+        $("#uploadForm").on("submit", function(e) {
+            e.preventDefault();
+
+            let formData = new FormData();
             let requestId = $("#upload_request_id").val();
             let files = $("#fileUpload")[0].files;
 
             if (files.length === 0) {
-                $("#uploadFeedback").removeClass("d-none").text("Please select at least one file.");
+                $("#uploadFeedback").removeClass("d-none");
                 return;
             }
 
-            let formData = new FormData();
-            formData.append("request_id", requestId);
+            // ✅ Append all files to FormData
             for (let i = 0; i < files.length; i++) {
-                formData.append("files[]", files[i]);
+                formData.append("uploaded_format[]", files[i]);
             }
 
+            formData.append("request_id", requestId);
+            formData.append("_token", $('meta[name="csrf-token"]').attr("content"));
+
             $.ajax({
-                url: "/requests/upload", // Define your route in Laravel
+                url: "/requests/upload-format/" + requestId,
                 type: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                        "content") // CSRF Protection
-                },
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function(response) {
-                    alert("Files uploaded successfully!");
+                    alert(response.success);
+
+                    // ✅ Update files inside the modal dynamically
+                    let filesContainer = $("#existingUploadedFiles");
+                    filesContainer.html(response.files.map(file =>
+                        `<div class="d-flex align-items-center border p-2 mb-1 rounded">
+                        <a href="/storage/uploads/${file}" target="_blank">${file}</a>
+                        <button class="btn btn-sm btn-danger deleteFileBtn" data-id="${requestId}" data-file="${file}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>`
+                    ).join(''));
+
+                    // ✅ Hide the modal first
                     $("#uploadModal").modal("hide");
+
+                    // ✅ Reload the page after a short delay
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500); // Adjust delay if needed
                 },
                 error: function(xhr) {
                     console.error("Error:", xhr.responseText);
-                    $("#uploadFeedback").removeClass("d-none").text(
-                        "File upload failed. Try again.");
+                    alert("File upload failed. Please try again.");
                 }
             });
         });
     });
+
+
+
 
 
     $(".viewAttachmentsBtn").click(function() {
@@ -434,6 +572,47 @@
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+        });
+    });
+
+
+
+    $(document).ready(function() {
+        let selectedRequestId = null;
+
+        // When "Forward" is clicked, store the request ID and show the modal
+        $(".forwardRequestBtn").on("click", function() {
+            selectedRequestId = $(this).data("id");
+            $("#forwardConfirmModal").modal("show");
+        });
+
+        // When "Yes, Forward" is clicked, send AJAX request
+        $("#confirmForwardBtn").on("click", function() {
+            if (!selectedRequestId) {
+                alert("Error: Request ID not found.");
+                return;
+            }
+
+            $.ajax({
+                url: "/requests/forward/" + selectedRequestId, // Laravel Route
+                type: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+                },
+                success: function(response) {
+                    alert(response.success); // Show success message
+                    $("#forwardConfirmModal").modal("hide"); // Close modal
+
+                    // ✅ Reload the page after a short delay to reflect changes
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500);
+                },
+                error: function(xhr) {
+                    console.error("Error:", xhr.responseText);
+                    alert("Failed to forward request. Please try again.");
+                }
+            });
         });
     });
     </script>

@@ -26,6 +26,8 @@ class UserRequest extends Model
         'Updated_Time',
         'Users_ID',
         'Accepted_By', // New column
+        'uploaded_format', // Newly added field
+
     ];    
 
     // Relationship: Each request belongs to a user

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\UserRequest;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+
 
 class SupportManageController extends Controller
 {
@@ -51,30 +53,86 @@ class SupportManageController extends Controller
         return response()->json(['success' => 'Request accepted successfully', 'status' => 'In Progress']);
     }
     
-    public function uploadFiles(Request $request)
-{
-    $request->validate([
-        'request_id' => 'required|exists:user_requests,Request_ID',
-        'files.*' => 'file|max:2048', // Max file size 2MB
-    ]);
-
-    $userRequest = UserRequest::where('Request_ID', $request->request_id)->first();
-    $existingAttachments = json_decode($userRequest->Attachment, true) ?? [];
+    public function uploadFormat(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'uploaded_format' => 'required|array',
+            'uploaded_format.*' => 'file|mimes:pdf,doc,docx|max:10240', // Max 10MB per file
+        ]);
     
-    $newAttachments = [];
-    if ($request->hasFile('files')) {
-        foreach ($request->file('files') as $file) {
-            $path = $file->store('attachments', 'public'); // Store in `storage/app/public/attachments`
-            $newAttachments[] = $path;
+        $userRequest = UserRequest::findOrFail($id);
+    
+        // Retrieve existing files if any
+        $existingFiles = $userRequest->uploaded_format ? json_decode($userRequest->uploaded_format, true) : [];
+    
+        // Ensure $existingFiles is an array
+        if (!is_array($existingFiles)) {
+            $existingFiles = [];
         }
+    
+        // Handle multiple file uploads
+        $uploadedFiles = [];
+        if ($request->hasFile('uploaded_format')) {
+            foreach ($request->file('uploaded_format') as $file) {
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->storeAs('uploads', $filename, 'public');
+                $uploadedFiles[] = $filename; // Add new file
+            }
+        }
+    
+        // Merge old and new files
+        $allFiles = array_merge($existingFiles, $uploadedFiles);
+    
+        // Save to database
+        $userRequest->uploaded_format = json_encode($allFiles);
+        $userRequest->save();
+    
+        return response()->json([
+            'success' => 'Files uploaded successfully!',
+            'files' => $uploadedFiles
+        ]);
     }
 
-    // Merge new files with existing ones
-    $userRequest->Attachment = json_encode(array_merge($existingAttachments, $newAttachments));
-    $userRequest->save();
+    public function deleteFile(Request $request, $id)
+{
+    $request->validate([
+        'file_name' => 'required|string',
+    ]);
 
-    return response()->json(['message' => 'Files uploaded successfully!', 'files' => $newAttachments]);
+    $userRequest = UserRequest::findOrFail($id);
+    $existingFiles = json_decode($userRequest->uploaded_format, true) ?? [];
+
+    // Remove file from array
+    if (($key = array_search($request->file_name, $existingFiles)) !== false) {
+        Storage::disk('public')->delete('uploads/' . $request->file_name);
+        unset($existingFiles[$key]);
+        $userRequest->uploaded_format = json_encode(array_values($existingFiles));
+        $userRequest->save();
+
+        return response()->json(['success' => 'File deleted successfully!']);
+    }
+
+    return response()->json(['error' => 'File not found'], 404);
 }
+
+public function forwardRequest($id)
+{
+    // Find the request by ID
+    $request = UserRequest::findOrFail($id);
+
+    if (!$request) {
+        return response()->json(['error' => 'Request not found'], 404);
+    }
+
+    // Update the request status to "Under Review"
+    $request->Status = 'Under Review';
+    $request->save();
+
+    return response()->json(['success' => 'Request forwarded successfully!']);
+}
+
+
+
 
     
 }

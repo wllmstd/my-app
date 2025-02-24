@@ -83,7 +83,9 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::post('/requests/accept/{id}', [SupportManageController::class, 'acceptRequest']);
-Route::post('/requests/upload', [SupportManageController::class, 'uploadFiles'])->name('requests.upload');
+Route::post('/requests/upload-format/{id}', [SupportManageController::class, 'uploadFormat']);
+Route::post('/requests/delete-file/{id}', [SupportManageController::class, 'deleteFile']);
+Route::post('/requests/forward/{id}', [SupportManageController::class, 'forwardRequest']);
 
 
 

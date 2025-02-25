@@ -91,21 +91,25 @@
                     <td id="uploadedFormat-{{ $request->Request_ID }}">
                         <!-- Upload Button - Opens Upload Modal -->
                         <button
-                            class="btn btn-sm {{ $request->Status === 'Under Review' ? 'btn-secondary' : 'btn-warning' }} openUploadModalBtn"
+                            class="btn btn-sm {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? 'btn-warning' : 'btn-secondary' }} openUploadModalBtn"
                             data-id="{{ $request->Request_ID }}"
                             data-files='@json(json_decode($request->uploaded_format, true) ?? [])'
-                            {{ $request->Status === 'In Progress' ? '' : 'disabled' }} data-bs-toggle="modal"
-                            data-bs-target="#uploadModal">
+                            {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? '' : 'disabled' }}
+                            data-bs-toggle="modal" data-bs-target="#uploadModal">
                             Upload Files
                         </button>
                     </td>
+
                     <td>
+                        <!-- Send for Review Button -->
                         <button
-                            class="btn btn-sm {{ $request->Status === 'Under Review' ? 'btn-secondary' : 'btn-success' }} forwardRequestBtn"
-                            {{ $request->Status === 'In Progress' ? '' : 'disabled' }}>
+                            class="btn btn-sm {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? 'btn-success' : 'btn-secondary' }} forwardRequestBtn"
+                            data-id="{{ $request->Request_ID }}"
+                            {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? '' : 'disabled' }}>
                             Send for Review
                         </button>
                     </td>
+
 
 
 

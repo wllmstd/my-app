@@ -1,5 +1,6 @@
 <?php
-
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminDashboardController;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\SupportManageController;
 use App\Http\Controllers\UserManageController;
 use App\Http\Controllers\RequestController;
+use App\Http\Controllers\AdminProfileController;
 
 
 
@@ -56,6 +58,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/adminmanage/edit/{id}', [AdminManageController::class, 'edit'])->name('adminmanage.edit');
     Route::put('/adminmanage/save-edited/{id}', [AdminManageController::class, 'saveEdited'])->name('adminmanage.saveEdited');
     Route::post('/adminmanage/store', [AdminManageController::class, 'store'])->name('adminmanage.store');
+
+    Route::get('/admin/profile', [AdminProfileController::class, 'index'])->name('admin.profile');
+    Route::post('/admin/profile/update', [AdminProfileController::class, 'update'])->name('admin.profile.update');
+    Route::get('/admin/profile-image', [AdminProfileController::class, 'getProfileImage'])->name('admin.profile.image');
+
+
+
 });
 
 //Charts for Admin
@@ -70,6 +79,8 @@ Route::get('/user/request-status-counts', [UserDashboardController::class, 'getR
     ->name('user.request.status.counts');
 Route::get('/user/format-counts', [UserDashboardController::class, 'getFormatCounts'])->name('user.request.format.counts');
 Route::get('/user/attachments-count', [UserDashboardController::class, 'getTotalAttachments'])->name('user.request.attachments.count');
+
+
 
 // Support Routes (Support management pages)
 Route::middleware(['auth'])->group(function () {

@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>Manage Users</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Bundle (JS & Popper) -->
@@ -539,9 +541,6 @@
             });
         });
 
-
-
-
         // Function to Delete an Attachment
         function deleteAttachment(requestId, fileName) {
             if (confirm("Are you sure you want to delete this attachment?")) {
@@ -563,7 +562,6 @@
                 });
             }
         }
-
 
         $(document).ready(function () {
             // Handle File Deletion
@@ -670,6 +668,9 @@
             let format = $(this).data("format");
             let uploadedFormat = $(this).data("uploaded-format");
 
+            //Save request ID inside modal
+            $("#reviewSubmissionModal").data("request-id", requestId);
+
             // Fill modal fields
             $("#reviewRequester").text(firstName + " " + lastName);
             $("#reviewDetails").text(format);
@@ -686,88 +687,126 @@
             // Show the modal
             $("#reviewSubmissionModal").modal("show");
 
-            // Handle "Mark as Done" Button Click
-            $("#markAsDoneBtn").off("click").on("click", function () {
-                $.ajax({
-                    url: `/requests/${requestId}/complete`,
-                    type: "POST",
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr("content"),
-                        status: "Completed",
-                        feedback: $("#reviewFeedback").val()
-                    },
-                    success: function () {
-                        alert("Request marked as complete!");
-                        $("#reviewSubmissionModal").modal("hide");
-                        location.reload(); // Refresh table
-                    },
-                    error: function () {
-                        alert("Error updating request status.");
+
+            $(document).ready(function () {
+                // ✅ Set CSRF Token Globally
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Set CSRF token globally
                     }
                 });
-            });
 
-            // Handle "Request Revision" Button Click
-            $("#reviseBtn").off("click").on("click", function () {
-                $.ajax({
-                    url: `/requests/${requestId}/revise`,
-                    type: "POST",
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr("content"),
-                        status: "Needs Revision",
-                        feedback: $("#reviewFeedback").val()
-                    },
-                    success: function () {
-                        alert("Request sent back for revision.");
-                        $("#reviewSubmissionModal").modal("hide");
-                        location.reload(); // Refresh table
-                    },
-                    error: function () {
-                        alert("Error updating request status.");
-                    }
-                });
-            });
-        });
-    });
+                // ✅ Handle Review Submission Modal Open
+                $(".reviewSubmissionBtn").on("click", function () {
+                    let requestId = $(this).data("id");
+                    let firstName = $(this).data("first-name");
+                    let lastName = $(this).data("last-name");
+                    let format = $(this).data("format");
+                    let uploadedFormat = $(this).data("uploaded-format");
 
-    //Load Profiler Name in the Review Submission Modal
-    $(document).ready(function () {
-        $(".reviewSubmissionBtn").on("click", function () {
-            let requestId = $(this).data("id");
+                    // ✅ Store request ID inside modal for reference
+                    $("#reviewSubmissionModal").data("request-id", requestId);
 
-            $.ajax({
-                url: `/requests/${requestId}/details`,
-                type: "GET",
-                success: function (data) {
-                    $("#reviewRequester").text(data.First_Name + " " + data.Last_Name);
-                    $("#reviewDetails").text(data.Format);
+                    // ✅ Fill modal fields dynamically
+                    $("#reviewRequester").text(`${firstName} ${lastName}`);
+                    $("#reviewDetails").text(format);
+                    $("#reviewUploadedFormat").html(
+                        uploadedFormat
+                            ? `<a href="/storage/submitted_files/${uploadedFormat}" target="_blank">${uploadedFormat}</a>`
+                            : "<p>No submitted file available</p>"
+                    );
 
-                    //profiler name is display
-                    let profilerName = (data.profiler_first_name && data.profiler_last_name)
-                        ? `${data.profiler_first_name} ${data.profiler_last_name}`
-                        : "Not Assigned";
-
-                    $("#reviewProfiler").text(profilerName);
-
-                    //Display uploaded file
-                    if (data.uploaded_format) {
-                        $("#reviewUploadedFormat").html(
-                            `<a href="/storage/submitted_files/${data.uploaded_format}" target="_blank">${data.uploaded_format}</a>`
-                        );
-                    } else {
-                        $("#reviewUploadedFormat").html("<p>No submitted file available</p>");
-                    }
-
-                    // Show the modal
+                    // ✅ Show the modal
                     $("#reviewSubmissionModal").modal("show");
-                },
-                error: function () {
-                    $("#reviewProfiler").text("Not Assigned");
-                    alert("Failed to load request details.");
-                }
+                });
+
+                // ✅ Handle "Mark as Done" Click (Efficiently Bound Once)
+                $("#markAsDoneBtn").off("click").on("click", function () {
+                    let requestId = $("#reviewSubmissionModal").data("request-id");
+                    let feedback = $("#reviewFeedback").val();
+
+                    if (!requestId) {
+                        alert("Error: Missing request ID.");
+                        return;
+                    }
+
+                    $.post(`/requests/${requestId}/complete`, { status: "Completed", feedback: feedback })
+                        .done(function () {
+                            alert("Request marked as complete!");
+
+                            // ✅ Update status in table dynamically
+                            $(`button[data-id='${requestId}']`).closest("tr").find("td:nth-child(2)").text("Completed");
+
+                            $("#reviewSubmissionModal").modal("hide"); // Close modal
+                        })
+                        .fail(function (xhr) {
+                            console.error("AJAX Error:", xhr.responseText);
+                            alert("Error updating request status.");
+                        });
+                });
+
+                // ✅ Handle "Request Revision" Click (Efficiently Bound Once)
+                $("#reviseBtn").off("click").on("click", function () {
+                    let requestId = $("#reviewSubmissionModal").data("request-id");
+                    let feedback = $("#reviewFeedback").val();
+
+                    if (!requestId) {
+                        alert("Error: Missing request ID.");
+                        return;
+                    }
+
+                    $.post(`/requests/${requestId}/revise`, { status: "Needs Revision", feedback: feedback })
+                        .done(function () {
+                            alert("Request sent back for revision.");
+                            $("#reviewSubmissionModal").modal("hide");
+                            location.reload(); // ✅ Refresh the table
+                        })
+                        .fail(function () {
+                            alert("Error updating request status.");
+                        });
+                });
+            });
+
+
+            //Load Profiler Name in the Review Submission Modal
+            $(document).ready(function () {
+                $(".reviewSubmissionBtn").on("click", function () {
+                    let requestId = $(this).data("id");
+
+                    $.ajax({
+                        url: `/requests/${requestId}/details`,
+                        type: "GET",
+                        success: function (data) {
+                            $("#reviewRequester").text(data.First_Name + " " + data.Last_Name);
+                            $("#reviewDetails").text(data.Format);
+
+                            //profiler name is display
+                            let profilerName = (data.profiler_first_name && data.profiler_last_name)
+                                ? `${data.profiler_first_name} ${data.profiler_last_name}`
+                                : "Not Assigned";
+
+                            $("#reviewProfiler").text(profilerName);
+
+                            //Display uploaded file
+                            if (data.uploaded_format) {
+                                $("#reviewUploadedFormat").html(
+                                    `<a href="/storage/submitted_files/${data.uploaded_format}" target="_blank">${data.uploaded_format}</a>`
+                                );
+                            } else {
+                                $("#reviewUploadedFormat").html("<p>No submitted file available</p>");
+                            }
+
+                            // Show the modal
+                            $("#reviewSubmissionModal").modal("show");
+                        },
+                        error: function () {
+                            $("#reviewProfiler").text("Not Assigned");
+                            alert("Failed to load request details.");
+                        }
+                    });
+                });
             });
         });
     });
-
 
 </script>

@@ -180,8 +180,8 @@ class RequestController extends Controller
     {
         try {
             $request = DB::table('requests')
-                ->leftJoin('users', 'users.id', '=', 'requests.accepted_by') 
-                ->where('requests.Request_ID', $id) 
+                ->leftJoin('users', 'users.id', '=', 'requests.accepted_by')
+                ->where('requests.Request_ID', $id)
                 ->select(
                     'requests.*',
                     'users.first_name AS profiler_first_name',
@@ -197,6 +197,27 @@ class RequestController extends Controller
         } catch (\Exception $e) {
             Log::error('Error fetching request details: ' . $e->getMessage());
             return response()->json(['message' => 'Server error occurred'], 500);
+        }
+    }
+
+    public function markAsComplete($id, Request $request)
+    {
+        try {
+            if (!$id) {
+                return response()->json(['success' => false, 'message' => 'Invalid request ID.'], 400);
+            }
+
+            DB::table('requests')
+                ->where('Request_ID', $id)
+                ->update([
+                    'Status' => 'Completed',
+                    'Updated_Time' => now(),
+                    'feedback' => $request->input('feedback')
+                ]);
+
+            return response()->json(['success' => true, 'message' => 'Request marked as complete.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
 

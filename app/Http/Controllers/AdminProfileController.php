@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Intervention\Image\Facades\Image; // Add this at the top
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -13,6 +13,7 @@ class AdminProfileController extends Controller
         $user = Auth::user(); // Get logged-in admin
         return view('admin.adminprofile', compact('user'));
     }
+
 
 public function update(Request $request)
 {
@@ -27,28 +28,16 @@ public function update(Request $request)
         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
 
-    // Handle image upload with cropping
+    // Handle image upload
     if ($request->hasFile('image')) {
-        // Delete old image if it exists
+        // Delete old image if exists
         if ($user->image && Storage::exists('public/' . $user->image)) {
             Storage::delete('public/' . $user->image);
         }
 
-        $imageFile = $request->file('image');
-        $imageName = time() . '.' . $imageFile->getClientOriginalExtension();
-        $imagePath = 'profile_images/' . $imageName;
-
-        // Resize and crop image to a square (150x150) centered
-        $image = \Intervention\Image\Facades\Image::make($imageFile)
-            ->fit(150, 150, function ($constraint) {
-                $constraint->upsize(); // Prevent stretching
-            });
-
-        // Save the image to storage
-        Storage::put('public/' . $imagePath, (string) $image->encode());
-
-        // Save path to the database
-        $user->image = $imagePath;
+        // Store new image
+        $imagePath = $request->file('image')->store('profile_images', 'public');
+        $user->image = $imagePath; // Save the correct path in DB
     }
 
     // Update user details
@@ -59,8 +48,7 @@ public function update(Request $request)
     $user->save();
 
     return redirect()->back()->with('success', 'Profile updated successfully!');
-}
-
+}   
     
 
     public function getProfileImage(Request $request)

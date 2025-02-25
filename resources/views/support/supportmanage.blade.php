@@ -59,7 +59,7 @@
                         <span class="badge"
                             style="background-color: orange; color: black;">{{ $request->Status }}</span>
                         <!-- Orange -->
-                        @elseif($request->Status === 'Under Revision')
+                        @elseif($request->Status === 'Needs Revision')
                         <span class="badge bg-danger">{{ $request->Status }}</span> <!-- Red -->
                         @elseif($request->Status === 'Completed')
                         <span class="badge bg-success">{{ $request->Status }}</span> <!-- Green -->
@@ -146,7 +146,7 @@
                         'Pending' => 'warning', // Yellow
                         'In Progress' => 'primary', // Blue
                         'Under Review' => 'orange', // Orange (custom class)
-                        'Under Revision' => 'danger', // Red
+                        'Needs Revision' => 'danger', // Red
                         'Completed' => 'success' // Green
                         ];
                         $colorClass = $statusColors[$profile->Status] ?? 'secondary';

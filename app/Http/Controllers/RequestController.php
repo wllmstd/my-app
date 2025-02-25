@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\UserRequest;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Facades\Log;
 
@@ -173,6 +174,32 @@ class RequestController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    //Fetch the Profiler's Name 
+    public function getRequestWithProfiler($id)
+    {
+        try {
+            $request = DB::table('requests')
+                ->leftJoin('users', 'users.id', '=', 'requests.accepted_by') 
+                ->where('requests.Request_ID', $id) 
+                ->select(
+                    'requests.*',
+                    'users.first_name AS profiler_first_name',
+                    'users.last_name AS profiler_last_name'
+                )
+                ->first();
+
+            if (!$request) {
+                return response()->json(['message' => 'Request not found'], 404);
+            }
+
+            return response()->json($request);
+        } catch (\Exception $e) {
+            Log::error('Error fetching request details: ' . $e->getMessage());
+            return response()->json(['message' => 'Server error occurred'], 500);
+        }
+    }
+
 
 
 }

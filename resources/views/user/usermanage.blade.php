@@ -13,9 +13,9 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"> -->
     <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <!-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> -->
 </head>
 
 <body>
@@ -344,6 +344,7 @@
                     <p><strong>Profiled by:</strong> <span id="reviewProfiler"></span></p>
                     <p><strong>Requester:</strong> <span id="reviewRequester"></span></p>
                     <p><strong>Request Details:</strong> <span id="reviewDetails"></span></p>
+
 
                     <p><strong>Submitted File:</strong></p>
                     <div id="reviewUploadedFormat"></div>
@@ -732,13 +733,39 @@
     //Load Profiler Name in the Review Submission Modal
     $(document).ready(function () {
         $(".reviewSubmissionBtn").on("click", function () {
-            let profiler = $(this).data("profiler"); // Get Profiler Name
+            let requestId = $(this).data("id");
 
-            // Fill modal fields
-            $("#reviewProfiler").text(profiler || "Not Assigned"); // Show Profiler Name or Default Text
+            $.ajax({
+                url: `/requests/${requestId}/details`,
+                type: "GET",
+                success: function (data) {
+                    $("#reviewRequester").text(data.First_Name + " " + data.Last_Name);
+                    $("#reviewDetails").text(data.Format);
 
-            // Show the modal
-            $("#reviewSubmissionModal").modal("show");
+                    //profiler name is display
+                    let profilerName = (data.profiler_first_name && data.profiler_last_name)
+                        ? `${data.profiler_first_name} ${data.profiler_last_name}`
+                        : "Not Assigned";
+
+                    $("#reviewProfiler").text(profilerName);
+
+                    //Display uploaded file
+                    if (data.uploaded_format) {
+                        $("#reviewUploadedFormat").html(
+                            `<a href="/storage/submitted_files/${data.uploaded_format}" target="_blank">${data.uploaded_format}</a>`
+                        );
+                    } else {
+                        $("#reviewUploadedFormat").html("<p>No submitted file available</p>");
+                    }
+
+                    // Show the modal
+                    $("#reviewSubmissionModal").modal("show");
+                },
+                error: function () {
+                    $("#reviewProfiler").text("Not Assigned");
+                    alert("Failed to load request details.");
+                }
+            });
         });
     });
 

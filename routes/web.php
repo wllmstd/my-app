@@ -106,3 +106,4 @@ Route::delete('/requests/{id}', [RequestController::class, 'destroy'])->name('re
 Route::post('/requests/{id}/delete-attachment', [RequestController::class, 'deleteAttachment'])->name('requests.deleteAttachment');
 Route::post('/requests/{id}/complete', [RequestController::class, 'markAsDone'])->name('requests.complete');
 Route::post('/requests/{id}/revise', [RequestController::class, 'requestRevision'])->name('requests.revise');
+Route::get('/requests/{id}/details', [RequestController::class, 'getRequestWithProfiler']);

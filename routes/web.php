@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\SupportManageController;
 use App\Http\Controllers\UserManageController;
 use App\Http\Controllers\RequestController;
-use App\Http\Controllers\AdminProfileController;
+use App\Http\Controllers\AdminProfileController;    
+use Illuminate\Support\Facades\Response;
 
 
 
@@ -119,3 +120,14 @@ Route::post('/requests/{id}/complete', [RequestController::class, 'markAsDone'])
 Route::post('/requests/{id}/revise', [RequestController::class, 'requestRevision'])->name('requests.revise');
 Route::get('/requests/{id}/details', [RequestController::class, 'getRequestWithProfiler']);
 Route::post('/requests/{id}/complete', [RequestController::class, 'markAsComplete'])->name('requests.complete');
+
+//Download Route
+Route::get('/download/{filename}', function ($filename) {
+    $filePath = 'uploads/' . $filename;
+
+    if (Storage::disk('public')->exists($filePath)) {
+        return Response::download(storage_path("app/public/{$filePath}"));
+    } else {
+        abort(404, "File not found.");
+    }
+});

@@ -54,60 +54,60 @@
             </thead>
             <tbody>
                 @foreach ($requests as $index => $request)
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $request->Status }}</td>
-                                    <td>{{ $request->First_Name }}</td>
-                                    <td>{{ $request->Last_Name }}</td>
-                                    <td>{{ $request->Nationality }}</td>
-                                    <td>{{ $request->Location }}</td>
-                                    <td>{{ $request->Format }}</td>
-                                    <!-- FIXED ATTACHMENT COUNT LOGIC -->
-                                    <td>
-                                        @php
-                                            $attachments = json_decode($request->Attachment, true);
-                                        @endphp
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $request->Status }}</td>
+                    <td>{{ $request->First_Name }}</td>
+                    <td>{{ $request->Last_Name }}</td>
+                    <td>{{ $request->Nationality }}</td>
+                    <td>{{ $request->Location }}</td>
+                    <td>{{ $request->Format }}</td>
+                    <!-- FIXED ATTACHMENT COUNT LOGIC -->
+                    <td>
+                        @php
+                        $attachments = json_decode($request->Attachment, true);
+                        @endphp
 
-                                        @if (!empty($attachments) && is_array($attachments))
-                                            @if (count($attachments) === 1)
-                                                1 file
-                                            @else
-                                                {{ count($attachments) }} files
-                                            @endif
-                                        @else
-                                            No attachment
-                                        @endif
-                                    </td>
+                        @if (!empty($attachments) && is_array($attachments))
+                        @if (count($attachments) === 1)
+                        1 file
+                        @else
+                        {{ count($attachments) }} files
+                        @endif
+                        @else
+                        No attachment
+                        @endif
+                    </td>
 
 
-                                    <td>{{ $request->Date_Created }}</td>
-                                    <td>{{ $request->Updated_Time }}</td>
-                                    <td>
-                                        <!-- View Request Button -->
-                                        <button class="btn btn-primary btn-sm viewRequestBtn" data-id="{{ $request->Request_ID }}"
-                                            data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
-                                            data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
-                                            data-format="{{ $request->Format }}" data-attachments="{{ $request->Attachment }}"
-                                            data-bs-toggle="modal" data-bs-target="#viewRequestModal">
-                                            <i class="bi bi-eye"></i> View
-                                        </button>
+                    <td>{{ $request->Date_Created }}</td>
+                    <td>{{ $request->Updated_Time }}</td>
+                    <td>
+                        <!-- View Request Button -->
+                        <button class="btn btn-primary btn-sm viewRequestBtn" data-id="{{ $request->Request_ID }}"
+                            data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
+                            data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
+                            data-format="{{ $request->Format }}" data-attachments="{{ $request->Attachment }}"
+                            data-bs-toggle="modal" data-bs-target="#viewRequestModal">
+                            <i class="bi bi-eye"></i> View
+                        </button>
 
-                                        <!-- Delete Request Button -->
-                                        <button class="btn btn-danger btn-sm deleteRequestBtn" data-id="{{ $request->Request_ID }}"
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                            <i class="bi bi-trash"></i> Delete
-                                        </button>
+                        <!-- Delete Request Button -->
+                        <button class="btn btn-danger btn-sm deleteRequestBtn" data-id="{{ $request->Request_ID }}"
+                            data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
 
-                                        <!-- Review Submission Button -->
-                                        <button class="btn btn-warning btn-sm reviewSubmissionBtn" data-id="{{ $request->Request_ID }}"
-                                            data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
-                                            data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
-                                            data-format="{{ $request->Format }}" data-uploaded-format="{{ $request->uploaded_format }}"
-                                            data-profiler="{{ $request->Profiler_Name }}">
-                                            <i class="bi bi-file-earmark-check"></i> Review Submission
-                                        </button>
-                                    </td>
-                                </tr>
+                        <!-- Review Submission Button -->
+                        <button class="btn btn-warning btn-sm reviewSubmissionBtn" data-id="{{ $request->Request_ID }}"
+                            data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
+                            data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
+                            data-format="{{ $request->Format }}" data-uploaded-format="{{ $request->uploaded_format }}"
+                            data-profiler="{{ $request->Profiler_Name }}">
+                            <i class="bi bi-file-earmark-check"></i> Review Submission
+                        </button>
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
         </table>
@@ -227,21 +227,21 @@
                         <div id="existingAttachments">
                             <h6>Existing Attachments:</h6>
                             @php
-                                $attachments = json_decode($request->Attachment, true);
+                            $attachments = json_decode($request->Attachment, true);
                             @endphp
                             @if (!empty($attachments))
-                                @foreach ($attachments as $file)
-                                    <div class="d-flex align-items-center border p-2 mb-1 rounded">
-                                        <a href="{{ asset('storage/attachments/' . $file) }}" target="_blank"
-                                            class="me-auto">{{ $file }}</a>
-                                        <<button type="button" class="btn btn-sm btn-danger delete-attachment-btn"
-                                            data-request-id="{{ $request->Request_ID }}" data-file-name="{{ $file }}">
-                                            <i class="bi bi-trash"></i>
-                                            </button>
-                                    </div>
-                                @endforeach
+                            @foreach ($attachments as $file)
+                            <div class="d-flex align-items-center border p-2 mb-1 rounded">
+                                <a href="{{ asset('storage/attachments/' . $file) }}" target="_blank"
+                                    class="me-auto">{{ $file }}</a>
+                                <<button type="button" class="btn btn-sm btn-danger delete-attachment-btn"
+                                    data-request-id="{{ $request->Request_ID }}" data-file-name="{{ $file }}">
+                                    <i class="bi bi-trash"></i>
+                                    </button>
+                            </div>
+                            @endforeach
                             @else
-                                <p>No attachments found.</p>
+                            <p>No attachments found.</p>
                             @endif
                         </div>
 
@@ -345,11 +345,10 @@
                 <div class="modal-body">
                     <p><strong>Profiled by:</strong> <span id="reviewProfiler"></span></p>
                     <p><strong>Requester:</strong> <span id="reviewRequester"></span></p>
-                    <p><strong>Request Details:</strong> <span id="reviewDetails"></span></p>
+                    <p><strong>Requested Format:</strong> <span id="reviewFormat"></span></p>
 
-
-                    <p><strong>Submitted File:</strong></p>
-                    <div id="reviewUploadedFormat"></div>
+                    <!-- <p><strong>Submitted File:</strong></p> -->
+                    <div id="reviewUploadedFormat" class="mt-2"></div>
 
                     <label for="reviewFeedback">Feedback:</label>
                     <textarea id="reviewFeedback" class="form-control" rows="3"
@@ -370,29 +369,30 @@
 </html>
 
 @if (session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
+<div class="alert alert-success">
+    {{ session('success') }}
+</div>
 @endif
 
 <script>
-
     //Initialize DataTable
-    $(document).ready(function () {
+    $(document).ready(function() {
         $('#requestTable').DataTable({
             "paging": true, // Enable pagination
             "searching": true, // Enable search
             "ordering": true, // Enable sorting
             "info": true, // Show information (entries count)
             "lengthMenu": [5, 10, 25, 50], // Dropdown for entries per page
-            "columnDefs": [
-                { "orderable": false, "targets": [10] } // Disable sorting for the action column
+            "columnDefs": [{
+                    "orderable": false,
+                    "targets": [10]
+                } // Disable sorting for the action column
             ]
         });
     });
 
     //Function for File Removal 
-    document.getElementById('attachment').addEventListener('change', function (event) {
+    document.getElementById('attachment').addEventListener('change', function(event) {
         const fileList = document.getElementById('fileList');
         fileList.innerHTML = '';
 
@@ -422,9 +422,9 @@
     }
 
     //View and Edit Form
-    $(document).ready(function () {
+    $(document).ready(function() {
         // Handle View Button Click
-        $(document).on("click", ".viewRequestBtn", function () {
+        $(document).on("click", ".viewRequestBtn", function() {
             // Debugging
             console.log("Button Data Attributes:", $(this).data());
 
@@ -487,8 +487,8 @@
 
 
         // Handle Form Submission to save changes to the request
-        $(document).ready(function () {
-            $("#updateRequestForm").on("submit", function (e) {
+        $(document).ready(function() {
+            $("#updateRequestForm").on("submit", function(e) {
                 e.preventDefault(); // Prevent full-page reload
 
                 let requestId = $("#request_id").val()
@@ -507,7 +507,7 @@
                     data: formData,
                     processData: false,
                     contentType: false,
-                    success: function (response) {
+                    success: function(response) {
                         // Show success message inside the View/Edit modal instead of closing it
                         $("#successMessage").text("Request updated successfully!");
                         $("#successModal").modal("show");
@@ -519,11 +519,11 @@
 
 
                         // Reload after closing success modal
-                        $("#successModal").on("hidden.bs.modal", function () {
+                        $("#successModal").on("hidden.bs.modal", function() {
                             location.reload();
                         });
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         console.error("Error:", xhr.responseText);
 
                         // Hide View/Edit Modal first
@@ -534,8 +534,7 @@
                         $("#failedMessage").text(
                             "Failed to update the request. Please try again."
                         );
-                        $("#failedModal").modal("show");
-                        ;
+                        $("#failedModal").modal("show");;
                     }
                 });
             });
@@ -551,7 +550,7 @@
                         _token: "{{ csrf_token() }}",
                         file_name: fileName
                     },
-                    success: function (response) {
+                    success: function(response) {
                         if (response.success) {
                             alert("Attachment deleted successfully!");
                             location.reload(); // Reload the page to reflect changes
@@ -563,15 +562,14 @@
             }
         }
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             // Handle File Deletion
-            $(".delete-file-btn").on("click", function () {
+            $(".delete-file-btn").on("click", function() {
                 let fileToDelete = $(this).data("file");
                 let deletedFilesInput = $("#deletedFilesInput");
 
                 // Add file to deleted files array
-                let deletedFiles = deletedFilesInput.val() ? JSON.parse(deletedFilesInput.val()) :
-                    [];
+                let deletedFiles = deletedFilesInput.val() ? JSON.parse(deletedFilesInput.val()) : [];
                 deletedFiles.push(fileToDelete);
                 deletedFilesInput.val(JSON.stringify(deletedFiles));
 
@@ -584,12 +582,12 @@
         let deleteId = null;
 
         // Capture request ID when delete button is clicked
-        $(document).on("click", ".deleteRequestBtn", function () {
+        $(document).on("click", ".deleteRequestBtn", function() {
             deleteId = $(this).data("id");
         });
 
         // Confirm deletion and send AJAX request
-        $("#confirmDelete").on("click", function () {
+        $("#confirmDelete").on("click", function() {
             if (deleteId) {
                 $.ajax({
                     url: "/requests/delete/" + deleteId, // Ensure this matches your Laravel route
@@ -597,7 +595,7 @@
                     data: {
                         _token: '{{ csrf_token() }}'
                     },
-                    success: function (response) {
+                    success: function(response) {
                         // Hide the delete modal after deletion
                         $("#deleteModal").modal("hide");
 
@@ -606,7 +604,7 @@
                             location.reload();
                         }, 500); // Adjust delay if needed
                     },
-                    error: function (xhr, status, error) {
+                    error: function(xhr, status, error) {
                         alert("Error deleting request: " + error);
                     }
                 });
@@ -630,7 +628,7 @@
     }
 
     // Handle Cancel - Switch Back to the View Modal
-    $("#deleteAttachmentModal").on("hidden.bs.modal", function () {
+    $("#deleteAttachmentModal").on("hidden.bs.modal", function() {
         if (!deleteConfirmed) {
             $("#viewRequestModal").modal("show"); // Reopen view modal if not deleted
         }
@@ -638,7 +636,7 @@
 
     // Handle Confirm Delete
     let deleteConfirmed = false;
-    $("#confirmDeleteBtn").on("click", function () {
+    $("#confirmDeleteBtn").on("click", function() {
         deleteConfirmed = true; // Mark as confirmed
 
         $.ajax({
@@ -648,165 +646,174 @@
                 _token: '{{ csrf_token() }}',
                 file_name: deleteFileName
             },
-            success: function (response) {
+            success: function(response) {
                 $("#deleteAttachmentModal").modal("hide"); // Close delete modal
                 location.reload(); // Reload to reflect changes
 
             },
-            error: function (xhr) {
+            error: function(xhr) {
                 alert("Error deleting attachment: " + xhr.responseJSON.error);
             }
         });
     });
 
-    //Handles the Review Submission Modal
-    $(document).ready(function () {
-        $(".reviewSubmissionBtn").on("click", function () {
-            let requestId = $(this).data("id");
-            let firstName = $(this).data("first-name");
-            let lastName = $(this).data("last-name");
-            let format = $(this).data("format");
-            let uploadedFormat = $(this).data("uploaded-format");
+    // Set CSRF Token Globally
+    $(document).ready(function() {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
 
-            //Save request ID inside modal
-            $("#reviewSubmissionModal").data("request-id", requestId);
+        // Function to parse and display uploaded files from the request table only
+        function displayUploadedFiles(uploadedFormat) {
+            let uploadedFilesArray = [];
 
-            // Fill modal fields
-            $("#reviewRequester").text(firstName + " " + lastName);
-            $("#reviewDetails").text(format);
-
-            // Display uploaded file
-            if (uploadedFormat) {
-                $("#reviewUploadedFormat").html(
-                    `<a href="/storage/submitted_files/${uploadedFormat}" target="_blank">${uploadedFormat}</a>`
-                );
-            } else {
-                $("#reviewUploadedFormat").html("<p>No submitted file available</p>");
+            try {
+                if (typeof uploadedFormat === "string") {
+                    uploadedFilesArray = JSON.parse(uploadedFormat);
+                } else if (Array.isArray(uploadedFormat)) {
+                    uploadedFilesArray = uploadedFormat;
+                }
+            } catch (error) {
+                console.error("Error parsing uploaded files:", error);
+                uploadedFilesArray = [];
             }
 
-            // Show the modal
-            $("#reviewSubmissionModal").modal("show");
+            let uploadedFilesHtml = '<h6>Submitted Files:</h6>';
+            if (uploadedFilesArray.length > 0) {
+                uploadedFilesArray.forEach((file) => {
+                    let fileName = file.split('/').pop();
+                    let fileUrl = `/storage/uploads/${fileName}`;
 
+                    let downloadUrl = `/download/${fileName}`;
+                    uploadedFilesHtml += `
+    <div class="d-flex justify-content-between align-items-center border p-2 mb-1 rounded">
+        <a href="${fileUrl}" target="_blank" class="text-primary text-decoration-none">${fileName}</a>
+        <a href="${downloadUrl}" class="btn btn-sm btn-success">
+            <i class="bi bi-download"></i> Download
+        </a>
+    </div>`;
 
-            $(document).ready(function () {
-                // ✅ Set CSRF Token Globally
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Set CSRF token globally
-                    }
                 });
+            } else {
+                uploadedFilesHtml += '<p>No submitted files available.</p>';
+            }
 
-                // ✅ Handle Review Submission Modal Open
-                $(".reviewSubmissionBtn").on("click", function () {
-                    let requestId = $(this).data("id");
-                    let firstName = $(this).data("first-name");
-                    let lastName = $(this).data("last-name");
-                    let format = $(this).data("format");
-                    let uploadedFormat = $(this).data("uploaded-format");
+            $("#reviewUploadedFormat").html(uploadedFilesHtml);
+        }
 
-                    // ✅ Store request ID inside modal for reference
+        // Handle Review Submission Modal
+        $(document).on("click", ".reviewSubmissionBtn", function(event) {
+            event.preventDefault();
+            let requestId = $(this).data("id");
+
+            $.ajax({
+                url: `/requests/${requestId}/details`,
+                type: "GET",
+                success: function(data) {
                     $("#reviewSubmissionModal").data("request-id", requestId);
+                    $("#reviewRequester").text(`${data.First_Name} ${data.Last_Name}`);
+                    $("#reviewDetails").text(data.Format);
 
-                    // ✅ Fill modal fields dynamically
-                    $("#reviewRequester").text(`${firstName} ${lastName}`);
-                    $("#reviewDetails").text(format);
-                    $("#reviewUploadedFormat").html(
-                        uploadedFormat
-                            ? `<a href="/storage/submitted_files/${uploadedFormat}" target="_blank">${uploadedFormat}</a>`
-                            : "<p>No submitted file available</p>"
-                    );
+                    let profilerName = (data.profiler_first_name && data.profiler_last_name) ?
+                        `${data.profiler_first_name} ${data.profiler_last_name}` :
+                        "Not Assigned";
+                    $("#reviewProfiler").text(profilerName);
 
-                    // ✅ Show the modal
+                    if (data.uploaded_format) {
+                        displayUploadedFiles(data.uploaded_format);
+                    } else {
+                        $("#reviewUploadedFormat").html("<p>No submitted file available</p>");
+                    }
                     $("#reviewSubmissionModal").modal("show");
-                });
-
-                // ✅ Handle "Mark as Done" Click (Efficiently Bound Once)
-                $("#markAsDoneBtn").off("click").on("click", function () {
-                    let requestId = $("#reviewSubmissionModal").data("request-id");
-                    let feedback = $("#reviewFeedback").val();
-
-                    if (!requestId) {
-                        alert("Error: Missing request ID.");
-                        return;
-                    }
-
-                    $.post(`/requests/${requestId}/complete`, { status: "Completed", feedback: feedback })
-                        .done(function () {
-                            alert("Request marked as complete!");
-
-                            // ✅ Update status in table dynamically
-                            $(`button[data-id='${requestId}']`).closest("tr").find("td:nth-child(2)").text("Completed");
-
-                            $("#reviewSubmissionModal").modal("hide"); // Close modal
-                        })
-                        .fail(function (xhr) {
-                            console.error("AJAX Error:", xhr.responseText);
-                            alert("Error updating request status.");
-                        });
-                });
-
-                // ✅ Handle "Request Revision" Click (Efficiently Bound Once)
-                $("#reviseBtn").off("click").on("click", function () {
-                    let requestId = $("#reviewSubmissionModal").data("request-id");
-                    let feedback = $("#reviewFeedback").val();
-
-                    if (!requestId) {
-                        alert("Error: Missing request ID.");
-                        return;
-                    }
-
-                    $.post(`/requests/${requestId}/revise`, { status: "Needs Revision", feedback: feedback })
-                        .done(function () {
-                            alert("Request sent back for revision.");
-                            $("#reviewSubmissionModal").modal("hide");
-                            location.reload(); // ✅ Refresh the table
-                        })
-                        .fail(function () {
-                            alert("Error updating request status.");
-                        });
-                });
+                },
+                error: function() {
+                    alert("Failed to load request details.");
+                }
             });
+        });
 
+        // Handle "Mark as Done" Click
+        $("#markAsDoneBtn").on("click", function() {
+            let requestId = $("#reviewSubmissionModal").data("request-id");
+            let feedback = $("#reviewFeedback").val();
 
-            //Load Profiler Name in the Review Submission Modal
-            $(document).ready(function () {
-                $(".reviewSubmissionBtn").on("click", function () {
-                    let requestId = $(this).data("id");
+            if (!requestId) {
+                alert("Error: Missing request ID.");
+                return;
+            }
 
-                    $.ajax({
-                        url: `/requests/${requestId}/details`,
-                        type: "GET",
-                        success: function (data) {
-                            $("#reviewRequester").text(data.First_Name + " " + data.Last_Name);
-                            $("#reviewDetails").text(data.Format);
-
-                            //profiler name is display
-                            let profilerName = (data.profiler_first_name && data.profiler_last_name)
-                                ? `${data.profiler_first_name} ${data.profiler_last_name}`
-                                : "Not Assigned";
-
-                            $("#reviewProfiler").text(profilerName);
-
-                            //Display uploaded file
-                            if (data.uploaded_format) {
-                                $("#reviewUploadedFormat").html(
-                                    `<a href="/storage/submitted_files/${data.uploaded_format}" target="_blank">${data.uploaded_format}</a>`
-                                );
-                            } else {
-                                $("#reviewUploadedFormat").html("<p>No submitted file available</p>");
-                            }
-
-                            // Show the modal
-                            $("#reviewSubmissionModal").modal("show");
-                        },
-                        error: function () {
-                            $("#reviewProfiler").text("Not Assigned");
-                            alert("Failed to load request details.");
-                        }
-                    });
+            $.post(`/requests/${requestId}/complete`, {
+                    status: "Completed",
+                    feedback: feedback
+                })
+                .done(function() {
+                    alert("Request marked as complete!");
+                    $(`button[data-id='${requestId}']`).closest("tr").find("td:nth-child(2)").text("Completed");
+                    $("#reviewSubmissionModal").modal("hide");
+                })
+                .fail(function(xhr) {
+                    console.error("AJAX Error:", xhr.responseText);
+                    alert("Error updating request status.");
                 });
-            });
+        });
+
+        // Handle "Request Revision" Click
+        $("#reviseBtn").on("click", function() {
+            let requestId = $("#reviewSubmissionModal").data("request-id");
+            let feedback = $("#reviewFeedback").val();
+
+            if (!requestId) {
+                alert("Error: Missing request ID.");
+                return;
+            }
+
+            $.post(`/requests/${requestId}/revise`, {
+                    status: "Needs Revision",
+                    feedback: feedback
+                })
+                .done(function() {
+                    alert("Request sent back for revision.");
+                    $("#reviewSubmissionModal").modal("hide");
+                    location.reload();
+                })
+                .fail(function() {
+                    alert("Error updating request status.");
+                });
         });
     });
 
+
+    // Load Profiler Name in the Review Submission Modal
+    $(document).on("click", ".reviewSubmissionBtn", function() {
+        let requestId = $(this).data("id");
+
+        $.ajax({
+            url: `/requests/${requestId}/details`,
+            type: "GET",
+            success: function(data) {
+                $("#reviewRequester").text(`${data.First_Name} ${data.Last_Name}`);
+                $("#reviewFormat").text(data.Format);
+
+                let profilerName = (data.profiler_first_name && data.profiler_last_name) ?
+                    `${data.profiler_first_name} ${data.profiler_last_name}` :
+                    "Not Assigned";
+
+                $("#reviewProfiler").text(profilerName);
+
+                if (data.uploaded_format) {
+                    displayUploadedFiles(data.uploaded_format);
+                } else {
+                    $("#reviewUploadedFormat").html("<p>No submitted file available</p>");
+                }
+
+                $("#reviewSubmissionModal").modal("show");
+            },
+            error: function() {
+                $("#reviewProfiler").text("Not Assigned");
+                alert("Failed to load request details.");
+            }
+        });
+    });
 </script>

@@ -80,22 +80,23 @@
                                     </td>
 
 
-                                    <td>{{ $request->Date_Created }}</td>
-                                    <td>{{ $request->Updated_Time }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($request->Date_Created)->format('M j, Y, h:i A') }}</td>
+                                    <!-- <td>{{ \Carbon\Carbon::parse($request->Updated_Time)->format('M j, Y, h:i A') }}</td> -->
+                                    <td>
+                                        {{ \Carbon\Carbon::parse($request->Updated_Time)->format('M j, Y, h:i A') }}
+                                        <br>
+                                        <small
+                                            class="text-muted">({{ \Carbon\Carbon::parse($request->Updated_Time)->diffForHumans() }})</small>
+                                    </td>
+
                                     <td>
                                         <!-- View Request Button -->
                                         <button class="btn btn-primary btn-sm viewRequestBtn" data-id="{{ $request->Request_ID }}"
                                             data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
                                             data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
                                             data-format="{{ $request->Format }}" data-attachments="{{ $request->Attachment }}"
-                                            data-bs-toggle="modal" data-bs-target="#viewRequestModal">
-                                            <i class="bi bi-eye"></i> View
-                                        </button>
-
-                                        <!-- Delete Request Button -->
-                                        <button class="btn btn-danger btn-sm deleteRequestBtn" data-id="{{ $request->Request_ID }}"
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                            <i class="bi bi-trash"></i> Delete
+                                            data-bs-toggle="modal" data-bs-target="#viewRequestModal" title="View request details">
+                                            <i class="bi bi-eye"></i>
                                         </button>
 
                                         <!-- Review Submission Button -->
@@ -103,9 +104,17 @@
                                             data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
                                             data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
                                             data-format="{{ $request->Format }}" data-uploaded-format="{{ $request->uploaded_format }}"
-                                            data-profiler="{{ $request->Profiler_Name }}">
-                                            <i class="bi bi-file-earmark-check"></i> Review Submission
+                                            data-profiler="{{ $request->Profiler_Name }}"
+                                            title="Check if the submitted file meets the requested format">
+                                            <i class="bi bi-file-earmark-check"></i>
                                         </button>
+
+                                        <!-- Delete Request Button -->
+                                        <button class="btn btn-danger btn-sm deleteRequestBtn" data-id="{{ $request->Request_ID }}"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal" title="Delete this request">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
                                     </td>
                                 </tr>
                 @endforeach
@@ -366,6 +375,26 @@
 
 </body>
 
+<style>
+    .viewRequestBtn:hover {
+        background-color: #0b5ed7;
+        /* Darker blue */
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .reviewSubmissionBtn:hover {
+        background-color: #d39e00;
+        /* Darker yellow */
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .deleteRequestBtn:hover {
+        background-color: #bb2d3b;
+        /* Darker red */
+        transition: background-color 0.2s ease-in-out;
+    }
+</style>
+
 </html>
 
 @if (session('success'))
@@ -375,6 +404,11 @@
 @endif
 
 <script>
+    // Initialize Bootstrap tooltips (Add Hover Effect & Tooltip for Buttons)
+    $(document).ready(function () {
+        $('[title]').tooltip();
+    });
+
     //Function for File Removal 
     document.getElementById('attachment').addEventListener('change', function (event) {
         const fileList = document.getElementById('fileList');

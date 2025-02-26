@@ -98,6 +98,7 @@ Route::post('/requests/accept/{id}', [SupportManageController::class, 'acceptReq
 Route::post('/requests/upload-format/{id}', [SupportManageController::class, 'uploadFormat']);
 Route::post('/requests/delete-file/{id}', [SupportManageController::class, 'deleteFile']);
 Route::post('/requests/forward/{id}', [SupportManageController::class, 'forwardRequest']);
+Route::get('/requests/check-files/{id}', [SupportManageController::class, 'checkFiles']);
 
 
 

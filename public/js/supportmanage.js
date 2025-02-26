@@ -87,24 +87,41 @@ $(document).ready(function() {
             }
         });
     });
-});
 
 
+    $(".filter-btn").on("click", function() {
+        let filter = $(this).data("filter");
+    
+            // Remove 'active' class from all buttons and add to clicked one
+            $(".filter-btn").removeClass("active");
+            $(this).addClass("active");
+    
+            // Show or hide tables and their headings based on filter
+            if (filter === "all") {
+                $("#acceptedRequestsTable, #pendingRequestsTable").show();
+                $("#acceptedRequestsHeading, #pendingRequestsHeading").show(); // Show headings
+                $(".request-row, .pending-row").show();
+            } else if (filter === "Pending") {
+                $("#acceptedRequestsTable, #acceptedRequestsHeading").hide(); // Hide Table 1 & Heading
+                $("#pendingRequestsTable, #pendingRequestsHeading").show();  // Show Table 2 & Heading
+            } else {
+                $("#acceptedRequestsTable, #acceptedRequestsHeading").show(); // Show Table 1 & Heading
+                $("#pendingRequestsTable, #pendingRequestsHeading").hide(); // Hide Table 2 & Heading
+                
+                $(".request-row").each(function() {
+                    let rowStatus = $(this).data("status");
+    
+                    if (rowStatus === filter) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            }
+        });
+    
 
-
-// Delete Attachment Function
-function deleteAttachment(requestId, file) {
-    if (confirm("Are you sure you want to delete this attachment?")) {
-        let deletedFiles = $("#deletedFilesInput").val() ? JSON.parse($("#deletedFilesInput").val()) : [];
-        deletedFiles.push(file);
-        $("#deletedFilesInput").val(JSON.stringify(deletedFiles));
-
-        $("a[href$='" + file + "']").closest("div").remove(); // Remove from UI
-    }
-}
-
-
-$(document).ready(function() {
+        
     // ✅ Open Upload Modal & Load Existing Files
     $(".openUploadModalBtn").on("click", function() {
         let requestId = $(this).data("id");
@@ -148,16 +165,22 @@ $(document).ready(function() {
                 _token: $('meta[name="csrf-token"]').attr("content") // CSRF token
             },
             success: function(response) {
-                alert(response.success); // ✅ Show success message
-
-                // ✅ Hide the modal first
-                $("#viewUploadedFilesModal").modal("hide");
-
-                // ✅ Reload the page after a short delay
-                setTimeout(() => {
-                    location.reload();
-                }, 500); // Delay of 500ms before reloading
+                alert(response.success);
+                $("#uploadModal").modal("hide");
+            
+                let filesContainer = $("#uploadedFormat-" + requestId);
+                filesContainer.html(response.files.map(file =>
+                    `<div class="d-flex align-items-center border p-2 mb-1 rounded">
+                        <a href="/storage/uploads/${file}" target="_blank">${file}</a>
+                        <button class="btn btn-sm btn-danger deleteFileBtn" data-id="${requestId}" data-file="${file}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>`
+                ).join(''));
+            
+                reloadPageWithFilter(); // ✅ Apply the current filter
             },
+            
             error: function(xhr) {
                 console.error("Error:", xhr.responseText);
                 alert("Failed to delete file. Please try again.");
@@ -222,10 +245,43 @@ $(document).ready(function() {
             }
         });
     });
+
+    // ✅ Restore the last selected filter on page load
+let savedFilter = localStorage.getItem("selectedFilter");
+if (savedFilter) {
+    $(".filter-btn[data-filter='" + savedFilter + "']").click();
+} else {
+    $(".filter-btn[data-filter='all']").click(); // Default to "All Tables"
+}
+
+// ✅ Save filter selection before making changes
+$(".filter-btn").on("click", function () {
+    let filter = $(this).data("filter");
+    localStorage.setItem("selectedFilter", filter); // Store filter in localStorage
+});
+
+// ✅ Function to Reload Page While Keeping the Filter
+function reloadPageWithFilter() {
+    let currentFilter = localStorage.getItem("selectedFilter") || "all";
+    $(".filter-btn[data-filter='" + currentFilter + "']").click(); // ✅ Reapply Filter
+}
+
+
 });
 
 
 
+
+// Delete Attachment Function
+function deleteAttachment(requestId, file) {
+    if (confirm("Are you sure you want to delete this attachment?")) {
+        let deletedFiles = $("#deletedFilesInput").val() ? JSON.parse($("#deletedFilesInput").val()) : [];
+        deletedFiles.push(file);
+        $("#deletedFilesInput").val(JSON.stringify(deletedFiles));
+
+        $("a[href$='" + file + "']").closest("div").remove(); // Remove from UI
+    }
+}
 
 
 $(".viewAttachmentsBtn").click(function() {
@@ -286,17 +342,40 @@ $(".viewAttachmentsBtn").click(function() {
     });
 });
 
-$(document).ready(function() {
+$(document).ready(function () {
     let selectedRequestId = null;
 
-    // When "Forward" is clicked, store the request ID and show the modal
-    $(".forwardRequestBtn").on("click", function() {
+    // When "Forward" is clicked, store the request ID and check for files
+    $(".forwardRequestBtn").on("click", function () {
         selectedRequestId = $(this).data("id");
-        $("#forwardConfirmModal").modal("show");
+
+        // ✅ Check if uploaded files exist in the UI
+        let uploadedFilesCount = $("#uploadedFormat-" + selectedRequestId).find("a").length;
+
+        if (uploadedFilesCount === 0) {
+            // If no files are detected in the UI, check from the database
+            $.ajax({
+                url: "/requests/check-files/" + selectedRequestId, // Laravel route
+                type: "GET",
+                success: function (response) {
+                    if (response.fileCount > 0) {
+                        $("#forwardConfirmModal").modal("show"); // ✅ Open modal if files exist
+                    } else {
+                        alert("You cannot forward this request because no files have been uploaded.");
+                    }
+                },
+                error: function (xhr) {
+                    console.error("Error:", xhr.responseText);
+                    alert("Failed to check uploaded files. Please try again.");
+                }
+            });
+        } else {
+            $("#forwardConfirmModal").modal("show"); // ✅ Open modal if files exist in the UI
+        }
     });
 
     // When "Yes, Forward" is clicked, send AJAX request
-    $("#confirmForwardBtn").on("click", function() {
+    $("#confirmForwardBtn").on("click", function () {
         if (!selectedRequestId) {
             alert("Error: Request ID not found.");
             return;
@@ -309,18 +388,25 @@ $(document).ready(function() {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
             },
             success: function(response) {
-                alert(response.success); // Show success message
-                $("#forwardConfirmModal").modal("hide"); // Close modal
-
-                // ✅ Reload the page after a short delay to reflect changes
-                setTimeout(() => {
-                    location.reload();
-                }, 500);
+                alert(response.success);
+                $("#forwardConfirmModal").modal("hide");
+            
+                let row = $(".forwardRequestBtn[data-id='" + selectedRequestId + "']").closest("tr");
+                row.find("td:nth-child(2)").html('<span class="badge bg-orange">Under Review</span>');
+            
+                reloadPageWithFilter(); // ✅ Preserve filter state
             },
-            error: function(xhr) {
+            
+            error: function (xhr) {
                 console.error("Error:", xhr.responseText);
                 alert("Failed to forward request. Please try again.");
             }
         });
     });
 });
+
+
+
+
+
+

@@ -130,6 +130,13 @@ public function forwardRequest($id)
 
     return response()->json(['success' => 'Request forwarded successfully!']);
 }
+public function checkFiles($id)
+{
+    $userRequest = UserRequest::findOrFail($id);
+    $files = json_decode($userRequest->uploaded_format, true) ?? [];
+
+    return response()->json(['fileCount' => count($files)]);
+}
 
 
 

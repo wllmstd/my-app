@@ -27,8 +27,18 @@
     @include('support.support_navbar')
 
     <div class="container mt-4">
+
+        <div class="mb-3">
+            <button class="btn btn-outline-dark filter-btn active" data-filter="all">All Tables</button>
+            <button class="btn btn-outline-warning filter-btn" data-filter="Pending">Pending Requests</button>
+            <button class="btn btn-outline-primary filter-btn" data-filter="In Progress">In Progress</button>
+            <button class="btn btn-outline-orange filter-btn" data-filter="Under Review">Under Review</button>
+            <button class="btn btn-outline-danger filter-btn" data-filter="Needs Revision">Needs Revision</button>
+            <button class="btn btn-outline-success filter-btn" data-filter="Completed">Completed</button>
+        </div>
+
         <!-- Table 1: My Accepted Requests -->
-        <h2>My Accepted Requests</h2>
+        <h2 id="acceptedRequestsHeading">My Accepted Requests</h2>
         <table id="acceptedRequestsTable" class="table table-bordered">
             <thead class="table-dark">
                 <tr>
@@ -48,7 +58,7 @@
             </thead>
             <tbody>
                 @foreach ($myAcceptedRequests as $index => $request)
-                <tr>
+                <tr class="request-row" data-status="{{ $request->Status }}">
                     <td>{{ $index + 1 }}</td>
                     <td>
                         @if($request->Status === 'Pending')
@@ -120,8 +130,8 @@
         </table>
 
         <!-- Table 2: Pending Requests -->
-        <h2>All Pending Requests</h2>
-        <table class="table table-bordered">
+        <h2 id="pendingRequestsHeading">All Pending Requests</h2>
+        <table  id="pendingRequestsTable" class="table table-bordered">
             <thead class="table-dark">
                 <tr>
                     <th>#</th>
@@ -136,9 +146,9 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="pendingRequestsTable">
                 @foreach ($profiles as $index => $profile)
-                <tr>
+                <tr class="pending-row">
                     <td>{{ $index + 1 }}</td>
                     <td>
                         @php
@@ -312,5 +322,62 @@
     <script src="{{ asset('js/supportmanage.js') }}"></script>
 
 </body>
+
+<style>
+    .filter-btn {
+    border-radius: 50px; /* Make buttons more circular */
+    padding: 6px 14px;
+}
+
+.filter-btn {
+    border-radius: 50px; /* Make buttons more circular */
+    padding: 6px 14px;
+}
+
+.filter-btn.active {
+    color: white !important;
+}
+
+/* Add specific colors when active */
+.filter-btn.active[data-filter="Pending"] {
+    background-color: #ffc107 !important; /* Yellow */
+    border-color: #ffc107 !important;
+}
+
+.filter-btn.active[data-filter="In Progress"] {
+    background-color: #0d6efd !important; /* Blue */
+    border-color: #0d6efd !important;
+}
+
+.filter-btn.active[data-filter="Under Review"] {
+    background-color: orange !important; /* Orange */
+    border-color: orange !important;
+}
+
+.filter-btn.active[data-filter="Needs Revision"] {
+    background-color: #dc3545 !important; /* Red */
+    border-color: #dc3545 !important;
+}
+
+.filter-btn.active[data-filter="Completed"] {
+    background-color: #198754 !important; /* Green */
+    border-color: #198754 !important;
+}
+
+.btn-outline-orange {
+    color: orange !important;
+    border-color: orange !important;
+}
+
+.btn-outline-orange:hover {
+    background-color: orange !important;
+    color: white !important;
+}
+
+#acceptedRequestsTable, #pendingRequestsTable, #acceptedRequestsHeading, #pendingRequestsHeading {
+    display: none; /* Hide tables initially */
+}
+
+</style>
 
 </html>

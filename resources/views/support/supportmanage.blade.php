@@ -52,7 +52,6 @@
                     <th>Format</th>
                     <th>Date Accepted</th>
                     <th>Uploads</th>
-                    <th>Actions</th>
 
                 </tr>
             </thead>
@@ -77,8 +76,6 @@
                         <span class="badge bg-secondary">{{ $request->Status }}</span> <!-- Default (Gray) -->
                         @endif
                     </td>
-
-
                     <td>{{ $request->First_Name }}</td>
                     <td>{{ $request->Last_Name }}</td>
                     <td>{{ $request->Nationality }}</td>
@@ -97,11 +94,11 @@
 
 
                     <!-- ✅ Display Uploaded Format -->
-
+                        <!-- Upload Button - Opens Upload Modal -->
                     <td id="uploadedFormat-{{ $request->Request_ID }}">
                         <!-- Upload Button - Opens Upload Modal -->
                         <button
-                            class="btn btn-sm {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? 'btn-warning' : 'btn-secondary' }} openUploadModalBtn"
+                            class="btn btn-sm {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? 'btn-success' : 'btn-secondary' }} openUploadModalBtn"
                             data-id="{{ $request->Request_ID }}"
                             data-files='@json(json_decode($request->uploaded_format, true) ?? [])'
                             {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? '' : 'disabled' }}
@@ -110,14 +107,6 @@
                         </button>
                     </td>
 
-                    <td>
-                        <!-- Send for Review Button -->
-                        <button
-                            class="btn btn-sm {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? 'btn-success' : 'btn-secondary' }} forwardRequestBtn"
-                            data-id="{{ $request->Request_ID }}"
-                            {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? '' : 'disabled' }}>
-                            Send for Review
-                        </button>
                     </td>
 
 
@@ -131,7 +120,7 @@
 
         <!-- Table 2: Pending Requests -->
         <h2 id="pendingRequestsHeading">All Pending Requests</h2>
-        <table  id="pendingRequestsTable" class="table table-bordered">
+        <table id="pendingRequestsTable" class="table table-bordered">
             <thead class="table-dark">
                 <tr>
                     <th>#</th>
@@ -274,8 +263,7 @@
         </div>
     </div>
 
-
-    <!-- Forward Confirmation Modal -->
+    <!-- Confirmation Modal for Forwarding -->
     <div class="modal fade" id="forwardConfirmModal" tabindex="-1" aria-labelledby="forwardConfirmLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -285,7 +273,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to forward this request? This action cannot be undone.
+                    Files are successfuly uploaded. Now, are you sure you want to forward this request? This action cannot be undone.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -294,6 +282,7 @@
             </div>
         </div>
     </div>
+
 
 
 
@@ -324,13 +313,15 @@
 </body>
 
 <style>
-    .filter-btn {
-    border-radius: 50px; /* Make buttons more circular */
+.filter-btn {
+    border-radius: 50px;
+    /* Make buttons more circular */
     padding: 6px 14px;
 }
 
 .filter-btn {
-    border-radius: 50px; /* Make buttons more circular */
+    border-radius: 50px;
+    /* Make buttons more circular */
     padding: 6px 14px;
 }
 
@@ -340,27 +331,32 @@
 
 /* Add specific colors when active */
 .filter-btn.active[data-filter="Pending"] {
-    background-color: #ffc107 !important; /* Yellow */
+    background-color: #ffc107 !important;
+    /* Yellow */
     border-color: #ffc107 !important;
 }
 
 .filter-btn.active[data-filter="In Progress"] {
-    background-color: #0d6efd !important; /* Blue */
+    background-color: #0d6efd !important;
+    /* Blue */
     border-color: #0d6efd !important;
 }
 
 .filter-btn.active[data-filter="Under Review"] {
-    background-color: orange !important; /* Orange */
+    background-color: orange !important;
+    /* Orange */
     border-color: orange !important;
 }
 
 .filter-btn.active[data-filter="Needs Revision"] {
-    background-color: #dc3545 !important; /* Red */
+    background-color: #dc3545 !important;
+    /* Red */
     border-color: #dc3545 !important;
 }
 
 .filter-btn.active[data-filter="Completed"] {
-    background-color: #198754 !important; /* Green */
+    background-color: #198754 !important;
+    /* Green */
     border-color: #198754 !important;
 }
 
@@ -374,10 +370,13 @@
     color: white !important;
 }
 
-#acceptedRequestsTable, #pendingRequestsTable, #acceptedRequestsHeading, #pendingRequestsHeading {
-    display: none; /* Hide tables initially */
+#acceptedRequestsTable,
+#pendingRequestsTable,
+#acceptedRequestsHeading,
+#pendingRequestsHeading {
+    display: none;
+    /* Hide tables initially */
 }
-
 </style>
 
 </html>

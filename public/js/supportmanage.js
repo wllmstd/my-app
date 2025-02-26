@@ -1,5 +1,5 @@
-$(document).ready(function() {
-    $(document).on("click", ".viewRequestBtn", function() {
+$(document).ready(function () {
+    $(document).on("click", ".viewRequestBtn", function () {
         let requestId = $(this).data("id"); // ✅ Fetch ID from View button
         let firstName = $(this).attr("data-first-name");
         let lastName = $(this).attr("data-last-name");
@@ -29,7 +29,7 @@ $(document).ready(function() {
             if (attachmentsArray.length > 0) {
                 noAttachmentsText.hide();
                 attachmentsArray.forEach((file) => {
-                    let fileName = file.split('/').pop();
+                    let fileName = file.split("/").pop();
                     let fileUrl = `/storage/attachments/${fileName}`;
                     attachmentsContainer.append(`
                     <div class="d-flex align-items-center border p-2 mb-1 rounded">
@@ -50,7 +50,7 @@ $(document).ready(function() {
     });
 
     // ✅ Accept Request Button - Ensure Correct ID is Sent
-    $(document).on("click", ".acceptRequestBtn", function() {
+    $(document).on("click", ".acceptRequestBtn", function () {
         let requestId = $(this).attr("data-id"); // ✅ Correctly fetch ID
 
         if (!requestId) {
@@ -62,83 +62,87 @@ $(document).ready(function() {
             url: "/requests/accept/" + requestId, // ✅ Correct Route
             type: "POST",
             headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content") // ✅ CSRF Token
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"), // ✅ CSRF Token
             },
             data: {
-                status: "In Progress"
+                status: "In Progress",
             }, // ✅ Send updated status
-            success: function(response) {
-                alert("Request accepted successfully! Status updated to In Progress.");
+            success: function (response) {
+                alert(
+                    "Request accepted successfully! Status updated to In Progress."
+                );
                 location.reload(); // ✅ Refresh Page to Update Status
 
                 // ✅ Update status in table dynamically
-                let row = $("button.uploadBtn[data-id='" + requestId + "']").closest(
-                    "tr");
+                let row = $(
+                    "button.uploadBtn[data-id='" + requestId + "']"
+                ).closest("tr");
                 row.find("td:nth-child(2)").text("In Progress"); // Update status column
 
                 // ✅ Enable Upload Button and Change Style
                 let uploadBtn = row.find(".uploadBtn");
-                uploadBtn.removeAttr("disabled").removeClass("btn-secondary").addClass(
-                    "btn-success");
+                uploadBtn
+                    .removeAttr("disabled")
+                    .removeClass("btn-secondary")
+                    .addClass("btn-success");
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.error("Error:", xhr.responseText);
-                alert("Failed to accept request. Please check console for details.");
-            }
+                alert(
+                    "Failed to accept request. Please check console for details."
+                );
+            },
         });
     });
 
-
-    $(".filter-btn").on("click", function() {
+    $(".filter-btn").on("click", function () {
         let filter = $(this).data("filter");
-    
-            // Remove 'active' class from all buttons and add to clicked one
-            $(".filter-btn").removeClass("active");
-            $(this).addClass("active");
-    
-            // Show or hide tables and their headings based on filter
-            if (filter === "all") {
-                $("#acceptedRequestsTable, #pendingRequestsTable").show();
-                $("#acceptedRequestsHeading, #pendingRequestsHeading").show(); // Show headings
-                $(".request-row, .pending-row").show();
-            } else if (filter === "Pending") {
-                $("#acceptedRequestsTable, #acceptedRequestsHeading").hide(); // Hide Table 1 & Heading
-                $("#pendingRequestsTable, #pendingRequestsHeading").show();  // Show Table 2 & Heading
-            } else {
-                $("#acceptedRequestsTable, #acceptedRequestsHeading").show(); // Show Table 1 & Heading
-                $("#pendingRequestsTable, #pendingRequestsHeading").hide(); // Hide Table 2 & Heading
-                
-                $(".request-row").each(function() {
-                    let rowStatus = $(this).data("status");
-    
-                    if (rowStatus === filter) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
-            }
-        });
-    
 
-        
+        // Remove 'active' class from all buttons and add to clicked one
+        $(".filter-btn").removeClass("active");
+        $(this).addClass("active");
+
+        // Show or hide tables and their headings based on filter
+        if (filter === "all") {
+            $("#acceptedRequestsTable, #pendingRequestsTable").show();
+            $("#acceptedRequestsHeading, #pendingRequestsHeading").show(); // Show headings
+            $(".request-row, .pending-row").show();
+        } else if (filter === "Pending") {
+            $("#acceptedRequestsTable, #acceptedRequestsHeading").hide(); // Hide Table 1 & Heading
+            $("#pendingRequestsTable, #pendingRequestsHeading").show(); // Show Table 2 & Heading
+        } else {
+            $("#acceptedRequestsTable, #acceptedRequestsHeading").show(); // Show Table 1 & Heading
+            $("#pendingRequestsTable, #pendingRequestsHeading").hide(); // Hide Table 2 & Heading
+
+            $(".request-row").each(function () {
+                let rowStatus = $(this).data("status");
+
+                if (rowStatus === filter) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+    });
+
     // ✅ Open Upload Modal & Load Existing Files
-    $(".openUploadModalBtn").on("click", function() {
-        let requestId = $(this).data("id");
+    $(".openUploadModalBtn").on("click", function () {
+        selectedRequestId = $(this).data("id");
         let existingFiles = $(this).data("files") || [];
 
-        $("#upload_request_id").val(requestId); // Set ID
+        $("#upload_request_id").val(selectedRequestId); // Set ID
 
         let filesContainer = $("#existingUploadedFiles");
         filesContainer.html(""); // Clear previous content
 
         if (existingFiles.length > 0) {
-            existingFiles.forEach(file => {
+            existingFiles.forEach((file) => {
                 let fileUrl = `/storage/uploads/${file}`;
                 let fileHtml = `
                 <div class="d-flex align-items-center border p-2 mb-1 rounded">
                     <a href="${fileUrl}" target="_blank" class="me-auto">${file}</a>
-                    <button class="btn btn-sm btn-danger deleteFileBtn" data-id="${requestId}" data-file="${file}">
+                    <button class="btn btn-sm btn-danger deleteFileBtn" data-id="${selectedRequestId}" data-file="${file}">
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>
@@ -150,48 +154,9 @@ $(document).ready(function() {
         }
     });
 
-    // ✅ Delete File Functionality
-    $(document).on("click", ".deleteFileBtn", function() {
-        let fileName = $(this).data("file"); // Get file name
-        let requestId = $(this).data("id"); // Get request ID
-
-        if (!confirm("Are you sure you want to delete this file?")) return;
-
-        $.ajax({
-            url: "/requests/delete-file/" + requestId,
-            type: "POST",
-            data: {
-                file_name: fileName,
-                _token: $('meta[name="csrf-token"]').attr("content") // CSRF token
-            },
-            success: function(response) {
-                alert(response.success);
-                $("#uploadModal").modal("hide");
-            
-                let filesContainer = $("#uploadedFormat-" + requestId);
-                filesContainer.html(response.files.map(file =>
-                    `<div class="d-flex align-items-center border p-2 mb-1 rounded">
-                        <a href="/storage/uploads/${file}" target="_blank">${file}</a>
-                        <button class="btn btn-sm btn-danger deleteFileBtn" data-id="${requestId}" data-file="${file}">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>`
-                ).join(''));
-            
-                reloadPageWithFilter(); // ✅ Apply the current filter
-            },
-            
-            error: function(xhr) {
-                console.error("Error:", xhr.responseText);
-                alert("Failed to delete file. Please try again.");
-            }
-        });
-    });
-
-
-
-
-    $("#uploadForm").on("submit", function(e) {
+    // ✅ Upload Files and Show Confirmation Modal
+    // ✅ Upload Files and Show Forward Confirmation Modal
+    $("#uploadForm").on("submit", function (e) {
         e.preventDefault();
 
         let formData = new FormData();
@@ -217,74 +182,148 @@ $(document).ready(function() {
             data: formData,
             processData: false,
             contentType: false,
-            success: function(response) {
-                alert(response.success);
+            success: function (response) {
+                // ✅ Hide Upload Modal
+                $("#uploadModal").modal("hide");
 
-                // ✅ Update files inside the modal dynamically
-                let filesContainer = $("#existingUploadedFiles");
-                filesContainer.html(response.files.map(file =>
-                    `<div class="d-flex align-items-center border p-2 mb-1 rounded">
+                // ✅ Ensure selectedRequestId is set
+                selectedRequestId = requestId;
+
+                // ✅ Open Forward Confirmation Modal
+                setTimeout(() => {
+                    $("#forwardConfirmModal").modal("show");
+                }, 500); // Small delay to ensure smooth transition
+            },
+            error: function (xhr) {
+                console.error("Error:", xhr.responseText);
+                alert("File upload failed. Please try again.");
+            },
+        });
+    });
+
+    // ✅ Forward Request After Confirming
+    $("#confirmForwardBtn").on("click", function () {
+        if (!selectedRequestId) {
+            alert("Error: Request ID not found.");
+            return;
+        }
+
+        $.ajax({
+            url: "/requests/forward/" + selectedRequestId,
+            type: "POST",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+            success: function (response) {
+                alert(response.success);
+                $("#forwardConfirmModal").modal("hide");
+
+                // ✅ Preserve the current filter before reload
+                let currentFilter = localStorage.getItem("selectedFilter");
+
+                setTimeout(() => {
+                    localStorage.setItem("selectedFilter", currentFilter);
+                    location.reload();
+                }, 500);
+            },
+            error: function (xhr) {
+                console.error("Error:", xhr.responseText);
+                alert("Failed to forward request. Please try again.");
+            },
+        });
+    });
+
+    // ✅ Delete File Functionality
+    // ✅ Delete File Functionality (Fixed)
+    $(document).on("click", ".deleteFileBtn", function () {
+        let fileName = $(this).data("file"); // Get file name
+        let requestId = $(this).data("id"); // Get request ID
+
+        // ✅ Show confirmation prompt before deleting
+        if (!confirm("Are you sure you want to delete this file?")) return;
+
+        $.ajax({
+            url: "/requests/delete-file/" + requestId,
+            type: "POST",
+            data: {
+                file_name: fileName,
+                _token: $('meta[name="csrf-token"]').attr("content"), // CSRF token
+            },
+            success: function (response) {
+                // ✅ Remove deleted file from UI (inside modal)
+                $(`button.deleteFileBtn[data-file='${fileName}']`)
+                    .closest("div")
+                    .remove();
+
+                // ✅ If no more files left, show "No uploaded files yet."
+                let remainingFiles = $("#existingUploadedFiles").children()
+                    .length;
+                if (remainingFiles === 0) {
+                    $("#existingUploadedFiles").html(
+                        "<p>No uploaded files yet.</p>"
+                    );
+                }
+
+                // ✅ Update table row UI dynamically
+                let filesContainer = $("#uploadedFormat-" + requestId);
+                filesContainer.html(
+                    response.files
+                        .map(
+                            (file) =>
+                                `<div class="d-flex align-items-center border p-2 mb-1 rounded">
                     <a href="/storage/uploads/${file}" target="_blank">${file}</a>
                     <button class="btn btn-sm btn-danger deleteFileBtn" data-id="${requestId}" data-file="${file}">
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>`
-                ).join(''));
-
-                // ✅ Hide the modal first
-                $("#uploadModal").modal("hide");
-
-                // ✅ Reload the page after a short delay
-                setTimeout(() => {
-                    location.reload();
-                }, 500); // Adjust delay if needed
+                        )
+                        .join("")
+                );
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.error("Error:", xhr.responseText);
-                alert("File upload failed. Please try again.");
-            }
+                alert("Failed to delete file. Please try again.");
+            },
         });
     });
 
     // ✅ Restore the last selected filter on page load
-let savedFilter = localStorage.getItem("selectedFilter");
-if (savedFilter) {
-    $(".filter-btn[data-filter='" + savedFilter + "']").click();
-} else {
-    $(".filter-btn[data-filter='all']").click(); // Default to "All Tables"
-}
+    let savedFilter = localStorage.getItem("selectedFilter");
+    if (savedFilter) {
+        $(".filter-btn[data-filter='" + savedFilter + "']").click();
+    } else {
+        $(".filter-btn[data-filter='all']").click(); // Default to "All Tables"
+    }
 
-// ✅ Save filter selection before making changes
-$(".filter-btn").on("click", function () {
-    let filter = $(this).data("filter");
-    localStorage.setItem("selectedFilter", filter); // Store filter in localStorage
+    // ✅ Save filter selection before making changes
+    $(".filter-btn").on("click", function () {
+        let filter = $(this).data("filter");
+        localStorage.setItem("selectedFilter", filter); // Store filter in localStorage
+    });
+
+    // ✅ Function to Reload Page While Keeping the Filter
+    function reloadPageWithFilter() {
+        let currentFilter = localStorage.getItem("selectedFilter") || "all";
+        $(".filter-btn[data-filter='" + currentFilter + "']").click(); // ✅ Reapply Filter
+    }
 });
-
-// ✅ Function to Reload Page While Keeping the Filter
-function reloadPageWithFilter() {
-    let currentFilter = localStorage.getItem("selectedFilter") || "all";
-    $(".filter-btn[data-filter='" + currentFilter + "']").click(); // ✅ Reapply Filter
-}
-
-
-});
-
-
-
 
 // Delete Attachment Function
 function deleteAttachment(requestId, file) {
     if (confirm("Are you sure you want to delete this attachment?")) {
-        let deletedFiles = $("#deletedFilesInput").val() ? JSON.parse($("#deletedFilesInput").val()) : [];
+        let deletedFiles = $("#deletedFilesInput").val()
+            ? JSON.parse($("#deletedFilesInput").val())
+            : [];
         deletedFiles.push(file);
         $("#deletedFilesInput").val(JSON.stringify(deletedFiles));
 
-        $("a[href$='" + file + "']").closest("div").remove(); // Remove from UI
+        $("a[href$='" + file + "']")
+            .closest("div")
+            .remove(); // Remove from UI
     }
 }
 
-
-$(".viewAttachmentsBtn").click(function() {
+$(".viewAttachmentsBtn").click(function () {
     let attachments = $(this).data("attachments");
     console.log("Raw attachments data:", attachments); // Debugging output
 
@@ -292,30 +331,36 @@ $(".viewAttachmentsBtn").click(function() {
 
     if (!attachments || attachments === "null" || attachments.length === 0) {
         $("#attachmentsList").append(
-            '<li class="list-group-item text-muted">No attachments available.</li>');
+            '<li class="list-group-item text-muted">No attachments available.</li>'
+        );
         return;
     }
 
     let attachmentArray;
     try {
-        attachmentArray = typeof attachments === "string" ? JSON.parse(attachments) : attachments;
+        attachmentArray =
+            typeof attachments === "string"
+                ? JSON.parse(attachments)
+                : attachments;
     } catch (error) {
         console.error("Error parsing attachments:", error);
         $("#attachmentsList").append(
-            '<li class="list-group-item text-danger">Error loading attachments.</li>');
+            '<li class="list-group-item text-danger">Error loading attachments.</li>'
+        );
         return;
     }
 
     if (!Array.isArray(attachmentArray)) {
         console.error("Expected an array but got:", typeof attachmentArray);
         $("#attachmentsList").append(
-            '<li class="list-group-item text-danger">Invalid attachment format.</li>');
+            '<li class="list-group-item text-danger">Invalid attachment format.</li>'
+        );
         return;
     }
 
     attachmentArray.forEach((file, index) => {
         let filePath = `/storage/attachments/${file}`;
-        let fileName = file.split('/').pop(); // Extract file name
+        let fileName = file.split("/").pop(); // Extract file name
 
         console.log("File Path:", filePath); // Debugging
         $("#attachmentsList").append(`
@@ -329,7 +374,7 @@ $(".viewAttachmentsBtn").click(function() {
     });
 
     // Download functionality
-    $(".downloadAttachmentBtn").click(function() {
+    $(".downloadAttachmentBtn").click(function () {
         let fileUrl = $(this).data("file");
         let fileName = $(this).data("filename");
 
@@ -342,71 +387,4 @@ $(".viewAttachmentsBtn").click(function() {
     });
 });
 
-$(document).ready(function () {
-    let selectedRequestId = null;
-
-    // When "Forward" is clicked, store the request ID and check for files
-    $(".forwardRequestBtn").on("click", function () {
-        selectedRequestId = $(this).data("id");
-
-        // ✅ Check if uploaded files exist in the UI
-        let uploadedFilesCount = $("#uploadedFormat-" + selectedRequestId).find("a").length;
-
-        if (uploadedFilesCount === 0) {
-            // If no files are detected in the UI, check from the database
-            $.ajax({
-                url: "/requests/check-files/" + selectedRequestId, // Laravel route
-                type: "GET",
-                success: function (response) {
-                    if (response.fileCount > 0) {
-                        $("#forwardConfirmModal").modal("show"); // ✅ Open modal if files exist
-                    } else {
-                        alert("You cannot forward this request because no files have been uploaded.");
-                    }
-                },
-                error: function (xhr) {
-                    console.error("Error:", xhr.responseText);
-                    alert("Failed to check uploaded files. Please try again.");
-                }
-            });
-        } else {
-            $("#forwardConfirmModal").modal("show"); // ✅ Open modal if files exist in the UI
-        }
-    });
-
-    // When "Yes, Forward" is clicked, send AJAX request
-    $("#confirmForwardBtn").on("click", function () {
-        if (!selectedRequestId) {
-            alert("Error: Request ID not found.");
-            return;
-        }
-
-        $.ajax({
-            url: "/requests/forward/" + selectedRequestId, // Laravel Route
-            type: "POST",
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
-            },
-            success: function(response) {
-                alert(response.success);
-                $("#forwardConfirmModal").modal("hide");
-            
-                let row = $(".forwardRequestBtn[data-id='" + selectedRequestId + "']").closest("tr");
-                row.find("td:nth-child(2)").html('<span class="badge bg-orange">Under Review</span>');
-            
-                reloadPageWithFilter(); // ✅ Preserve filter state
-            },
-            
-            error: function (xhr) {
-                console.error("Error:", xhr.responseText);
-                alert("Failed to forward request. Please try again.");
-            }
-        });
-    });
-});
-
-
-
-
-
-
+$(document).ready(function () {});

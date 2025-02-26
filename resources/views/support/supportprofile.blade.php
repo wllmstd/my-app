@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.support') 
 
 @section('title', 'Support Profile')
 

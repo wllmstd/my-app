@@ -1,49 +1,27 @@
 <?php
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminDashboardController;
-use App\Http\Controllers\SupportDashboardController;
-use App\Http\Controllers\UserDashboardController;
-use App\Http\Controllers\AdminManageController;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\SupportManageController;
-use App\Http\Controllers\UserManageController;
-use App\Http\Controllers\RequestController;
-use App\Http\Controllers\AdminProfileController;    
-use App\Http\Controllers\SupportProfileController;    
 use Illuminate\Support\Facades\Response;
+use Illuminate\Http\Request;
+use App\Http\Controllers\{
+    AuthController, AdminDashboardController, SupportDashboardController, UserDashboardController,
+    AdminManageController, SupportManageController, UserManageController, RequestController,
+    AdminProfileController, SupportProfileController
+};
+use App\Http\Middleware\RoleMiddleware;
 
+// ===============================
+// AUTHENTICATION ROUTES
+// ===============================
 
-
-// Root route pointing to the login page
+// Root Login Route
 Route::get('/', function () {
     return view('login');
 })->name('login');
 
-// Handle login request
 Route::post('/', [AuthController::class, 'login'])->name('login.post');
-
-// Registration Routes
-Route::get('/signup', [AuthController::class, 'showSignup'])->name('signup');
-Route::post('/signup', [AuthController::class, 'signup'])->name('signup.post');
-
-Route::get('/admindashboard', [AdminDashboardController::class, 'index'])
-    ->name('admindashboard')
-    ->middleware('auth');
-
-
-
-
-Route::get('/supportdashboard', function () {
-    return view('support.supportdashboard');
-})->name('supportdashboard')->middleware('auth');
-
-Route::get('/userdashboard', function () {
-    return view('user.userdashboard');
-})->name('userdashboard')->middleware('auth');
-
 
 // Logout Route
 Route::post('/logout', function () {
@@ -53,86 +31,105 @@ Route::post('/logout', function () {
     return redirect('/');
 })->name('logout');
 
-// Admin Routes (Admin management pages)
-Route::middleware(['auth'])->group(function () {
-    Route::get('/adminmanage', [AdminManageController::class, 'index'])->name('adminmanage');
-    Route::delete('/adminmanage/delete/{id}', [AdminManageController::class, 'destroy'])->name('adminmanage.delete');
-    Route::get('/adminmanage/edit/{id}', [AdminManageController::class, 'edit'])->name('adminmanage.edit');
-    Route::put('/adminmanage/save-edited/{id}', [AdminManageController::class, 'saveEdited'])->name('adminmanage.saveEdited');
-    Route::post('/adminmanage/store', [AdminManageController::class, 'store'])->name('adminmanage.store');
 
-    Route::get('/admin/profile', [AdminProfileController::class, 'index'])->name('admin.profile');
-    Route::post('/admin/profile/update', [AdminProfileController::class, 'update'])->name('admin.profile.update');
-    Route::get('/admin/profile-image', [AdminProfileController::class, 'getProfileImage'])->name('admin.profile.image');
+// ===============================
+// ADMIN ROUTES (Only for Admin Role)
+// ===============================
+Route::middleware(['auth', RoleMiddleware::class . ':Admin'])->group(function () {
+    Route::get('/admindashboard', [AdminDashboardController::class, 'index'])->name('admindashboard');
 
+    Route::prefix('adminmanage')->group(function () {
+        Route::get('/', [AdminManageController::class, 'index'])->name('adminmanage');
+        Route::post('/store', [AdminManageController::class, 'store'])->name('adminmanage.store');
+        Route::get('/edit/{id}', [AdminManageController::class, 'edit'])->name('adminmanage.edit');
+        Route::put('/save-edited/{id}', [AdminManageController::class, 'saveEdited'])->name('adminmanage.saveEdited');
+        Route::delete('/delete/{id}', [AdminManageController::class, 'destroy'])->name('adminmanage.delete');
+    });
 
+    Route::prefix('admin/profile')->group(function () {
+        Route::get('/', [AdminProfileController::class, 'index'])->name('admin.profile');
+        Route::post('/update', [AdminProfileController::class, 'update'])->name('admin.profile.update');
+        Route::get('/image', [AdminProfileController::class, 'getProfileImage'])->name('admin.profile.image');
+    });
 
+    // Admin Charts
+    Route::get('/admin/users/count', [AdminDashboardController::class, 'getUserCount'])->name('admin.users.count');
+    Route::get('/admin/users/department-count', [AdminDashboardController::class, 'getDepartmentCounts']);
 });
 
-//Charts for Admin
-Route::get('/admin/users/count', [AdminDashboardController::class, 'getUserCount'])
-    ->name('admin.users.count')
-    ->middleware('auth');
-Route::get('/admin/users/department-count', [AdminDashboardController::class, 'getDepartmentCounts']);
+// ===============================
+// SUPPORT ROUTES (Only for Support Role)
+// ===============================
+Route::middleware(['auth', RoleMiddleware::class . ':Profiler'])->group(function () {
+    Route::get('/supportdashboard', fn() => view('support.supportdashboard'))->name('supportdashboard');
+    Route::prefix('supportmanage')->group(function () {
+        Route::get('/', [SupportManageController::class, 'index'])->name('supportmanage');
+        Route::post('/store', [SupportManageController::class, 'store'])->name('supportmanage.store');
+        Route::get('/edit/{id}', [SupportManageController::class, 'edit'])->name('supportmanage.edit');
+        Route::put('/save-edited/{id}', [SupportManageController::class, 'saveEdited'])->name('supportmanage.saveEdited');
+        Route::delete('/delete/{id}', [SupportManageController::class, 'destroy'])->name('supportmanage.delete');
+        Route::get('/addprofile', [SupportManageController::class, 'create'])->name('support.addprofile');
+    });
 
-//Charts for Users/TAs
-Route::get('/user/request-counts', [UserDashboardController::class, 'getRequestCounts'])->name('user.request.counts');
-Route::get('/user/request-status-counts', [UserDashboardController::class, 'getRequestStatusCounts'])
-    ->name('user.request.status.counts');
-Route::get('/user/format-counts', [UserDashboardController::class, 'getFormatCounts'])->name('user.request.format.counts');
-Route::get('/user/attachments-count', [UserDashboardController::class, 'getTotalAttachments'])->name('user.request.attachments.count');
+    Route::prefix('support/profile')->group(function () {
+        Route::get('/', [SupportProfileController::class, 'index'])->name('support.supportprofile');
+        Route::post('/update', [SupportProfileController::class, 'update'])->name('support.profile.update');
+    });
 
-
-
-// Support Routes (Support management pages)
-Route::middleware(['auth'])->group(function () {
-    Route::get('/supportmanage', [SupportManageController::class, 'index'])->name('supportmanage');
-    Route::delete('/supportmanage/delete/{id}', [SupportManageController::class, 'destroy'])->name('supportmanage.delete');
-    Route::get('/supportmanage/edit/{id}', [SupportManageController::class, 'edit'])->name('supportmanage.edit');
-    Route::put('/supportmanage/save-edited/{id}', [SupportManageController::class, 'saveEdited'])->name('supportmanage.saveEdited');
-    Route::post('/supportmanage/store', [SupportManageController::class, 'store'])->name('supportmanage.store');
-
-    Route::get('/supportmanage/addprofile', [SupportManageController::class, 'create'])->name('support.addprofile');
-
-    Route::get('/support/profile', [SupportProfileController::class, 'index'])->name('support.supportprofile');
-    Route::post('/support/profile/update', [SupportProfileController::class, 'update'])->name('support.profile.update');
+    // Support Request Management
+    Route::post('/requests/accept/{id}', [SupportManageController::class, 'acceptRequest']);
+    Route::post('/requests/upload-format/{id}', [SupportManageController::class, 'uploadFormat']);
+    Route::post('/requests/delete-file/{id}', [SupportManageController::class, 'deleteFile']);
+    Route::post('/requests/forward/{id}', [SupportManageController::class, 'forwardRequest']);
+    Route::get('/requests/check-files/{id}', [SupportManageController::class, 'checkFiles']);
 });
 
-Route::post('/requests/accept/{id}', [SupportManageController::class, 'acceptRequest']);
-Route::post('/requests/upload-format/{id}', [SupportManageController::class, 'uploadFormat']);
-Route::post('/requests/delete-file/{id}', [SupportManageController::class, 'deleteFile']);
-Route::post('/requests/forward/{id}', [SupportManageController::class, 'forwardRequest']);
-Route::get('/requests/check-files/{id}', [SupportManageController::class, 'checkFiles']);
+// ===============================
+// USER ROUTES (Only for Authenticated Users)
+// ===============================
+Route::middleware(['auth', RoleMiddleware::class . ':Talent Acquisition'])->group(function () {
+    Route::get('/userdashboard', fn() => view('user.userdashboard'))->name('userdashboard');
+    Route::prefix('usermanage')->group(function () {
+        Route::get('/', [UserManageController::class, 'index'])->name('usermanage');
+        Route::get('/addrequest', [UserManageController::class, 'create'])->name('user.addrequest');
+    });
 
-
-
-// User Routes (User management pages)
-Route::middleware(['auth'])->group(function () {
-    Route::get('/usermanage', [UserManageController::class, 'index'])->name('usermanage');
-    Route::get('/usermanage/addrequest', [UserManageController::class, 'create'])->name('user.addrequest');
     Route::post('/requests', [RequestController::class, 'store'])->name('requests.store');
 });
 
+// ===============================
+// REQUEST ROUTES
+// ===============================
+Route::prefix('requests')->group(function () {
+    Route::get('/', [RequestController::class, 'index'])->name('requests.index');
+    Route::get('/edit/{id}', [RequestController::class, 'edit'])->name('requests.edit');
+    Route::match(['PUT', 'POST'], '/update/{id}', [RequestController::class, 'saveEdited'])->name('requests.update');
+    Route::delete('/delete/{id}', [RequestController::class, 'destroy'])->name('requests.destroy');
+    Route::post('/{id}/delete-attachment', [RequestController::class, 'deleteAttachment'])->name('requests.deleteAttachment');
+    Route::post('/{id}/complete', [RequestController::class, 'markAsComplete'])->name('requests.complete');
+    Route::post('/{id}/revise', [RequestController::class, 'requestRevision'])->name('requests.revise');
+    Route::get('/{id}/details', [RequestController::class, 'getRequestWithProfiler']);
+});
 
-// Request Routes
-Route::get('/requests/edit/{id}', [RequestController::class, 'edit'])->name('requests.edit');
-Route::match(['PUT', 'POST'], '/requests/update/{id}', [RequestController::class, 'saveEdited'])->name('requests.update');
-Route::delete('/requests/delete/{id}', [RequestController::class, 'destroy'])->name('requests.destroy');
-Route::get('/requests', [RequestController::class, 'index'])->name('requests.index');
-Route::delete('/requests/{id}', [RequestController::class, 'destroy'])->name('requests.destroy');
-Route::post('/requests/{id}/delete-attachment', [RequestController::class, 'deleteAttachment'])->name('requests.deleteAttachment');
-Route::post('/requests/{id}/complete', [RequestController::class, 'markAsDone'])->name('requests.complete');
-Route::post('/requests/{id}/revise', [RequestController::class, 'requestRevision'])->name('requests.revise');
-Route::get('/requests/{id}/details', [RequestController::class, 'getRequestWithProfiler']);
-Route::post('/requests/{id}/complete', [RequestController::class, 'markAsComplete'])->name('requests.complete');
+// ===============================
+// USER DASHBOARD CHARTS
+// ===============================
+Route::prefix('user')->group(function () {
+    Route::get('/request-counts', [UserDashboardController::class, 'getRequestCounts'])->name('user.request.counts');
+    Route::get('/request-status-counts', [UserDashboardController::class, 'getRequestStatusCounts'])->name('user.request.status.counts');
+    Route::get('/format-counts', [UserDashboardController::class, 'getFormatCounts'])->name('user.request.format.counts');
+    Route::get('/attachments-count', [UserDashboardController::class, 'getTotalAttachments'])->name('user.request.attachments.count');
+});
 
-//Download Route
+// ===============================
+// FILE DOWNLOAD ROUTE
+// ===============================
 Route::get('/download/{filename}', function ($filename) {
     $filePath = 'uploads/' . $filename;
 
     if (Storage::disk('public')->exists($filePath)) {
         return Response::download(storage_path("app/public/{$filePath}"));
-    } else {
-        abort(404, "File not found.");
     }
+
+    abort(404, "File not found.");
 });

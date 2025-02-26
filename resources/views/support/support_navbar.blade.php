@@ -22,11 +22,23 @@
                     <a class="nav-link {{ request()->routeIs('notifications') ? 'active text-white' : '' }}"
                         href="#">Notifications</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a>
+
+                <!-- Profile Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown">
+                        <img src="{{ asset('storage/' . auth()->user()->image) }}" class="rounded-circle me-2" alt="Profile" width="35" height="35">
+                        <span>{{ auth()->user()->name }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                        <li><a class="dropdown-item" href="{{ route('support.supportprofile') }}"><i class="fa fa-user me-2"></i>View Profile</a></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                                <i class="fa fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
-
         </div>
     </div>
 </nav>

@@ -12,6 +12,7 @@ use App\Http\Controllers\SupportManageController;
 use App\Http\Controllers\UserManageController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\AdminProfileController;    
+use App\Http\Controllers\SupportProfileController;    
 use Illuminate\Support\Facades\Response;
 
 
@@ -92,6 +93,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/supportmanage/store', [SupportManageController::class, 'store'])->name('supportmanage.store');
 
     Route::get('/supportmanage/addprofile', [SupportManageController::class, 'create'])->name('support.addprofile');
+
+    Route::get('/support/profile', [SupportProfileController::class, 'index'])->name('support.supportprofile');
+    Route::post('/support/profile/update', [SupportProfileController::class, 'update'])->name('support.profile.update');
 });
 
 Route::post('/requests/accept/{id}', [SupportManageController::class, 'acceptRequest']);

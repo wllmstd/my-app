@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\{
     AuthController, AdminDashboardController, SupportDashboardController, UserDashboardController,
     AdminManageController, SupportManageController, UserManageController, RequestController,
-    AdminProfileController, SupportProfileController
+    AdminProfileController, SupportProfileController, UserProfileController
 };
 use App\Http\Middleware\RoleMiddleware;
 
@@ -92,6 +92,10 @@ Route::middleware(['auth', RoleMiddleware::class . ':Talent Acquisition'])->grou
     Route::prefix('usermanage')->group(function () {
         Route::get('/', [UserManageController::class, 'index'])->name('usermanage');
         Route::get('/addrequest', [UserManageController::class, 'create'])->name('user.addrequest');
+    });
+    Route::prefix('user/profile')->group(function () {
+        Route::get('/', [UserProfileController::class, 'index'])->name('user.userprofile');
+        Route::post('/update', [UserProfileController::class, 'update'])->name('user.profile.update');
     });
 
     Route::post('/requests', [RequestController::class, 'store'])->name('requests.store');

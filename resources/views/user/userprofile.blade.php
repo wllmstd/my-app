@@ -1,6 +1,6 @@
-@extends('layouts.support') 
+@extends('layouts.user') 
 
-@section('title', 'Support Profile')
+@section('title', 'User Profile')
 
 @section('content')
 <div class="container mt-5">
@@ -12,10 +12,10 @@
 
             <div class="card shadow-lg">
                 <div class="card-header bg-primary text-white text-center">
-                    <h4>Profiler Profile</h4>
+                    <h4>Talent Acquisition Profile</h4>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('support.profile.update') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <div class="row">

@@ -385,6 +385,7 @@ $(".viewAttachmentsBtn").click(function () {
         a.click();
         document.body.removeChild(a);
     });
-});
 
-$(document).ready(function () {});
+    //Initialize Bootstrap tooltips
+    $('[data-bs-toggle="tooltip"]').tooltip();
+});

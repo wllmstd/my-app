@@ -48,10 +48,10 @@
                     <th>Last Name</th>
                     <th>Nationality</th>
                     <th>Location</th>
-                    <th>Attachments</th>
                     <th>Format</th>
+                    <th>Attachments</th>
                     <th>Date Accepted</th>
-                    <th>Uploads</th>
+                    <th>Submit</th>
 
                 </tr>
             </thead>
@@ -80,21 +80,20 @@
                     <td>{{ $request->Last_Name }}</td>
                     <td>{{ $request->Nationality }}</td>
                     <td>{{ $request->Location }}</td>
+                    <td>{{ $request->Format }}</td>
                     <td>
                         <button class="btn btn-info btn-sm viewAttachmentsBtn"
                             data-attachments='@json(json_decode($request->Attachment, true))' data-bs-toggle="modal"
-                            data-bs-target="#attachmentsModal">
-                            View Attachments
+                            data-bs-target="#attachmentsModal" data-bs-toggle="tooltip" data-bs-placement="top" title="View Attachments"> <i class="bi bi-paperclip"></i>
+                            <!-- View Attachments -->
                         </button>
-
-
                     </td>
-                    <td>{{ $request->Format }}</td>
+
                     <td>{{ $request->Updated_Time }}</td>
 
 
                     <!-- ✅ Display Uploaded Format -->
-                        <!-- Upload Button - Opens Upload Modal -->
+                    <!-- Upload Button - Opens Upload Modal -->
                     <td id="uploadedFormat-{{ $request->Request_ID }}">
                         <!-- Upload Button - Opens Upload Modal -->
                         <button
@@ -102,8 +101,9 @@
                             data-id="{{ $request->Request_ID }}"
                             data-files='@json(json_decode($request->uploaded_format, true) ?? [])'
                             {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? '' : 'disabled' }}
-                            data-bs-toggle="modal" data-bs-target="#uploadModal">
-                            Upload Files
+                            data-bs-toggle="modal" data-bs-target="#uploadModal" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Upload and send the requested format"><i class="bi bi-upload"></i>
+                            <!-- Upload Files -->
                         </button>
                     </td>
 
@@ -313,70 +313,70 @@
 </body>
 
 <style>
-.filter-btn {
-    border-radius: 50px;
-    /* Make buttons more circular */
-    padding: 6px 14px;
-}
+    .filter-btn {
+        border-radius: 50px;
+        /* Make buttons more circular */
+        padding: 6px 14px;
+    }
 
-.filter-btn {
-    border-radius: 50px;
-    /* Make buttons more circular */
-    padding: 6px 14px;
-}
+    .filter-btn {
+        border-radius: 50px;
+        /* Make buttons more circular */
+        padding: 6px 14px;
+    }
 
-.filter-btn.active {
-    color: white !important;
-}
+    .filter-btn.active {
+        color: white !important;
+    }
 
-/* Add specific colors when active */
-.filter-btn.active[data-filter="Pending"] {
-    background-color: #ffc107 !important;
-    /* Yellow */
-    border-color: #ffc107 !important;
-}
+    /* Add specific colors when active */
+    .filter-btn.active[data-filter="Pending"] {
+        background-color: #ffc107 !important;
+        /* Yellow */
+        border-color: #ffc107 !important;
+    }
 
-.filter-btn.active[data-filter="In Progress"] {
-    background-color: #0d6efd !important;
-    /* Blue */
-    border-color: #0d6efd !important;
-}
+    .filter-btn.active[data-filter="In Progress"] {
+        background-color: #0d6efd !important;
+        /* Blue */
+        border-color: #0d6efd !important;
+    }
 
-.filter-btn.active[data-filter="Under Review"] {
-    background-color: orange !important;
-    /* Orange */
-    border-color: orange !important;
-}
+    .filter-btn.active[data-filter="Under Review"] {
+        background-color: orange !important;
+        /* Orange */
+        border-color: orange !important;
+    }
 
-.filter-btn.active[data-filter="Needs Revision"] {
-    background-color: #dc3545 !important;
-    /* Red */
-    border-color: #dc3545 !important;
-}
+    .filter-btn.active[data-filter="Needs Revision"] {
+        background-color: #dc3545 !important;
+        /* Red */
+        border-color: #dc3545 !important;
+    }
 
-.filter-btn.active[data-filter="Completed"] {
-    background-color: #198754 !important;
-    /* Green */
-    border-color: #198754 !important;
-}
+    .filter-btn.active[data-filter="Completed"] {
+        background-color: #198754 !important;
+        /* Green */
+        border-color: #198754 !important;
+    }
 
-.btn-outline-orange {
-    color: orange !important;
-    border-color: orange !important;
-}
+    .btn-outline-orange {
+        color: orange !important;
+        border-color: orange !important;
+    }
 
-.btn-outline-orange:hover {
-    background-color: orange !important;
-    color: white !important;
-}
+    .btn-outline-orange:hover {
+        background-color: orange !important;
+        color: white !important;
+    }
 
-#acceptedRequestsTable,
-#pendingRequestsTable,
-#acceptedRequestsHeading,
-#pendingRequestsHeading {
-    display: none;
-    /* Hide tables initially */
-}
+    #acceptedRequestsTable,
+    #pendingRequestsTable,
+    #acceptedRequestsHeading,
+    #pendingRequestsHeading {
+        display: none;
+        /* Hide tables initially */
+    }
 </style>
 
 </html>

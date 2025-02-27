@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Dashboard</a>
+        <a class="navbar-brand" href="#">Geco Queuing System</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -24,23 +24,23 @@
                         href="#">Notifications</a>
                 </li>
 
-                <!-- Profile Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown"
-                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="{{ asset('storage/' . auth()->user()->image) }}" alt="Profile Picture"
-                            class="rounded-circle" width="40" height="40">
+
+                                <!-- Profile Dropdown -->
+                                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown">
+                        <img src="{{ asset('storage/' . auth()->user()->image) }}" class="rounded-circle me-2" alt="Profile" width="35" height="35">
+                        <span>{{ auth()->user()->name }}</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                        <li><a class="dropdown-item" href="{{ route('admin.profile') }}">Profile</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.profile') }}"><i class="fa fa-user me-2"></i>View Profile</a></li>
                         <li>
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="dropdown-item text-danger">Logout</button>
-                            </form>
+                            <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                                <i class="fa fa-sign-out-alt me-2"></i>Logout
+                            </a>
                         </li>
                     </ul>
                 </li>
+
 
             </ul>
         </div>

@@ -86,7 +86,8 @@
                     <td>
                         <button class="btn btn-info btn-sm viewAttachmentsBtn"
                             data-attachments='@json(json_decode($request->Attachment, true))' data-bs-toggle="modal"
-                            data-bs-target="#attachmentsModal" data-bs-toggle="tooltip" data-bs-placement="top" title="View Attachments"> <i class="bi bi-paperclip"></i>
+                            data-bs-target="#attachmentsModal" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="View Attachments"> <i class="bi bi-paperclip"></i>
                             <!-- View Attachments -->
                         </button>
                     </td>
@@ -98,15 +99,22 @@
                     <!-- Upload Button - Opens Upload Modal -->
                     <td id="uploadedFormat-{{ $request->Request_ID }}">
                         <!-- Upload Button - Opens Upload Modal -->
-                        <button
-                            class="btn btn-sm {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? 'btn-success' : 'btn-secondary' }} openUploadModalBtn"
+                        <button class="btn btn-sm {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? 'btn-success' : 'btn-secondary' }} openUploadModalBtn"
                             data-id="{{ $request->Request_ID }}"
+                            data-requested-by="{{ $request->user->first_name ?? '' }} {{ $request->user->last_name ?? '' }}"
+                            data-applicant-name="{{ $request->First_Name }} {{ $request->Last_Name }}"
+                            data-requested-format="{{ $request->Format }}"
                             data-files='@json(json_decode($request->uploaded_format, true) ?? [])'
                             {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? '' : 'disabled' }}
-                            data-bs-toggle="modal" data-bs-target="#uploadModal" data-bs-toggle="tooltip"
-                            data-bs-placement="top" title="Upload and send the requested format"><i class="bi bi-upload"></i>
-                            <!-- Upload Files -->
+                            data-bs-toggle="modal"
+                            data-bs-target="#uploadModal"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Upload and send the requested format">
+                            <i class="bi bi-upload"></i>
                         </button>
+
+                        <!-- Upload Files -->
                     </td>
 
                     </td>
@@ -245,17 +253,26 @@
                 </div>
                 <form id="uploadForm" enctype="multipart/form-data">
                     @csrf
-                    <input type="hidden" id="upload_request_id" name="request_id"> <!-- Store Request ID -->
+                    <input type="hidden" id="upload_request_id" name="request_id">
 
                     <div class="modal-body">
-                        <h6>Existing Files:</h6>
-                        <div id="existingUploadedFiles" class="mb-3"></div> <!-- ✅ Files + Trash Buttons Here -->
+                        <p><strong>Requested By:</strong> <span id="requestedBy"></span></p>
+                        <p><strong>Name of Applicant:</strong> <span id="applicantName"></span></p>
+                        <p><strong>Requested Format:</strong> <span id="requestedFormat"></span></p>
+
+                        <h6>Uploaded Files:</h6>
+                        <div id="existingUploadedFiles" class="mb-3"></div>
 
                         <label for="fileUpload" class="form-label">Select File(s)</label>
                         <input type="file" class="form-control" id="fileUpload" name="uploaded_format[]" multiple>
 
                         <div id="uploadFeedback" class="text-danger d-none">Please select at least one file.</div>
+
+                        <label for="uploadMessage" class="form-label mt-3">Message/Feedback</label>
+                        <textarea class="form-control" id="uploadMessage" name="upload_message" rows="3"
+                            placeholder="Add a message or feedback about the upload (optional)"></textarea>
                     </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Upload</button>
@@ -275,7 +292,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Files are successfuly uploaded. Now, are you sure you want to forward this request? This action cannot be undone.
+                    Files are successfuly uploaded. Now, are you sure you want to forward this request? This action
+                    cannot be undone.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -284,10 +302,6 @@
             </div>
         </div>
     </div>
-
-
-
-
 
     <!-- Attachments Modal -->
     <div class="modal fade" id="attachmentsModal" tabindex="-1" aria-labelledby="attachmentsModalLabel"

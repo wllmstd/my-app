@@ -113,6 +113,8 @@ Route::prefix('requests')->group(function () {
     Route::post('/{id}/complete', [RequestController::class, 'markAsComplete'])->name('requests.complete');
     Route::post('/{id}/revise', [RequestController::class, 'requestRevision'])->name('requests.revise');
     Route::get('/{id}/details', [RequestController::class, 'getRequestWithProfiler']);
+    Route::get('/{id}/full-details', [RequestController::class, 'getRequestDetails']);
+
 });
 
 // ===============================

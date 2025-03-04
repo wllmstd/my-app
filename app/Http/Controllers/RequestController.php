@@ -221,6 +221,27 @@ class RequestController extends Controller
         }
     }
 
+    public function getRequestDetails($id)
+    {
+        try {
+            $request = DB::table('requests')
+                ->leftJoin('users', 'users.id', '=', 'requests.Users_ID') // ✅ Ensure correct user ID
+                ->where('requests.Request_ID', $id)
+                ->select(
+                    'requests.*',
+                    'users.first_name AS requested_by_first_name',
+                    'users.last_name AS requested_by_last_name'
+                )
+                ->first();
 
+            if (!$request) {
+                return response()->json(['message' => 'Request not found'], 404);
+            }
 
+            return response()->json($request);
+        } catch (\Exception $e) {
+            Log::error('Error fetching request details: ' . $e->getMessage());
+            return response()->json(['message' => 'Server error occurred'], 500);
+        }
+    }
 }

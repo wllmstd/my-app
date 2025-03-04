@@ -188,10 +188,10 @@ $(document).ready(function () {
         let requestId = $(this).data("id");
 
         $.ajax({
-            url: `/requests/${requestId}/full-details`, 
+            url: `/requests/${requestId}/full-details`,
             type: "GET",
             success: function (data) {
-                console.log("Fetched Data:", data); 
+                console.log("Fetched Data:", data);
 
                 //Populate the requested by field
                 if (
@@ -359,21 +359,53 @@ $(document).on("click", ".deleteFileBtn", function () {
     });
 });
 
-// ✅ Restore the last selected filter on page load
-let savedFilter = localStorage.getItem("selectedFilter");
-if (savedFilter) {
-    $(".filter-btn[data-filter='" + savedFilter + "']").click();
-} else {
-    $(".filter-btn[data-filter='all']").click(); // Default to "All Tables"
-}
+//Table Filter Functionality
+$(document).ready(function () {
+    let savedFilter = localStorage.getItem("selectedFilter") || "all"; // Default to 'all' if nothing is saved
 
-// ✅ Save filter selection before making changes
-$(".filter-btn").on("click", function () {
-    let filter = $(this).data("filter");
-    localStorage.setItem("selectedFilter", filter); // Store filter in localStorage
+    // Show tables based on saved filter
+    showFilteredTable(savedFilter);
+
+    // Highlight the correct filter button
+    $(".filter-btn").removeClass("active");
+    $(".filter-btn[data-filter='" + savedFilter + "']").addClass("active");
 });
 
-// ✅ Function to Reload Page While Keeping the Filter
+// Function to show the correct table based on filter
+function showFilteredTable(filter) {
+    if (filter === "all") {
+        $("#acceptedRequestsTable, #pendingRequestsTable").show();
+        $("#acceptedRequestsHeading, #pendingRequestsHeading").show();
+        $(".request-row, .pending-row").show();
+    } else if (filter === "Pending") {
+        $("#acceptedRequestsTable, #acceptedRequestsHeading").hide();
+        $("#pendingRequestsTable, #pendingRequestsHeading").show();
+    } else {
+        $("#acceptedRequestsTable, #acceptedRequestsHeading").show();
+        $("#pendingRequestsTable, #pendingRequestsHeading").hide();
+
+        $(".request-row").each(function () {
+            let rowStatus = $(this).data("status");
+
+            if (rowStatus === filter) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    }
+}
+
+// Event listener for filter buttons
+$(".filter-btn").on("click", function () {
+    let filter = $(this).data("filter");
+    localStorage.setItem("selectedFilter", filter); // Save filter selection
+
+    $(".filter-btn").removeClass("active");
+    $(this).addClass("active");
+
+    showFilteredTable(filter); // Apply the selected filter
+});
 
 // Delete Attachment Function
 function deleteAttachment(file) {

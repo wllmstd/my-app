@@ -15,10 +15,15 @@ class RequestController extends Controller
 {
     public function index()
     {
-        $requests = UserRequest::all(); // Use UserRequest instead of RequestModel
+        $userId = Auth::id(); // Get currently logged-in user's ID
+    
+        $requests = UserRequest::where(function ($query) use ($userId) {
+            $query->where('Status', 'Pending') // Everyone sees pending requests
+                  ->orWhere('accepted_by', $userId); // Profiler sees only their own assigned requests
+        })->get();
+    
         return view('user.usermanage', compact('requests'));
     }
-
 
     public function destroy($id)
     {

@@ -170,7 +170,7 @@
                         <div class="mb-3">
                             <label for="attachment" class="form-label">Attachments (PDF, DOCX)</label>
                             <input type="file" class="form-control" id="attachment" name="attachments[]"
-                                accept=".pdf,.doc,.docx" multiple>
+                                accept=".pdf,.doc,.docx">
                         </div>
 
                         <!-- File Preview Section -->

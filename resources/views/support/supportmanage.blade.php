@@ -388,12 +388,14 @@
     }
 
     #acceptedRequestsTable,
-    #pendingRequestsTable,
-    #acceptedRequestsHeading,
-    #pendingRequestsHeading {
-        display: none;
-        /* Hide tables initially */
-    }
+#pendingRequestsTable,
+#acceptedRequestsHeading,
+#pendingRequestsHeading,
+#acceptedRequestsTable_wrapper,
+#pendingRequestsTable_wrapper {
+    display: none; /* Hide initially */
+}
+
 </style>
 
 </html>

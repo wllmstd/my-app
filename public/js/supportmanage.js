@@ -96,36 +96,6 @@ $(document).ready(function () {
         });
     });
 
-    // $(".filter-btn").on("click", function () {
-    //     let filter = $(this).data("filter");
-
-    //     // Remove 'active' class from all buttons and add to clicked one
-    //     $(".filter-btn").removeClass("active");
-    //     $(this).addClass("active");
-
-    //     // Show or hide tables and their headings based on filter
-    //     if (filter === "all") {
-    //         $("#acceptedRequestsTable, #pendingRequestsTable").show();
-    //         $("#acceptedRequestsHeading, #pendingRequestsHeading").show(); // Show headings
-    //         $(".request-row, .pending-row").show();
-    //     } else if (filter === "Pending") {
-    //         $("#acceptedRequestsTable, #acceptedRequestsHeading").hide(); // Hide Table 1 & Heading
-    //         $("#pendingRequestsTable, #pendingRequestsHeading").show(); // Show Table 2 & Heading
-    //     } else {
-    //         $("#acceptedRequestsTable, #acceptedRequestsHeading").show(); // Show Table 1 & Heading
-    //         $("#pendingRequestsTable, #pendingRequestsHeading").hide(); // Hide Table 2 & Heading
-
-    //         $(".request-row").each(function () {
-    //             let rowStatus = $(this).data("status");
-
-    //             if (rowStatus === filter) {
-    //                 $(this).show();
-    //             } else {
-    //                 $(this).hide();
-    //             }
-    //         });
-    //     }
-    // });
 
     // Open Upload Modal & Load Existing Files
     $(document).ready(function () {
@@ -361,6 +331,14 @@ $(document).on("click", ".deleteFileBtn", function () {
 });
 
 $(document).ready(function () {
+        $('#userTable').DataTable({
+            "paging": true, // Enable pagination
+            "searching": true, // Enable search
+            "ordering": true, // Enable sorting
+            "info": true, // Show information (entries count)
+            "lengthMenu": [5, 10, 25, 50], // Dropdown for entries per page
+        });
+
     // ✅ Initialize DataTables for Both Tables
     let acceptedTable = $("#acceptedRequestsTable").DataTable({
         paging: true,
@@ -395,94 +373,39 @@ $(document).ready(function () {
     function applyFilter(filter) {
         $(".filter-btn").removeClass("active");
         $(".filter-btn[data-filter='" + filter + "']").addClass("active");
-
+    
         console.log("Applying Filter:", filter);
-
+    
         if (filter === "all") {
             // ✅ Show both tables & clear filters
             $("#acceptedRequestsTable, #pendingRequestsTable").show();
             $("#acceptedRequestsHeading, #pendingRequestsHeading").show();
+            $(".dataTables_wrapper").show(); // ✅ Show DataTable controls
             acceptedTable.search("").columns().search("").draw();
             pendingTable.search("").columns().search("").draw();
         } else if (filter === "Pending") {
             // ✅ Show Pending Table & Hide Accepted Table
             $("#acceptedRequestsTable, #acceptedRequestsHeading").hide();
             $("#pendingRequestsTable, #pendingRequestsHeading").show();
+            $("#acceptedRequestsTable_wrapper").hide(); // ✅ Hide DataTable controls for accepted requests
+            $("#pendingRequestsTable_wrapper").show();  // ✅ Show DataTable controls for pending requests
             pendingTable.column(1).search(filter, true, false).draw();
         } else {
             // ✅ Show Accepted Table & Hide Pending Table
             $("#acceptedRequestsTable, #acceptedRequestsHeading").show();
             $("#pendingRequestsTable, #pendingRequestsHeading").hide();
+            $("#acceptedRequestsTable_wrapper").show(); // ✅ Show DataTable controls for accepted requests
+            $("#pendingRequestsTable_wrapper").hide();  // ✅ Hide DataTable controls for pending requests
             acceptedTable.column(1).search(filter, true, false).draw();
         }
     }
+    
 
     // ✅ Debugging: Check if the status column is read properly
     $(".request-row").each(function () {
         console.log("Row Status:", $(this).data("status"));
     });
 });
-
-
-// $(document).ready(function () {
-//     // ✅ Initialize DataTables for Accepted and Pending Requests Tables
-//     let acceptedTable = $("#acceptedRequestsTable").DataTable({
-//         paging: true,
-//         searching: true,
-//         ordering: true,
-//         info: true,
-//         lengthMenu: [5, 10, 25, 50],
-//         columnDefs: [{ orderable: false, targets: [8] }], // Disable sorting for action column
-//     });
-
-//     let pendingTable = $("#pendingRequestsTable").DataTable({
-//         paging: true,
-//         searching: true,
-//         ordering: true,
-//         info: true,
-//         lengthMenu: [5, 10, 25, 50],
-//         columnDefs: [{ orderable: false, targets: [8] }], // Disable sorting for action column
-//     });
-
-//     // ✅ Preserve and Apply Last Selected Filter on Page Load
-//     let savedFilter = localStorage.getItem("selectedFilter") || "all";
-//     applyFilter(savedFilter);
-
-//     // ✅ Handle Filter Button Click
-//     $(".filter-btn").on("click", function () {
-//         let filter = $(this).data("filter");
-//         localStorage.setItem("selectedFilter", filter);
-//         applyFilter(filter);
-//     });
-
-//     // ✅ Function to Apply Filter
-//     function applyFilter(filter) {
-//         $(".filter-btn").removeClass("active");
-//         $(".filter-btn[data-filter='" + filter + "']").addClass("active");
-
-//         // ✅ Reset all previous filters before applying a new one
-//         acceptedTable.search("").columns().search("").draw();
-//         pendingTable.search("").columns().search("").draw();
-
-//         if (filter === "all") {
-//             $("#acceptedRequestsTable, #pendingRequestsTable").show();
-//             $("#acceptedRequestsHeading, #pendingRequestsHeading").show();
-//             acceptedTable.search("").draw(); // Reset DataTables
-//             pendingTable.search("").draw();
-//         } else {
-//             $("#acceptedRequestsTable, #acceptedRequestsHeading").show();
-//             $("#pendingRequestsTable, #pendingRequestsHeading").hide();
-
-//             if (filter === "Pending") {
-//                 $("#acceptedRequestsTable, #acceptedRequestsHeading").hide();
-//                 $("#pendingRequestsTable, #pendingRequestsHeading").show();
-//                 pendingTable.column(1).search("^" + filter + "$", true, false).draw();
-//             } else {
-//                 acceptedTable.column(1).search("^" + filter + "$", true, false).draw();
-//             }
-//         }
-//     }
-// });
 
 
 // Delete Attachment Function
@@ -565,4 +488,7 @@ $(".viewAttachmentsBtn").click(function () {
 
     //Initialize Bootstrap tooltips
     $('[data-bs-toggle="tooltip"]').tooltip();
+
+
+
 });

@@ -1,4 +1,5 @@
 $(document).ready(function () {
+
     $(document).on("click", ".viewRequestBtn", function () {
         let requestId = $(this).data("id"); // ✅ Fetch ID from View button
         let firstName = $(this).attr("data-first-name");
@@ -95,36 +96,36 @@ $(document).ready(function () {
         });
     });
 
-    $(".filter-btn").on("click", function () {
-        let filter = $(this).data("filter");
+    // $(".filter-btn").on("click", function () {
+    //     let filter = $(this).data("filter");
 
-        // Remove 'active' class from all buttons and add to clicked one
-        $(".filter-btn").removeClass("active");
-        $(this).addClass("active");
+    //     // Remove 'active' class from all buttons and add to clicked one
+    //     $(".filter-btn").removeClass("active");
+    //     $(this).addClass("active");
 
-        // Show or hide tables and their headings based on filter
-        if (filter === "all") {
-            $("#acceptedRequestsTable, #pendingRequestsTable").show();
-            $("#acceptedRequestsHeading, #pendingRequestsHeading").show(); // Show headings
-            $(".request-row, .pending-row").show();
-        } else if (filter === "Pending") {
-            $("#acceptedRequestsTable, #acceptedRequestsHeading").hide(); // Hide Table 1 & Heading
-            $("#pendingRequestsTable, #pendingRequestsHeading").show(); // Show Table 2 & Heading
-        } else {
-            $("#acceptedRequestsTable, #acceptedRequestsHeading").show(); // Show Table 1 & Heading
-            $("#pendingRequestsTable, #pendingRequestsHeading").hide(); // Hide Table 2 & Heading
+    //     // Show or hide tables and their headings based on filter
+    //     if (filter === "all") {
+    //         $("#acceptedRequestsTable, #pendingRequestsTable").show();
+    //         $("#acceptedRequestsHeading, #pendingRequestsHeading").show(); // Show headings
+    //         $(".request-row, .pending-row").show();
+    //     } else if (filter === "Pending") {
+    //         $("#acceptedRequestsTable, #acceptedRequestsHeading").hide(); // Hide Table 1 & Heading
+    //         $("#pendingRequestsTable, #pendingRequestsHeading").show(); // Show Table 2 & Heading
+    //     } else {
+    //         $("#acceptedRequestsTable, #acceptedRequestsHeading").show(); // Show Table 1 & Heading
+    //         $("#pendingRequestsTable, #pendingRequestsHeading").hide(); // Hide Table 2 & Heading
 
-            $(".request-row").each(function () {
-                let rowStatus = $(this).data("status");
+    //         $(".request-row").each(function () {
+    //             let rowStatus = $(this).data("status");
 
-                if (rowStatus === filter) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-        }
-    });
+    //             if (rowStatus === filter) {
+    //                 $(this).show();
+    //             } else {
+    //                 $(this).hide();
+    //             }
+    //         });
+    //     }
+    // });
 
     // Open Upload Modal & Load Existing Files
     $(document).ready(function () {
@@ -359,53 +360,130 @@ $(document).on("click", ".deleteFileBtn", function () {
     });
 });
 
-//Table Filter Functionality
 $(document).ready(function () {
-    let savedFilter = localStorage.getItem("selectedFilter") || "all"; // Default to 'all' if nothing is saved
+    // ✅ Initialize DataTables for Both Tables
+    let acceptedTable = $("#acceptedRequestsTable").DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        info: true,
+        lengthMenu: [5, 10, 25, 50],
+        columnDefs: [{ orderable: false, targets: [9] }],
+    });
 
-    // Show tables based on saved filter
-    showFilteredTable(savedFilter);
+    let pendingTable = $("#pendingRequestsTable").DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        info: true,
+        lengthMenu: [5, 10, 25, 50],
+        columnDefs: [{ orderable: false, targets: [9] }],
+    });
 
-    // Highlight the correct filter button
-    $(".filter-btn").removeClass("active");
-    $(".filter-btn[data-filter='" + savedFilter + "']").addClass("active");
-});
+    // ✅ Preserve and Apply Last Selected Filter on Page Load
+    let savedFilter = localStorage.getItem("selectedFilter") || "all";
+    applyFilter(savedFilter);
 
-// Function to show the correct table based on filter
-function showFilteredTable(filter) {
-    if (filter === "all") {
-        $("#acceptedRequestsTable, #pendingRequestsTable").show();
-        $("#acceptedRequestsHeading, #pendingRequestsHeading").show();
-        $(".request-row, .pending-row").show();
-    } else if (filter === "Pending") {
-        $("#acceptedRequestsTable, #acceptedRequestsHeading").hide();
-        $("#pendingRequestsTable, #pendingRequestsHeading").show();
-    } else {
-        $("#acceptedRequestsTable, #acceptedRequestsHeading").show();
-        $("#pendingRequestsTable, #pendingRequestsHeading").hide();
+    // ✅ Handle Filter Button Click
+    $(".filter-btn").on("click", function () {
+        let filter = $(this).data("filter");
+        localStorage.setItem("selectedFilter", filter);
+        applyFilter(filter);
+    });
 
-        $(".request-row").each(function () {
-            let rowStatus = $(this).data("status");
+    // ✅ Function to Apply Filter in DataTables
+    function applyFilter(filter) {
+        $(".filter-btn").removeClass("active");
+        $(".filter-btn[data-filter='" + filter + "']").addClass("active");
 
-            if (rowStatus === filter) {
-                $(this).show();
-            } else {
-                $(this).hide();
-            }
-        });
+        console.log("Applying Filter:", filter);
+
+        if (filter === "all") {
+            // ✅ Show both tables & clear filters
+            $("#acceptedRequestsTable, #pendingRequestsTable").show();
+            $("#acceptedRequestsHeading, #pendingRequestsHeading").show();
+            acceptedTable.search("").columns().search("").draw();
+            pendingTable.search("").columns().search("").draw();
+        } else if (filter === "Pending") {
+            // ✅ Show Pending Table & Hide Accepted Table
+            $("#acceptedRequestsTable, #acceptedRequestsHeading").hide();
+            $("#pendingRequestsTable, #pendingRequestsHeading").show();
+            pendingTable.column(1).search(filter, true, false).draw();
+        } else {
+            // ✅ Show Accepted Table & Hide Pending Table
+            $("#acceptedRequestsTable, #acceptedRequestsHeading").show();
+            $("#pendingRequestsTable, #pendingRequestsHeading").hide();
+            acceptedTable.column(1).search(filter, true, false).draw();
+        }
     }
-}
 
-// Event listener for filter buttons
-$(".filter-btn").on("click", function () {
-    let filter = $(this).data("filter");
-    localStorage.setItem("selectedFilter", filter); // Save filter selection
-
-    $(".filter-btn").removeClass("active");
-    $(this).addClass("active");
-
-    showFilteredTable(filter); // Apply the selected filter
+    // ✅ Debugging: Check if the status column is read properly
+    $(".request-row").each(function () {
+        console.log("Row Status:", $(this).data("status"));
+    });
 });
+
+
+// $(document).ready(function () {
+//     // ✅ Initialize DataTables for Accepted and Pending Requests Tables
+//     let acceptedTable = $("#acceptedRequestsTable").DataTable({
+//         paging: true,
+//         searching: true,
+//         ordering: true,
+//         info: true,
+//         lengthMenu: [5, 10, 25, 50],
+//         columnDefs: [{ orderable: false, targets: [8] }], // Disable sorting for action column
+//     });
+
+//     let pendingTable = $("#pendingRequestsTable").DataTable({
+//         paging: true,
+//         searching: true,
+//         ordering: true,
+//         info: true,
+//         lengthMenu: [5, 10, 25, 50],
+//         columnDefs: [{ orderable: false, targets: [8] }], // Disable sorting for action column
+//     });
+
+//     // ✅ Preserve and Apply Last Selected Filter on Page Load
+//     let savedFilter = localStorage.getItem("selectedFilter") || "all";
+//     applyFilter(savedFilter);
+
+//     // ✅ Handle Filter Button Click
+//     $(".filter-btn").on("click", function () {
+//         let filter = $(this).data("filter");
+//         localStorage.setItem("selectedFilter", filter);
+//         applyFilter(filter);
+//     });
+
+//     // ✅ Function to Apply Filter
+//     function applyFilter(filter) {
+//         $(".filter-btn").removeClass("active");
+//         $(".filter-btn[data-filter='" + filter + "']").addClass("active");
+
+//         // ✅ Reset all previous filters before applying a new one
+//         acceptedTable.search("").columns().search("").draw();
+//         pendingTable.search("").columns().search("").draw();
+
+//         if (filter === "all") {
+//             $("#acceptedRequestsTable, #pendingRequestsTable").show();
+//             $("#acceptedRequestsHeading, #pendingRequestsHeading").show();
+//             acceptedTable.search("").draw(); // Reset DataTables
+//             pendingTable.search("").draw();
+//         } else {
+//             $("#acceptedRequestsTable, #acceptedRequestsHeading").show();
+//             $("#pendingRequestsTable, #pendingRequestsHeading").hide();
+
+//             if (filter === "Pending") {
+//                 $("#acceptedRequestsTable, #acceptedRequestsHeading").hide();
+//                 $("#pendingRequestsTable, #pendingRequestsHeading").show();
+//                 pendingTable.column(1).search("^" + filter + "$", true, false).draw();
+//             } else {
+//                 acceptedTable.column(1).search("^" + filter + "$", true, false).draw();
+//             }
+//         }
+//     }
+// });
+
 
 // Delete Attachment Function
 function deleteAttachment(file) {

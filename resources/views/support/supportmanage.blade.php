@@ -14,11 +14,12 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <!-- jQuery & DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" defer></script>
 
 
 </head>
@@ -41,7 +42,7 @@
 
         <!-- Table 1: My Accepted Requests -->
         <h2 id="acceptedRequestsHeading">My Accepted Requests</h2>
-        <table id="acceptedRequestsTable" class="table table-bordered">
+        <table id="acceptedRequestsTable" class="table table-bordered table-striped">
             <thead class="table-dark">
                 <tr>
                     <th>#</th>
@@ -130,7 +131,7 @@
 
         <!-- Table 2: Pending Requests -->
         <h2 id="pendingRequestsHeading">All Pending Requests</h2>
-        <table id="pendingRequestsTable" class="table table-bordered">
+        <table id="pendingRequestsTable" class="table table-bordered table-striped">
             <thead class="table-dark">
                 <tr>
                     <th>#</th>

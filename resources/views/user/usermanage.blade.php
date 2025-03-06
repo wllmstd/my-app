@@ -18,6 +18,9 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/1.13.4/sorting/datetime-moment.js"></script>
+
 
 </head>
 
@@ -57,7 +60,6 @@
                     <th>Nationality</th>
                     <th>Location</th>
                     <th>Format</th>
-                    <th>Date Created</th>
                     <th>Updated Time</th>
                     <th>Action</th>
                 </tr>
@@ -87,7 +89,6 @@
                     <td>{{ $request->Nationality }}</td>
                     <td>{{ $request->Location }}</td>
                     <td>{{ $request->Format }}</td>
-                    <td>{{ \Carbon\Carbon::parse($request->Date_Created)->format('M j, Y, h:i A') }}</td>
                     <td>
                         {{ \Carbon\Carbon::parse($request->Updated_Time)->format('M j, Y, h:i A') }}
                         <br>
@@ -202,6 +203,22 @@
                     <input type="hidden" id="request_id" name="id"> <!-- Hidden field for ID -->
 
                     <div class="modal-body">
+                        <div class="mb-3 d-flex align-items-center">
+                            <label class="form-label mb-0" style="white-space: nowrap;"><strong>Date
+                                    Created:</strong></label>
+                            <span
+                                class="ms-2">{{ \Carbon\Carbon::parse($request->Date_Created)->format('M j, Y, h:i A') }}</span>
+                        </div>
+
+                        <div class="mb-3 d-flex align-items-center">
+                            <label class="form-label mb-0" style="white-space: nowrap;"><strong>Created
+                                    By:</strong></label>
+                            <span class="ms-2">
+                                {{ optional($request->creator)->first_name }}
+                                {{ optional($request->creator)->last_name }}
+                            </span>
+                        </div>
+
                         <div class="mb-3">
                             <label for="edit_first_name" class="form-label">First Name</label>
                             <input type="text" class="form-control" id="edit_first_name" name="first_name" required>

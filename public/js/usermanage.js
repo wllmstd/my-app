@@ -15,7 +15,7 @@ $(document).ready(function() {
         "lengthMenu": [5, 10, 25, 50],
         "columnDefs": [{
             "orderable": false,
-            "targets": [9] // Disable sorting for action column
+            "targets": [8] // Disable sorting for action column
         }]
     });
 
@@ -72,14 +72,10 @@ function removeFile(index) {
     document.querySelector(`div[data-index="${index}"]`).remove();
 }
 
-//View and Edit Form
+// View and Edit Form
 $(document).ready(function() {
     // Handle View Button Click
     $(document).on("click", ".viewRequestBtn", function() {
-        // Debugging
-        console.log("Button Data Attributes:", $(this).data());
-
-        // Get values using .attr() for better reliability
         let requestId = $(this).data("id");
         let firstName = $(this).attr("data-first-name");
         let lastName = $(this).attr("data-last-name");
@@ -87,13 +83,6 @@ $(document).ready(function() {
         let location = $(this).attr("data-location");
         let format = $(this).attr("data-format");
         let attachments = $(this).attr("data-attachments");
-
-        console.log("Request ID:", requestId);
-        console.log("First Name:", firstName);
-        console.log("Last Name:", lastName);
-        console.log("Nationality:", nationality);
-        console.log("Location:", location);
-        console.log("Format:", format);
 
         // Populate Form Fields
         $("#request_id").val(requestId);
@@ -105,95 +94,110 @@ $(document).ready(function() {
 
         // Populate Existing Attachments
         let attachmentsHtml = '<h6>Existing Attachments:</h6>';
-        try {
-            let attachmentsArray = attachments ? JSON.parse(attachments) : [];
-            if (attachmentsArray.length > 0) {
-                attachmentsArray.forEach((file) => {
-                    let fileName = file.split('/').pop();
-                    let fileUrl = `/storage/attachments/${fileName}`;
-                    attachmentsHtml += `
-                    <div class="d-flex align-items-center border p-2 mb-1 rounded">
-                        <a href="${fileUrl}" target="_blank" class="me-auto">${fileName}</a>
-                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteAttachment(${requestId}, '${file}')">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                `;
-                });
-            } else {
-                attachmentsHtml += '<p>No attachments found.</p>';
-            }
-        } catch (error) {
-            console.error("Error parsing attachments:", error);
-            attachmentsHtml += '<p>Error loading attachments.</p>';
+        let attachmentsArray = attachments ? JSON.parse(attachments) : [];
+
+        if (attachmentsArray.length > 0) {
+            attachmentsArray.forEach((file) => {
+                let fileName = file.split('/').pop();
+                let fileUrl = `/storage/attachments/${fileName}`;
+                attachmentsHtml += `
+                <div class="d-flex align-items-center border p-2 mb-1 rounded">
+                    <a href="${fileUrl}" target="_blank" class="me-auto">${fileName}</a>
+                    <button type="button" class="btn btn-sm btn-danger delete-attachment-btn"
+                        data-request-id="${requestId}" data-file-name="${file}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>`;
+            });
+
+            // Disable file upload if an attachment exists
+            $("#edit_attachments").prop("disabled", true);
+        } else {
+            attachmentsHtml += '<p>No attachments found.</p>';
+            $("#edit_attachments").prop("disabled", false);
         }
+
         $("#existingAttachments").html(attachmentsHtml);
-
-
-        $("#request_id").val(requestId);
-
-        // Set Form Action
-        $("#updateRequestForm").attr("action", `/requests/update/${requestId}`);
     });
 
+    // Prevent file selection if disabled
+    $("#edit_attachments").on("change", function() {
+        if ($(this).prop("disabled")) {
+            alert("You can only have one attachment. Please remove the existing file before uploading a new one.");
+            $(this).val(""); // Clear the selected file
+        }
+    });
 
-    // Handle Form Submission to save changes to the request
-    $(document).ready(function() {
-        $("#updateRequestForm").on("submit", function(e) {
-            e.preventDefault(); // Prevent full-page reload
+    // Handle File Deletion
+    $(document).on("click", ".delete-attachment-btn", function() {
+        let requestId = $(this).data("request-id");
+        let fileName = $(this).data("file-name");
 
-            let requestId = $("#request_id").val()
-                .trim(); // Get request ID and ensure it's not empty
-            if (!requestId) {
-                alert("Error: Missing request ID.");
-                return;
-            }
-
-            let formData = new FormData(this);
-            formData.append("_method", "PUT"); // Tell Laravel this is a PUT request
-
+        if (confirm("Are you sure you want to delete this attachment?")) {
             $.ajax({
-                url: "/requests/update/" + requestId,
+                url: `/requests/${requestId}/delete-attachment`,
                 type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    file_name: fileName
+                },
                 success: function(response) {
-                    $("#viewRequestModal").modal("hide"); // Hide the view modal
+                    if (response.success) {
+                        alert("Attachment deleted successfully!");
 
-                    // Show success message inside the View/Edit modal instead of closing it
-                    $("#successMessage").text("Request updated successfully!");
-                    $("#successModal").modal("show");
+                        // Remove the deleted attachment from UI
+                        $(`button[data-file-name='${fileName}']`).closest("div").remove();
 
-                    // Update fields dynamically without closing the modal
-                    setTimeout(() => {
-                            $("#successModal").modal("hide");
-                        },
-                        10
-                    ); // Auto-hide success modal after 1 second (adjust if needed)
+                        // Check if there are remaining attachments
+                        if ($("#existingAttachments").children().length === 1) {
+                            $("#existingAttachments").html('<p>No attachments found.</p>');
+                        }
 
-
-                    // Reload after closing success modal
-                    $("#successModal").on("hidden.bs.modal", function() {
-                        location.reload();
-                    });
+                        // Enable file upload input since the attachment is deleted
+                        $("#edit_attachments").prop("disabled", false);
+                    } else {
+                        alert("Failed to delete attachment.");
+                    }
                 },
                 error: function(xhr) {
-                    console.error("Error:", xhr.responseText);
-
-                    // Hide View/Edit Modal first
-                    $("#viewRequestModal").modal("hide");
-
-                    // Show Failure Modal after a slight delay
-
-                    $("#failedMessage").text(
-                        "Failed to update the request. Please try again."
-                    );
-                    $("#failedModal").modal("show");;
+                    console.error("Error deleting file:", xhr.responseText);
+                    alert("An error occurred. Please try again.");
                 }
             });
+        }
+    });
+
+    // Handle Form Submission
+    $("#updateRequestForm").on("submit", function(e) {
+        e.preventDefault();
+
+        let requestId = $("#request_id").val().trim();
+        if (!requestId) {
+            alert("Error: Missing request ID.");
+            return;
+        }
+
+        let formData = new FormData(this);
+        formData.append("_method", "PUT");
+
+        $.ajax({
+            url: "/requests/update/" + requestId,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $("#viewRequestModal").modal("hide");
+                alert("Request updated successfully!");
+                location.reload();
+            },
+            error: function(xhr) {
+                console.error("Error:", xhr.responseText);
+                alert("Failed to update the request. Please try again.");
+            }
         });
     });
+
 
     // Function to Delete an Attachment
     function deleteAttachment(requestId, fileName) {
@@ -202,20 +206,35 @@ $(document).ready(function() {
                 url: `/requests/${requestId}/delete-attachment`,
                 type: "POST",
                 data: {
-                    _token: "{{ csrf_token() }}",
+                    _token: $('meta[name="csrf-token"]').attr("content"), // ✅ Ensure correct CSRF token
                     file_name: fileName
                 },
                 success: function(response) {
                     if (response.success) {
                         alert("Attachment deleted successfully!");
-                        location.reload(); // Reload the page to reflect changes
+    
+                        // Remove the deleted attachment from UI
+                        $(`button[data-file-name='${fileName}']`).closest("div").remove();
+    
+                        // Check if there are remaining attachments
+                        if ($("#existingAttachments").children().length === 1) {
+                            $("#existingAttachments").html('<p>No attachments found.</p>');
+                        }
+    
+                        // ✅ Enable file upload input since the attachment is deleted
+                        $("#edit_attachments").prop("disabled", false);
                     } else {
                         alert("Failed to delete attachment.");
                     }
+                },
+                error: function(xhr) {
+                    console.error("Error deleting file:", xhr.responseText);
+                    alert("An error occurred. Please try again.");
                 }
             });
         }
     }
+    
 
         $(document).ready(function() {
         // Handle File Deletion

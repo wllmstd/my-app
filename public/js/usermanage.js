@@ -5,19 +5,18 @@ console.log("✅ usermanage.js has been loaded!");
 $(document).ready(function() {
     $('[title]').tooltip();
 
-
-      // Initialize DataTables
-      let table = $('#requestTable').DataTable({
-        "paging": true,
-        "searching": true,
-        "ordering": true,
-        "info": true,
-        "lengthMenu": [5, 10, 25, 50],
-        "columnDefs": [{
-            "orderable": false,
-            "targets": [8] // Disable sorting for action column
-        }]
-    });
+        let table = $('#requestTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "lengthMenu": [5, 10, 25, 50],
+            "order": [[7, "desc"]], // Column index 7 = Updated_Time
+            "columnDefs": [
+                { "orderable": false, "targets": [8] } // Disable sorting for action column
+            ]
+        });
+    
 
     // ✅ Preserve Filter State
     let savedFilter = localStorage.getItem("selectedFilter") || "all";

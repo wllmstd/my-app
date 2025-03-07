@@ -18,9 +18,6 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-    <script src="https://cdn.datatables.net/plug-ins/1.13.4/sorting/datetime-moment.js"></script>
-
 
 </head>
 
@@ -89,13 +86,14 @@
                     <td>{{ $request->Nationality }}</td>
                     <td>{{ $request->Location }}</td>
                     <td>{{ $request->Format }}</td>
-                    <td>
+                    <td data-order="{{ \Carbon\Carbon::parse($request->Updated_Time)->timestamp }}">
                         {{ \Carbon\Carbon::parse($request->Updated_Time)->format('M j, Y, h:i A') }}
                         <br>
                         <small class="text-muted">
                             ({{ \Carbon\Carbon::parse($request->Updated_Time)->diffForHumans() }})
                         </small>
                     </td>
+
                     <td>
                         <button class="btn btn-primary btn-sm viewRequestBtn" data-id="{{ $request->Request_ID }}"
                             data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
@@ -214,8 +212,8 @@
                             <label class="form-label mb-0" style="white-space: nowrap;"><strong>Created
                                     By:</strong></label>
                             <span class="ms-2">
-                                {{ optional($request->creator)->first_name }}
-                                {{ optional($request->creator)->last_name }}
+                                {{ ($request->user)->first_name }}
+                                {{ ($request->user)->last_name }}
                             </span>
                         </div>
 

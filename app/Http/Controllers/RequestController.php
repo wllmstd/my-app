@@ -13,18 +13,13 @@ use Illuminate\Support\Facades\Log;
 
 class RequestController extends Controller
 {
-    public function index()
-    {
-        $userId = Auth::id(); // Get currently logged-in user's ID
-    
-        $requests = UserRequest::where(function ($query) use ($userId) {
-            $query->where('Status', 'Pending') // Everyone sees pending requests
-                  ->orWhere('accepted_by', $userId); // Profiler sees only their own assigned requests
-        })->get();
-    
-        return view('user.usermanage', compact('requests'));
-    }
+public function index()
+{
+    $user = Auth::user(); // Get the authenticated user
+    return view('user.usermanage', compact('requests'));
+}
 
+    
     public function destroy($id)
     {
         $request = UserRequest::findOrFail($id);

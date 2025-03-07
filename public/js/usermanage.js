@@ -1,22 +1,20 @@
 console.log("✅ usermanage.js has been loaded!");
 
-
 // Initialize Bootstrap tooltips (Add Hover Effect & Tooltip for Buttons)
-$(document).ready(function() {
-    $('[title]').tooltip();
+$(document).ready(function () {
+    $("[title]").tooltip();
 
-        let table = $('#requestTable').DataTable({
-            "paging": true,
-            "searching": true,
-            "ordering": true,
-            "info": true,
-            "lengthMenu": [5, 10, 25, 50],
-            "order": [[7, "desc"]], // Column index 7 = Updated_Time
-            "columnDefs": [
-                { "orderable": false, "targets": [8] } // Disable sorting for action column
-            ]
-        });
-    
+    let table = $("#requestTable").DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        info: true,
+        lengthMenu: [5, 10, 25, 50],
+        order: [[7, "desc"]], // Column index 7 = Updated_Time
+        columnDefs: [
+            { orderable: false, targets: [8] }, // Disable sorting for action column
+        ],
+    });
 
     // ✅ Preserve Filter State
     let savedFilter = localStorage.getItem("selectedFilter") || "all";
@@ -36,45 +34,59 @@ $(document).ready(function() {
         if (filter === "all") {
             table.search("").columns().search("").draw(); // Show everything
         } else {
-            table.column(1).search("^" + filter + "$", true, false).draw(); // Exact match
+            table
+                .column(1)
+                .search("^" + filter + "$", true, false)
+                .draw(); // Exact match
         }
     }
 });
 
-//Function for File Removal 
-document.getElementById('attachment').addEventListener('change', function(event) {
-    const fileList = document.getElementById('fileList');
-    fileList.innerHTML = '';
+//Function for File Removal
+document
+    .getElementById("attachment")
+    .addEventListener("change", function (event) {
+        const fileList = document.getElementById("fileList");
+        fileList.innerHTML = "";
 
-    Array.from(event.target.files).forEach((file, index) => {
-        const fileDiv = document.createElement('div');
-        fileDiv.classList.add('d-flex', 'align-items-center', 'border', 'p-2', 'mb-1', 'rounded');
-        fileDiv.innerHTML = `
-                <span class="me-auto">${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+        Array.from(event.target.files).forEach((file, index) => {
+            const fileDiv = document.createElement("div");
+            fileDiv.classList.add(
+                "d-flex",
+                "align-items-center",
+                "border",
+                "p-2",
+                "mb-1",
+                "rounded"
+            );
+            fileDiv.innerHTML = `
+                <span class="me-auto">${file.name} (${(
+                file.size / 1024
+            ).toFixed(2)} KB)</span>
                 <button type="button" class="btn btn-sm btn-danger" onclick="removeFile(${index})">
                     <i class="bi bi-x"></i>
                 </button>
             `;
-        fileDiv.dataset.index = index;
-        fileList.appendChild(fileDiv);
+            fileDiv.dataset.index = index;
+            fileList.appendChild(fileDiv);
+        });
     });
-});
 
 function removeFile(index) {
-    const fileList = document.getElementById('attachment');
+    const fileList = document.getElementById("attachment");
     const newFiles = Array.from(fileList.files).filter((_, i) => i !== index);
 
     const dataTransfer = new DataTransfer();
-    newFiles.forEach(file => dataTransfer.items.add(file));
+    newFiles.forEach((file) => dataTransfer.items.add(file));
     fileList.files = dataTransfer.files;
 
     document.querySelector(`div[data-index="${index}"]`).remove();
 }
 
 // View and Edit Form
-$(document).ready(function() {
+$(document).ready(function () {
     // Handle View Button Click
-    $(document).on("click", ".viewRequestBtn", function() {
+    $(document).on("click", ".viewRequestBtn", function () {
         let requestId = $(this).data("id");
         let firstName = $(this).attr("data-first-name");
         let lastName = $(this).attr("data-last-name");
@@ -91,13 +103,22 @@ $(document).ready(function() {
         $("#edit_location").val(location);
         $("#edit_format").val(format);
 
+        // Get requested by name from the button data attributes
+        let requestedBy = $(this).attr("data-requested-by");
+
+        // Debugging: Ensure requestedBy has a value
+        console.log("Requested By:", requestedBy);
+
+        // Populate the "Created By" field
+        $("#requestedBy").text(requestedBy ? requestedBy : "Unknown User");
+
         // Populate Existing Attachments
-        let attachmentsHtml = '<h6>Existing Attachments:</h6>';
+        let attachmentsHtml = "<h6>Existing Attachments:</h6>";
         let attachmentsArray = attachments ? JSON.parse(attachments) : [];
 
         if (attachmentsArray.length > 0) {
             attachmentsArray.forEach((file) => {
-                let fileName = file.split('/').pop();
+                let fileName = file.split("/").pop();
                 let fileUrl = `/storage/attachments/${fileName}`;
                 attachmentsHtml += `
                 <div class="d-flex align-items-center border p-2 mb-1 rounded">
@@ -112,7 +133,7 @@ $(document).ready(function() {
             // Disable file upload if an attachment exists
             $("#edit_attachments").prop("disabled", true);
         } else {
-            attachmentsHtml += '<p>No attachments found.</p>';
+            attachmentsHtml += "<p>No attachments found.</p>";
             $("#edit_attachments").prop("disabled", false);
         }
 
@@ -120,15 +141,17 @@ $(document).ready(function() {
     });
 
     // Prevent file selection if disabled
-    $("#edit_attachments").on("change", function() {
+    $("#edit_attachments").on("change", function () {
         if ($(this).prop("disabled")) {
-            alert("You can only have one attachment. Please remove the existing file before uploading a new one.");
+            alert(
+                "You can only have one attachment. Please remove the existing file before uploading a new one."
+            );
             $(this).val(""); // Clear the selected file
         }
     });
 
     // Handle File Deletion
-    $(document).on("click", ".delete-attachment-btn", function() {
+    $(document).on("click", ".delete-attachment-btn", function () {
         let requestId = $(this).data("request-id");
         let fileName = $(this).data("file-name");
 
@@ -138,18 +161,22 @@ $(document).ready(function() {
                 type: "POST",
                 data: {
                     _token: $('meta[name="csrf-token"]').attr("content"),
-                    file_name: fileName
+                    file_name: fileName,
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         alert("Attachment deleted successfully!");
 
                         // Remove the deleted attachment from UI
-                        $(`button[data-file-name='${fileName}']`).closest("div").remove();
+                        $(`button[data-file-name='${fileName}']`)
+                            .closest("div")
+                            .remove();
 
                         // Check if there are remaining attachments
                         if ($("#existingAttachments").children().length === 1) {
-                            $("#existingAttachments").html('<p>No attachments found.</p>');
+                            $("#existingAttachments").html(
+                                "<p>No attachments found.</p>"
+                            );
                         }
 
                         // Enable file upload input since the attachment is deleted
@@ -158,16 +185,16 @@ $(document).ready(function() {
                         alert("Failed to delete attachment.");
                     }
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     console.error("Error deleting file:", xhr.responseText);
                     alert("An error occurred. Please try again.");
-                }
+                },
             });
         }
     });
 
     // Handle Form Submission
-    $("#updateRequestForm").on("submit", function(e) {
+    $("#updateRequestForm").on("submit", function (e) {
         e.preventDefault();
 
         let requestId = $("#request_id").val().trim();
@@ -185,18 +212,17 @@ $(document).ready(function() {
             data: formData,
             processData: false,
             contentType: false,
-            success: function(response) {
+            success: function (response) {
                 $("#viewRequestModal").modal("hide");
                 alert("Request updated successfully!");
                 location.reload();
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.error("Error:", xhr.responseText);
                 alert("Failed to update the request. Please try again.");
-            }
+            },
         });
     });
-
 
     // Function to Delete an Attachment
     function deleteAttachment(requestId, fileName) {
@@ -206,44 +232,48 @@ $(document).ready(function() {
                 type: "POST",
                 data: {
                     _token: $('meta[name="csrf-token"]').attr("content"), // ✅ Ensure correct CSRF token
-                    file_name: fileName
+                    file_name: fileName,
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         alert("Attachment deleted successfully!");
-    
+
                         // Remove the deleted attachment from UI
-                        $(`button[data-file-name='${fileName}']`).closest("div").remove();
-    
+                        $(`button[data-file-name='${fileName}']`)
+                            .closest("div")
+                            .remove();
+
                         // Check if there are remaining attachments
                         if ($("#existingAttachments").children().length === 1) {
-                            $("#existingAttachments").html('<p>No attachments found.</p>');
+                            $("#existingAttachments").html(
+                                "<p>No attachments found.</p>"
+                            );
                         }
-    
+
                         // ✅ Enable file upload input since the attachment is deleted
                         $("#edit_attachments").prop("disabled", false);
                     } else {
                         alert("Failed to delete attachment.");
                     }
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     console.error("Error deleting file:", xhr.responseText);
                     alert("An error occurred. Please try again.");
-                }
+                },
             });
         }
     }
-    
 
-        $(document).ready(function() {
+    $(document).ready(function () {
         // Handle File Deletion
-        $(".delete-file-btn").on("click", function() {
+        $(".delete-file-btn").on("click", function () {
             let fileToDelete = $(this).data("file");
             let deletedFilesInput = $("#deletedFilesInput");
 
             // Add file to deleted files array
-            let deletedFiles = deletedFilesInput.val() ? JSON.parse(deletedFilesInput.val()) :
-            [];
+            let deletedFiles = deletedFilesInput.val()
+                ? JSON.parse(deletedFilesInput.val())
+                : [];
             deletedFiles.push(fileToDelete);
             deletedFilesInput.val(JSON.stringify(deletedFiles));
 
@@ -252,24 +282,26 @@ $(document).ready(function() {
         });
     });
 
-    //Delete Request 
+    //Delete Request
     let deleteId = null;
 
     // Capture request ID when delete button is clicked
-    $(document).on("click", ".deleteRequestBtn", function() {
+    $(document).on("click", ".deleteRequestBtn", function () {
         deleteId = $(this).data("id");
     });
 
     // Confirm deletion and send AJAX request
-    $("#confirmDelete").on("click", function() {
+    $("#confirmDelete").on("click", function () {
         if (deleteId) {
             $.ajax({
                 url: "/requests/delete/" + deleteId, // Ensure this matches your Laravel route
                 type: "DELETE",
                 headers: {
-                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content") // ✅ Fix: Ensure CSRF token is included
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ), // ✅ Fix: Ensure CSRF token is included
                 },
-                success: function(response) {
+                success: function (response) {
                     // Hide the delete modal after deletion
                     $("#deleteModal").modal("hide");
 
@@ -278,9 +310,9 @@ $(document).ready(function() {
                         location.reload();
                     }, 10); // Adjust delay if needed
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert("Error deleting request: " + error);
-                }
+                },
             });
         }
     });
@@ -302,7 +334,7 @@ function deleteAttachment(requestId, fileName) {
 }
 
 // Handle Cancel - Switch Back to the View Modal
-$("#deleteAttachmentModal").on("hidden.bs.modal", function() {
+$("#deleteAttachmentModal").on("hidden.bs.modal", function () {
     if (!deleteConfirmed) {
         $("#viewRequestModal").modal("show"); // Reopen view modal if not deleted
     }
@@ -310,7 +342,7 @@ $("#deleteAttachmentModal").on("hidden.bs.modal", function() {
 
 // Handle Confirm Delete
 let deleteConfirmed = false;
-$("#confirmDeleteBtn").on("click", function() {
+$("#confirmDeleteBtn").on("click", function () {
     deleteConfirmed = true; // Mark as confirmed
 
     // ✅ Save the current filter before making the request
@@ -320,12 +352,12 @@ $("#confirmDeleteBtn").on("click", function() {
         url: `/requests/${deleteRequestId}/delete-attachment`,
         type: "POST",
         headers: {
-            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content") // ✅ Fix: Ensure CSRF token is included
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"), // ✅ Fix: Ensure CSRF token is included
         },
         data: {
-            file_name: deleteFileName
+            file_name: deleteFileName,
         },
-        success: function(response) {
+        success: function (response) {
             $("#deleteAttachmentModal").modal("hide"); // Close delete modal
 
             // ✅ Restore the selected filter after reloading
@@ -334,12 +366,11 @@ $("#confirmDeleteBtn").on("click", function() {
                 location.reload();
             }, 500);
         },
-        error: function(xhr) {
+        error: function (xhr) {
             alert("Error deleting attachment: " + xhr.responseJSON.error);
-        }
+        },
     });
 });
-
 
 // Function to parse and display uploaded files from the request table only
 function displayUploadedFiles(uploadedFormat) {
@@ -356,10 +387,10 @@ function displayUploadedFiles(uploadedFormat) {
         uploadedFilesArray = [];
     }
 
-    let uploadedFilesHtml = '<h6>Submitted Files:</h6>';
+    let uploadedFilesHtml = "<h6>Submitted Files:</h6>";
     if (uploadedFilesArray.length > 0) {
         uploadedFilesArray.forEach((file) => {
-            let fileName = file.split('/').pop();
+            let fileName = file.split("/").pop();
             let fileUrl = `/storage/uploads/${fileName}`;
             let downloadUrl = `/download/${fileName}`;
 
@@ -372,56 +403,58 @@ function displayUploadedFiles(uploadedFormat) {
             </div>`;
         });
     } else {
-        uploadedFilesHtml += '<p>No submitted files available.</p>';
+        uploadedFilesHtml += "<p>No submitted files available.</p>";
     }
 
     $("#reviewUploadedFormat").html(uploadedFilesHtml);
 }
 
 //  Set CSRF Token Globally / Wait for document to be fully loaded
-$(document).ready(function() {
+$(document).ready(function () {
     $.ajaxSetup({
         headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+        },
     });
 
-
-
-
     // Handle Review Submission Modal
-    $(document).on("click", ".reviewSubmissionBtn", function(event) {
+    $(document).on("click", ".reviewSubmissionBtn", function (event) {
         event.preventDefault();
         let requestId = $(this).data("id");
 
         $.ajax({
             url: `/requests/${requestId}/details`,
             type: "GET",
-            success: function(data) {
+            success: function (data) {
                 $("#reviewSubmissionModal").data("request-id", requestId);
-                $("#reviewRequester").text(`${data.First_Name} ${data.Last_Name}`);
+                $("#reviewRequester").text(
+                    `${data.First_Name} ${data.Last_Name}`
+                );
                 $("#reviewDetails").text(data.Format);
 
-                let profilerName = (data.profiler_first_name && data.profiler_last_name) ?
-                    `${data.profiler_first_name} ${data.profiler_last_name}` :
-                    "Not Assigned";
+                let profilerName =
+                    data.profiler_first_name && data.profiler_last_name
+                        ? `${data.profiler_first_name} ${data.profiler_last_name}`
+                        : "Not Assigned";
                 $("#reviewProfiler").text(profilerName);
 
                 if (data.uploaded_format) {
                     displayUploadedFiles(data.uploaded_format);
                 } else {
-                    $("#reviewUploadedFormat").html("<p>No submitted file available</p>");
+                    $("#reviewUploadedFormat").html(
+                        "<p>No submitted file available</p>"
+                    );
                 }
                 $("#reviewSubmissionModal").modal("show");
             },
-            error: function() {
+            error: function () {
                 alert("Failed to load request details.");
-            }
+            },
         });
     });
 
     // Handle "Mark as Done" Click
-    $("#markAsDoneBtn").on("click", function() {
+    $("#markAsDoneBtn").on("click", function () {
         let requestId = $("#reviewSubmissionModal").data("request-id");
         let feedback = $("#reviewFeedback").val();
 
@@ -431,28 +464,29 @@ $(document).ready(function() {
         }
 
         $.post(`/requests/${requestId}/complete`, {
-                status: "Completed",
-                feedback: feedback
-            })
-            .done(function() {
+            status: "Completed",
+            feedback: feedback,
+        })
+            .done(function () {
                 alert("Request marked as complete!");
-                $(`button[data-id='${requestId}']`).closest("tr").find("td:nth-child(2)").text(
-                    "Completed");
+                $(`button[data-id='${requestId}']`)
+                    .closest("tr")
+                    .find("td:nth-child(2)")
+                    .text("Completed");
                 $("#reviewSubmissionModal").modal("hide");
 
-                $("#reviewSubmissionModal").on("hidden.bs.modal", function() {
-                location.reload();
-            });
-
+                $("#reviewSubmissionModal").on("hidden.bs.modal", function () {
+                    location.reload();
+                });
             })
-            .fail(function(xhr) {
+            .fail(function (xhr) {
                 console.error("AJAX Error:", xhr.responseText);
                 alert("Error updating request status.");
             });
     });
 
     // Handle "Request Revision" Click
-    $("#reviseBtn").on("click", function() {
+    $("#reviseBtn").on("click", function () {
         let requestId = $("#reviewSubmissionModal").data("request-id");
         let feedback = $("#reviewFeedback").val();
 
@@ -462,53 +496,56 @@ $(document).ready(function() {
         }
 
         $.post(`/requests/${requestId}/revise`, {
-                status: "Needs Revision",
-                feedback: feedback
-            })
-            .done(function() {
+            status: "Needs Revision",
+            feedback: feedback,
+        })
+            .done(function () {
                 alert("Request sent back for revision.");
                 $("#reviewSubmissionModal").modal("hide");
                 location.reload();
             })
-            .fail(function() {
+            .fail(function () {
                 alert("Error updating request status.");
             });
     });
 });
 
 // Load Profiler Name in the Review Submission Modal
-$(document).on("click", ".reviewSubmissionBtn", function() {
+$(document).on("click", ".reviewSubmissionBtn", function () {
     let requestId = $(this).data("id");
 
     $.ajax({
         url: `/requests/${requestId}/details`,
         type: "GET",
-        success: function(data) {
+        success: function (data) {
             $("#reviewRequester").text(`${data.First_Name} ${data.Last_Name}`);
             $("#reviewFormat").text(data.Format);
 
-            let profilerName = (data.profiler_first_name && data.profiler_last_name) ?
-                `${data.profiler_first_name} ${data.profiler_last_name}` :
-                "Not Assigned";
+            let profilerName =
+                data.profiler_first_name && data.profiler_last_name
+                    ? `${data.profiler_first_name} ${data.profiler_last_name}`
+                    : "Not Assigned";
 
             $("#reviewProfiler").text(profilerName);
 
             if (data.uploaded_format) {
                 displayUploadedFiles(data.uploaded_format);
             } else {
-                $("#reviewUploadedFormat").html("<p>No submitted file available</p>");
+                $("#reviewUploadedFormat").html(
+                    "<p>No submitted file available</p>"
+                );
             }
 
             $("#reviewSubmissionModal").modal("show");
         },
-        error: function() {
+        error: function () {
             $("#reviewProfiler").text("Not Assigned");
             alert("Failed to load request details.");
-        }
+        },
     });
 
-    $(document).ready(function() {
-        $(".filter-btn").on("click", function() {
+    $(document).ready(function () {
+        $(".filter-btn").on("click", function () {
             let filter = $(this).data("filter");
 
             // Remove 'active' class from all buttons and add to clicked one
@@ -519,7 +556,7 @@ $(document).on("click", ".reviewSubmissionBtn", function() {
             if (filter === "all") {
                 $(".request-row").show();
             } else {
-                $(".request-row").each(function() {
+                $(".request-row").each(function () {
                     let rowStatus = $(this).data("status");
 
                     if (rowStatus === filter) {

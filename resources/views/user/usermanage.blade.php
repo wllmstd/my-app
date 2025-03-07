@@ -99,6 +99,7 @@
                             data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
                             data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
                             data-format="{{ $request->Format }}" data-attachments="{{ $request->Attachment }}"
+                            data-requested-by="{{ $request->creator->first_name ?? 'Unknown' }} {{ $request->creator->last_name ?? '' }}"
                             data-bs-toggle="modal" data-bs-target="#viewRequestModal" title="View request details">
                             <i class="bi bi-eye"></i>
                         </button>
@@ -211,11 +212,12 @@
                         <div class="mb-3 d-flex align-items-center">
                             <label class="form-label mb-0" style="white-space: nowrap;"><strong>Created
                                     By:</strong></label>
-                            <span class="ms-2">
-                                {{ ($request->user)->first_name }}
-                                {{ ($request->user)->last_name }}
+                            <span class="ms-2" id="requestedBy">
+                                {{ $request->creator->first_name ?? 'Unknown' }}
+                                {{ $request->creator->last_name ?? '' }}
                             </span>
                         </div>
+
 
                         <div class="mb-3">
                             <label for="edit_first_name" class="form-label">First Name</label>

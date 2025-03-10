@@ -100,18 +100,16 @@
                     <!-- Upload Button - Opens Upload Modal -->
                     <td id="uploadedFormat-{{ $request->Request_ID }}">
                         <!-- Upload Button - Opens Upload Modal -->
-                        <button class="btn btn-sm {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? 'btn-success' : 'btn-secondary' }} openUploadModalBtn"
+                        <button
+                            class="btn btn-sm {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? 'btn-success' : 'btn-secondary' }} openUploadModalBtn"
                             data-id="{{ $request->Request_ID }}"
                             data-requested-by="{{ $request->user->first_name ?? '' }} {{ $request->user->last_name ?? '' }}"
                             data-applicant-name="{{ $request->First_Name }} {{ $request->Last_Name }}"
                             data-requested-format="{{ $request->Format }}"
                             data-files='@json(json_decode($request->uploaded_format, true) ?? [])'
                             {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? '' : 'disabled' }}
-                            data-bs-toggle="modal"
-                            data-bs-target="#uploadModal"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            title="Upload and send the requested format">
+                            data-bs-toggle="modal" data-bs-target="#uploadModal" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Upload and send the requested format">
                             <i class="bi bi-upload"></i>
                         </button>
 
@@ -142,7 +140,6 @@
                     <th>Location</th>
                     <th>Format</th>
                     <th>Attachment</th>
-                    <th>Date Created</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -180,12 +177,13 @@
                         No attachment
                         @endif
                     </td>
-                    <td>{{ $profile->Date_Created }}</td>
                     <td>
                         <button class="btn btn-primary btn-sm viewRequestBtn" data-id="{{ $profile->Request_ID }}"
                             data-first-name="{{ $profile->First_Name }}" data-last-name="{{ $profile->Last_Name }}"
                             data-nationality="{{ $profile->Nationality }}" data-location="{{ $profile->Location }}"
-                            data-format="{{ $profile->Format }}" data-attachments="{{ $profile->Attachment }}"
+                            data-format="{{ $profile->Format }}"
+                            data-requested-by="{{ $profile->user->first_name ?? '' }} {{ $profile->user->last_name ?? '' }}"
+                            data-date-created="{{ \Carbon\Carbon::parse($profile->Date_Created)->format('M j, Y, h:i A') }}"
                             data-bs-toggle="modal" data-bs-target="#viewRequestModal">
                             View & Accept
                         </button>
@@ -209,7 +207,17 @@
 
                 <div class="modal-body">
                     <input type="hidden" id="request_id" name="id">
+                        <!-- Requested By -->
+    <div class="mb-3 d-flex align-items-center">
+        <label class="form-label mb-0" style="white-space: nowrap;"><strong>Requested By:</strong></label>
+        <span class="ms-2" id="view_requested_by"></span>
+    </div>
 
+    <!-- Date Created -->
+    <div class="mb-3 d-flex align-items-center">
+        <label class="form-label mb-0" style="white-space: nowrap;"><strong>Date Created:</strong></label>
+        <span class="ms-2" id="view_date_created"></span>
+    </div>
                     <div class="mb-3">
                         <label for="view_first_name" class="form-label">First Name</label>
                         <input type="text" class="form-control" id="view_first_name" readonly>
@@ -330,72 +338,72 @@
 </body>
 
 <style>
-    .filter-btn {
-        border-radius: 50px;
-        /* Make buttons more circular */
-        padding: 6px 14px;
-    }
+.filter-btn {
+    border-radius: 50px;
+    /* Make buttons more circular */
+    padding: 6px 14px;
+}
 
-    .filter-btn {
-        border-radius: 50px;
-        /* Make buttons more circular */
-        padding: 6px 14px;
-    }
+.filter-btn {
+    border-radius: 50px;
+    /* Make buttons more circular */
+    padding: 6px 14px;
+}
 
-    .filter-btn.active {
-        color: white !important;
-    }
+.filter-btn.active {
+    color: white !important;
+}
 
-    /* Add specific colors when active */
-    .filter-btn.active[data-filter="Pending"] {
-        background-color: #ffc107 !important;
-        /* Yellow */
-        border-color: #ffc107 !important;
-    }
+/* Add specific colors when active */
+.filter-btn.active[data-filter="Pending"] {
+    background-color: #ffc107 !important;
+    /* Yellow */
+    border-color: #ffc107 !important;
+}
 
-    .filter-btn.active[data-filter="In Progress"] {
-        background-color: #0d6efd !important;
-        /* Blue */
-        border-color: #0d6efd !important;
-    }
+.filter-btn.active[data-filter="In Progress"] {
+    background-color: #0d6efd !important;
+    /* Blue */
+    border-color: #0d6efd !important;
+}
 
-    .filter-btn.active[data-filter="Under Review"] {
-        background-color: orange !important;
-        /* Orange */
-        border-color: orange !important;
-    }
+.filter-btn.active[data-filter="Under Review"] {
+    background-color: orange !important;
+    /* Orange */
+    border-color: orange !important;
+}
 
-    .filter-btn.active[data-filter="Needs Revision"] {
-        background-color: #dc3545 !important;
-        /* Red */
-        border-color: #dc3545 !important;
-    }
+.filter-btn.active[data-filter="Needs Revision"] {
+    background-color: #dc3545 !important;
+    /* Red */
+    border-color: #dc3545 !important;
+}
 
-    .filter-btn.active[data-filter="Completed"] {
-        background-color: #198754 !important;
-        /* Green */
-        border-color: #198754 !important;
-    }
+.filter-btn.active[data-filter="Completed"] {
+    background-color: #198754 !important;
+    /* Green */
+    border-color: #198754 !important;
+}
 
-    .btn-outline-orange {
-        color: orange !important;
-        border-color: orange !important;
-    }
+.btn-outline-orange {
+    color: orange !important;
+    border-color: orange !important;
+}
 
-    .btn-outline-orange:hover {
-        background-color: orange !important;
-        color: white !important;
-    }
+.btn-outline-orange:hover {
+    background-color: orange !important;
+    color: white !important;
+}
 
-    #acceptedRequestsTable,
+#acceptedRequestsTable,
 #pendingRequestsTable,
 #acceptedRequestsHeading,
 #pendingRequestsHeading,
 #acceptedRequestsTable_wrapper,
 #pendingRequestsTable_wrapper {
-    display: none; /* Hide initially */
+    display: none;
+    /* Hide initially */
 }
-
 </style>
 
 </html>

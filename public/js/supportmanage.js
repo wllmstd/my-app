@@ -8,7 +8,11 @@ $(document).ready(function () {
         let location = $(this).attr("data-location");
         let format = $(this).attr("data-format");
         let attachments = $(this).attr("data-attachments");
-
+    
+        // ✅ Fetch Requested By & Date Created
+        let requestedBy = $(this).attr("data-requested-by"); 
+        let dateCreated = $(this).attr("data-date-created");
+    
         // ✅ Populate Modal Fields
         $("#request_id").val(requestId);
         $("#view_first_name").val(firstName);
@@ -16,15 +20,19 @@ $(document).ready(function () {
         $("#view_nationality").val(nationality);
         $("#view_location").val(location);
         $("#view_format").val(format);
-
+    
+        // ✅ Populate Requested By & Date Created
+        $("#view_requested_by").text(requestedBy);
+        $("#view_date_created").text(dateCreated);
+    
         // ✅ Assign Request ID to Accept Button (Fix)
         $(".acceptRequestBtn").attr("data-id", requestId);
-
+    
         // ✅ Handle Attachments
         let attachmentsContainer = $("#attachmentsContainer");
         let noAttachmentsText = $("#noAttachments");
         attachmentsContainer.html(""); // Clear previous attachments
-
+    
         try {
             let attachmentsArray = attachments ? JSON.parse(attachments) : [];
             if (attachmentsArray.length > 0) {
@@ -33,10 +41,10 @@ $(document).ready(function () {
                     let fileName = file.split("/").pop();
                     let fileUrl = `/storage/attachments/${fileName}`;
                     attachmentsContainer.append(`
-                    <div class="d-flex align-items-center border p-2 mb-1 rounded">
-                        <a href="${fileUrl}" target="_blank" class="me-auto">${fileName}</a>
-                    </div>
-                `);
+                        <div class="d-flex align-items-center border p-2 mb-1 rounded">
+                            <a href="${fileUrl}" target="_blank" class="me-auto">${fileName}</a>
+                        </div>
+                    `);
                 });
             } else {
                 noAttachmentsText.show();
@@ -45,11 +53,11 @@ $(document).ready(function () {
             console.error("Error parsing attachments:", error);
             noAttachmentsText.text("Error loading attachments.").show();
         }
-
+    
         // ✅ Show Modal
         $("#viewRequestModal").modal("show");
     });
-
+    
     // ✅ Accept Request Button - Ensure Correct ID is Sent
     $(document).on("click", ".acceptRequestBtn", function () {
         let requestId = $(this).attr("data-id"); // ✅ Correctly fetch ID
@@ -355,7 +363,7 @@ $(document).ready(function () {
         ordering: true,
         info: true,
         lengthMenu: [5, 10, 25, 50],
-        columnDefs: [{ orderable: false, targets: [9] }],
+        columnDefs: [{ orderable: false, targets: [8] }],
     });
 
     // ✅ Preserve and Apply Last Selected Filter on Page Load

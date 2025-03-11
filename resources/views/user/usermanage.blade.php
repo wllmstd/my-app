@@ -198,15 +198,17 @@
                 <form id="updateRequestForm" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
-                    <!-- Laravel requires this for update requests -->
                     <input type="hidden" id="request_id" name="id"> <!-- Hidden field for ID -->
 
                     <div class="modal-body">
+                        @if($requests->isNotEmpty())
+                        @foreach($requests as $request)
                         <div class="mb-3 d-flex align-items-center">
                             <label class="form-label mb-0" style="white-space: nowrap;"><strong>Date
                                     Created:</strong></label>
-                            <span
-                                class="ms-2">{{ \Carbon\Carbon::parse($request->Date_Created)->format('M j, Y, h:i A') }}</span>
+                            <span class="ms-2">
+                                {{ \Carbon\Carbon::parse($request->Date_Created)->format('M j, Y, h:i A') }}
+                            </span>
                         </div>
 
                         <div class="mb-3 d-flex align-items-center">
@@ -217,76 +219,90 @@
                                 {{ $request->creator->last_name ?? '' }}
                             </span>
                         </div>
-
-
-                        <div class="mb-3">
-                            <label for="edit_first_name" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="edit_first_name" name="first_name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_last_name" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="edit_last_name" name="last_name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_nationality" class="form-label">Nationality</label>
-                            <input type="text" class="form-control" id="edit_nationality" name="nationality" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_location" class="form-label">Location</label>
-                            <input type="text" class="form-control" id="edit_location" name="location" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_format" class="form-label">Format</label>
-                            <select class="form-select" id="edit_format" name="format" required>
-                                <option value="Geco Standard">Geco Standard</option>
-                                <option value="Geco New Date">Geco New Date</option>
-                                <option value="Geco New Rate">Geco New Rate</option>
-                                <option value="Blind">Blind</option>
-                                <option value="HTD">HTD</option>
-                                <option value="SAP">SAP</option>
-                                <option value="PCX">PCX</option>
-                                <option value="Accenture">Accenture</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_attachments" class="form-label">Attachments</label>
-                            <input type="file" class="form-control" id="edit_attachments" name="attachments[]" multiple>
-                        </div>
-
-                        <!-- Existing Attachments -->
-                        <div id="existingAttachments">
-                            <h6>Existing Attachments:</h6>
-                            @php
-                            $attachments = json_decode($request->Attachment, true);
-                            @endphp
-                            @if (!empty($attachments))
-                            @foreach ($attachments as $file)
-                            <div class="d-flex align-items-center border p-2 mb-1 rounded">
-                                <a href="{{ asset('storage/attachments/' . $file) }}" target="_blank"
-                                    class="me-auto">{{ $file }}</a>
-                                <<button type="button" class="btn btn-sm btn-danger delete-attachment-btn"
-                                    data-request-id="{{ $request->Request_ID }}" data-file-name="{{ $file }}">
-                                    <i class="bi bi-trash"></i>
-                                    </button>
-                            </div>
-                            @endforeach
-                            @else
-                            <p>No attachments found.</p>
-                            @endif
-                        </div>
-
-                        <!-- Hidden Input for Deleted Files -->
-                        <input type="hidden" name="deleted_files[]" id="deletedFilesInput">
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success">Save Changes</button>
+                        @endforeach
+                        @else
+                        <p class="text-danger text-center">No requests found.</p>
+                        @endif
                     </div>
                 </form>
             </div>
         </div>
+
+
+
+        <div class="mb-3">
+            <label for="edit_first_name" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="edit_first_name" name="first_name" required>
+        </div>
+        <div class="mb-3">
+            <label for="edit_last_name" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="edit_last_name" name="last_name" required>
+        </div>
+        <div class="mb-3">
+            <label for="edit_nationality" class="form-label">Nationality</label>
+            <input type="text" class="form-control" id="edit_nationality" name="nationality" required>
+        </div>
+        <div class="mb-3">
+            <label for="edit_location" class="form-label">Location</label>
+            <input type="text" class="form-control" id="edit_location" name="location" required>
+        </div>
+        <div class="mb-3">
+            <label for="edit_format" class="form-label">Format</label>
+            <select class="form-select" id="edit_format" name="format" required>
+                <option value="Geco Standard">Geco Standard</option>
+                <option value="Geco New Date">Geco New Date</option>
+                <option value="Geco New Rate">Geco New Rate</option>
+                <option value="Blind">Blind</option>
+                <option value="HTD">HTD</option>
+                <option value="SAP">SAP</option>
+                <option value="PCX">PCX</option>
+                <option value="Accenture">Accenture</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="edit_attachments" class="form-label">Attachments</label>
+            <input type="file" class="form-control" id="edit_attachments" name="attachments[]" multiple>
+        </div>
+
+        <!-- Existing Attachments -->
+        <div id="existingAttachments">
+            <h6>Existing Attachments:</h6>
+
+            @if(isset($request) && !empty($request->Attachment))
+            @php
+            $attachments = json_decode($request->Attachment, true);
+            @endphp
+
+            @if (!empty($attachments) && is_array($attachments))
+            @foreach ($attachments as $file)
+            <div class="d-flex align-items-center border p-2 mb-1 rounded">
+                <a href="{{ asset('storage/attachments/' . $file) }}" target="_blank" class="me-auto">{{ $file }}</a>
+                <button type="button" class="btn btn-sm btn-danger delete-attachment-btn"
+                    data-request-id="{{ $request->Request_ID }}" data-file-name="{{ $file }}">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            @endforeach
+            @else
+            <p>No attachments found.</p>
+            @endif
+            @else
+            <p>No attachments found.</p>
+            @endif
+        </div>
+
+
+        <!-- Hidden Input for Deleted Files -->
+        <input type="hidden" name="deleted_files[]" id="deletedFilesInput">
+
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-success">Save Changes</button>
+        </div>
+        </form>
     </div>
+
 
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\UserRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\RequestAcceptedMail;
+use Illuminate\Support\Facades\Mail;
 
 
 class SupportManageController extends Controller
@@ -24,34 +26,63 @@ class SupportManageController extends Controller
         return view('support.supportmanage', compact('myAcceptedRequests', 'profiles'));
     }
 
+
     public function acceptRequest($id)
-    {
-        \Log::info("Received request for ID: " . $id);
-    
-        // Find the request
-        $request = UserRequest::where('Request_ID', $id)->first();
-    
-        if (!$request) {
-            \Log::error("Request not found for ID: " . $id);
-            return response()->json(['error' => 'Request not found'], 404);
-        }
-    
-        // Log old status
-        \Log::info("Old Status: " . $request->Status);
-    
-        // Try updating using the update() method instead of save()
-        $updated = UserRequest::where('Request_ID', $id)->update([
-            'Status' => 'In Progress',
-            'Accepted_By' => auth()->id(), // Store the ID of the logged-in profiler
-        ]);    
-        if ($updated) {
-            \Log::info("Status updated to 'In Progress' successfully!");
-        } else {
-            \Log::error("Database update failed.");
-        }
-    
-        return response()->json(['success' => 'Request accepted successfully', 'status' => 'In Progress']);
+{
+    \Log::info("Received request for ID: " . $id);
+
+    // Find the request
+    $request = UserRequest::where('Request_ID', $id)->first();
+
+    if (!$request) {
+        \Log::error("Request not found for ID: " . $id);
+        return response()->json(['error' => 'Request not found'], 404);
     }
+
+    // Log request details
+    \Log::info("Request found: " . json_encode($request));
+
+    // Get the TA (User who made the request)
+    $user = $request->creator; // ✅ Get the TA (request creator)
+
+    // Check if the relationship is working
+    if (!$user) {
+        \Log::error("Creator (TA) not found for request ID: " . $id);
+    } else {
+        \Log::info("TA Found: " . $user->first_name . " " . $user->last_name . " | Email: " . $user->email);
+    }
+
+    // Get the Profiler (Authenticated User)
+    $profiler = auth()->user(); // ✅ Profiler who accepted the request
+
+    \Log::info("Request accepted by: " . $profiler->first_name . " " . $profiler->last_name . " | Email: " . $profiler->email);
+
+    // Update status
+    $updated = UserRequest::where('Request_ID', $id)->update([
+        'Status' => 'In Progress',
+        'Accepted_By' => $profiler->id, 
+    ]);
+
+    if ($updated) {
+        \Log::info("Status updated to 'In Progress' successfully!");
+
+        // Send email notification
+        if ($user && $user->email) {
+            \Log::info("Preparing to send email to: " . $user->email);
+            Mail::send(new RequestAcceptedMail($user, $request, $profiler));
+            \Log::info("✅ Email successfully sent to: " . $user->email);
+        } else {
+            \Log::error("🚨 User email not found. Email NOT sent.");
+        }
+    } else {
+        \Log::error("❌ Database update failed.");
+    }
+
+    return response()->json(['success' => 'Request accepted successfully', 'status' => 'In Progress']);
+}
+
+    
+    
     
     public function uploadFormat(Request $request, $id)
     {

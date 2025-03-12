@@ -30,8 +30,6 @@
     @include('admin.admin_navbar')
     <!-- Include the navbar here -->
     <div class="container mt-4">
-        <h2 class="text-center mb-4">Manage Users</h2>
-
         <!-- Add User Button -->
         <div class="d-flex justify-content-end mb-3">
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
@@ -41,12 +39,11 @@
         </div>
 
         <!-- User Management Table -->
-        <table class="table table-bordered table-striped" id="userTable">
-            <thead class="table-dark">
+        <table class="table" id="userTable">
+            <thead>
                 <tr>
                     <th>#</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
+                    <th>User Name</th>
                     <th>Department</th>
                     <th>Email</th>
                     <th>Actions</th>
@@ -56,8 +53,20 @@
                 @foreach($users as $user)
                 <tr>
                     <td>{{ $loop->iteration }}</td> <!-- Display the iteration number -->
-                    <td>{{ $user->first_name }}</td>
-                    <td>{{ $user->last_name }}</td>
+                    <td>
+                    <div class="d-flex align-items-center">
+    @if(auth()->user()->department == 'Admin')
+    <img src="{{ url('storage/' . $user->image) }}" 
+     onerror="this.onerror=null; this.src='{{ asset('images/default.png') }}';"
+     alt="Profile Image" class="rounded-circle me-2" width="40" height="40">
+
+
+    @endif
+    <span>{{ $user->first_name }} {{ $user->last_name }}</span>
+</div>
+
+
+                    </td>
                     <td>{{ $user->department }}</td>
                     <td>{{ $user->email }}</td>
                     <td>
@@ -356,5 +365,138 @@ $(document).ready(function() {
     });
 });
 </script>
+
+
+<style>
+    /* Modern Clean Design */
+    .container {
+    max-width: 90%;
+    margin: auto;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Header Styling */
+h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 3px solid #4CAF50;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+/* Add User Button */
+.btn-success {
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+}
+
+.btn-success:hover {
+    background: #388E3C;
+}
+
+
+/* Profile Image */
+.rounded-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #1f335f;
+    margin-right: 10px;
+}
+
+/* Action Buttons */
+.btn-warning, .btn-danger {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.btn-warning {
+    background: #FFB300;
+    color: #fff;
+    border: none;
+}
+
+.btn-warning:hover {
+    background: #FFA000;
+    transform: scale(1.1);
+}
+
+.btn-danger {
+    background: #E53935;
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #D32F2F;
+    transform: scale(1.1);
+}
+
+.table {
+    background: #D32F2F;
+
+}
+
+/* Global Font & Styling */
+body, table, .dataTables_filter input, .dataTables_length select {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Search Bar */
+.dataTables_filter {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.dataTables_filter input {
+    width: 250px;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s;
+}
+
+#userTable {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    background: #1f335f;
+
+}
+#userTable th {
+    background: #1f335f;
+    color: #fff;
+}
+
+#userTable td {
+    padding: 14px 16px;
+    text-align: left;
+    background: #fff;
+}
+
+
+/* Row Styling */
+#userTable tbody tr {
+    transition: background 0.3s, transform 0.2s ease-in-out;
+}
+
+/* Subtle Hover Effect */
+#userTable tbody tr:hover {
+    transform: scale(1.01);
+}
+
+
+</style>
 
 </html>

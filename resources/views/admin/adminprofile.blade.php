@@ -3,6 +3,8 @@
 @section('title', 'Admin Profile')
 
 @section('content')
+<link rel="stylesheet" href="{{ asset('css/admin/adminprofile.css') }}">
+
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-10">
@@ -11,9 +13,10 @@
             @endif
 
             <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white text-center">
-                    <h4>Admin Profile</h4>
-                </div>
+            <div class="card-header" style="font-weight: 900 !important;">
+                Admin Profile
+            </div>
+
                 <div class="card-body">
                     <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf

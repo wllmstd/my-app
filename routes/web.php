@@ -12,11 +12,22 @@ use App\Http\Controllers\{
 };
 use App\Http\Middleware\RoleMiddleware;
 
+
+
+// ===============================
+// PUBLIC ROUTE FOR PROFILE IMAGES
+// ===============================
+Route::get('/profile-image/{filename}', function ($filename) {
+    if (Storage::disk('public')->exists("profile_images/{$filename}")) {
+        return response()->file(storage_path("app/public/profile_images/{$filename}"));
+    }
+    abort(404, "Image not found.");
+})->middleware(['auth']); // Only logged-in users can access
+
+
 // ===============================
 // AUTHENTICATION ROUTES
 // ===============================
-
-// Root Login Route
 Route::get('/', function () {
     return view('login');
 })->name('login');
@@ -138,4 +149,7 @@ Route::get('/download/{filename}', function ($filename) {
     }
 
     abort(404, "File not found.");
+    
 });
+
+

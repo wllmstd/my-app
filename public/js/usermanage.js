@@ -94,6 +94,8 @@ $(document).ready(function () {
         let location = $(this).attr("data-location");
         let format = $(this).attr("data-format");
         let attachments = $(this).attr("data-attachments");
+        let dateCreated = $(this).data("date-created");
+
 
         // Populate Form Fields
         $("#request_id").val(requestId);
@@ -102,6 +104,7 @@ $(document).ready(function () {
         $("#edit_nationality").val(nationality);
         $("#edit_location").val(location);
         $("#edit_format").val(format);
+        $(".modal-body span.date-created").text(dateCreated || "N/A");
 
         // Get requested by name from the button data attributes
         let requestedBy = $(this).attr("data-requested-by");

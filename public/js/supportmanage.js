@@ -350,23 +350,24 @@ $(document).on("click", ".deleteFileBtn", function () {
     });
 });
 
-$(document).ready(function () {
-        $('#userTable').DataTable({
-            "paging": true, // Enable pagination
-            "searching": true, // Enable search
-            "ordering": true, // Enable sorting
-            "info": true, // Show information (entries count)
-            "lengthMenu": [5, 10, 25, 50], // Dropdown for entries per page
-        });
 
-    // ✅ Initialize DataTables for Both Tables
+$(document).ready(function () {
+    // ✅ Initialize DataTables
+    $('#userTable').DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        info: true,
+        lengthMenu: [5, 10, 25, 50],
+    });
+
     let acceptedTable = $("#acceptedRequestsTable").DataTable({
         paging: true,
         searching: true,
         ordering: true,
         info: true,
         lengthMenu: [5, 10, 25, 50],
-        columnDefs: [{ orderable: false, targets: [9] }],
+        columnDefs: [{ orderable: false, targets: [9] }]
     });
 
     let pendingTable = $("#pendingRequestsTable").DataTable({
@@ -375,57 +376,166 @@ $(document).ready(function () {
         ordering: true,
         info: true,
         lengthMenu: [5, 10, 25, 50],
-        columnDefs: [{ orderable: false, targets: [8] }],
+        columnDefs: [{ orderable: false, targets: [8] }]
     });
 
-    // ✅ Preserve and Apply Last Selected Filter on Page Load
+    // ✅ Load last viewed counts and dismissed states from localStorage
+    let lastViewedCounts = JSON.parse(localStorage.getItem('lastViewedCounts')) || {
+        all: 0,
+        pending: 0,
+        inProgress: 0,
+        underReview: 0,
+        needsRevision: 0,
+        completed: 0
+    };
+
+    let dismissedBadges = JSON.parse(localStorage.getItem('dismissedBadges')) || {
+        all: false,
+        pending: false,
+        inProgress: false,
+        underReview: false,
+        needsRevision: false,
+        completed: false
+    };
+
+    // ✅ Apply filter based on saved state
     let savedFilter = localStorage.getItem("selectedFilter") || "all";
     applyFilter(savedFilter);
 
-    // ✅ Handle Filter Button Click
-    $(".filter-btn").on("click", function () {
-        let filter = $(this).data("filter");
-        localStorage.setItem("selectedFilter", filter);
-        applyFilter(filter);
-    });
-
-    // ✅ Function to Apply Filter in DataTables
     function applyFilter(filter) {
         $(".filter-btn").removeClass("active");
         $(".filter-btn[data-filter='" + filter + "']").addClass("active");
-    
+
         console.log("Applying Filter:", filter);
-    
+
         if (filter === "all") {
-            // ✅ Show both tables & clear filters
             $("#acceptedRequestsTable, #pendingRequestsTable").show();
             $("#acceptedRequestsHeading, #pendingRequestsHeading").show();
-            $(".dataTables_wrapper").show(); // ✅ Show DataTable controls
+            $(".dataTables_wrapper").show();
             acceptedTable.search("").columns().search("").draw();
             pendingTable.search("").columns().search("").draw();
         } else if (filter === "Pending") {
-            // ✅ Show Pending Table & Hide Accepted Table
             $("#acceptedRequestsTable, #acceptedRequestsHeading").hide();
             $("#pendingRequestsTable, #pendingRequestsHeading").show();
-            $("#acceptedRequestsTable_wrapper").hide(); // ✅ Hide DataTable controls for accepted requests
-            $("#pendingRequestsTable_wrapper").show();  // ✅ Show DataTable controls for pending requests
+            $("#acceptedRequestsTable_wrapper").hide();
+            $("#pendingRequestsTable_wrapper").show();
             pendingTable.column(1).search(filter, true, false).draw();
         } else {
-            // ✅ Show Accepted Table & Hide Pending Table
             $("#acceptedRequestsTable, #acceptedRequestsHeading").show();
             $("#pendingRequestsTable, #pendingRequestsHeading").hide();
-            $("#acceptedRequestsTable_wrapper").show(); // ✅ Show DataTable controls for accepted requests
-            $("#pendingRequestsTable_wrapper").hide();  // ✅ Hide DataTable controls for pending requests
+            $("#acceptedRequestsTable_wrapper").show();
+            $("#pendingRequestsTable_wrapper").hide();
             acceptedTable.column(1).search(filter, true, false).draw();
         }
-    }
-    
 
-    // ✅ Debugging: Check if the status column is read properly
-    $(".request-row").each(function () {
-        console.log("Row Status:", $(this).data("status"));
+        // ✅ Update Status Counts After Applying Filter
+        updateStatusCounts();
+    }
+
+    function updateStatusCounts() {
+        let allCount = acceptedTable.rows().count() + pendingTable.rows().count();
+        let pendingCount = pendingTable.rows().data().toArray()
+            .filter(row => $(row[1]).text().trim() === "Pending").length;
+        let inProgressCount = acceptedTable.rows().data().toArray()
+            .filter(row => $(row[1]).text().trim() === "In Progress").length;
+        let underReviewCount = acceptedTable.rows().data().toArray()
+            .filter(row => $(row[1]).text().trim() === "Under Review").length;
+        let needsRevisionCount = acceptedTable.rows().data().toArray()
+            .filter(row => $(row[1]).text().trim() === "Needs Revision").length;
+        let completedCount = acceptedTable.rows().data().toArray()
+            .filter(row => $(row[1]).text().trim() === "Completed").length;
+
+        // ✅ Update button text with counts
+        $("#count-all").text(`(${allCount})`);
+        $("#count-pending").text(`(${pendingCount})`);
+        $("#count-in-progress").text(`(${inProgressCount})`);
+        $("#count-under-review").text(`(${underReviewCount})`);
+        $("#count-needs-revision").text(`(${needsRevisionCount})`);
+        $("#count-completed").text(`(${completedCount})`);
+
+        // ✅ Handle "NEW" badges
+        if (allCount > lastViewedCounts.all && !dismissedBadges.all) {
+            $("#new-badge-all").show();
+        } else {
+            $("#new-badge-all").hide();
+        }
+
+        if (pendingCount > lastViewedCounts.pending && !dismissedBadges.pending) {
+            $("#new-badge-pending").show();
+        } else {
+            $("#new-badge-pending").hide();
+        }
+
+        if (inProgressCount > lastViewedCounts.inProgress && !dismissedBadges.inProgress) {
+            $("#new-badge-in-progress").show();
+        } else {
+            $("#new-badge-in-progress").hide();
+        }
+
+        if (underReviewCount > lastViewedCounts.underReview && !dismissedBadges.underReview) {
+            $("#new-badge-under-review").show();
+        } else {
+            $("#new-badge-under-review").hide();
+        }
+
+        if (needsRevisionCount > lastViewedCounts.needsRevision && !dismissedBadges.needsRevision) {
+            $("#new-badge-needs-revision").show();
+        } else {
+            $("#new-badge-needs-revision").hide();
+        }
+
+        if (completedCount > lastViewedCounts.completed && !dismissedBadges.completed) {
+            $("#new-badge-completed").show();
+        } else {
+            $("#new-badge-completed").hide();
+        }
+    }
+
+    $(".filter-btn").on("click", function () {
+        let filter = $(this).data("filter");
+        let key = filter.replace(/\s+/g, '-').toLowerCase();
+
+        // ✅ Hide the badge when clicked
+        $(`#new-badge-${key}`).hide();
+        dismissedBadges[key] = true;
+
+        switch (filter) {
+            case "all":
+                lastViewedCounts.all = acceptedTable.rows().count() + pendingTable.rows().count();
+                break;
+            case "Pending":
+                lastViewedCounts.pending = pendingTable.rows().data().toArray()
+                    .filter(row => $(row[1]).text().trim() === "Pending").length;
+                break;
+            case "In Progress":
+                lastViewedCounts.inProgress = acceptedTable.rows().data().toArray()
+                    .filter(row => $(row[1]).text().trim() === "In Progress").length;
+                break;
+            case "Under Review":
+                lastViewedCounts.underReview = acceptedTable.rows().data().toArray()
+                    .filter(row => $(row[1]).text().trim() === "Under Review").length;
+                break;
+            case "Needs Revision":
+                lastViewedCounts.needsRevision = acceptedTable.rows().data().toArray()
+                    .filter(row => $(row[1]).text().trim() === "Needs Revision").length;
+                break;
+            case "Completed":
+                lastViewedCounts.completed = acceptedTable.rows().data().toArray()
+                    .filter(row => $(row[1]).text().trim() === "Completed").length;
+                break;
+        }
+
+        localStorage.setItem('lastViewedCounts', JSON.stringify(lastViewedCounts));
+        localStorage.setItem('dismissedBadges', JSON.stringify(dismissedBadges));
+
+        applyFilter(filter);
     });
+
+    setTimeout(updateStatusCounts, 200);
+    acceptedTable.on('draw', updateStatusCounts);
+    pendingTable.on('draw', updateStatusCounts);
 });
+
 
 
 // Delete Attachment Function

@@ -32,13 +32,50 @@
     <div class="container mt-4">
 
         <div class="mb-3">
-            <button class="btn btn-outline-dark filter-btn active" data-filter="all">All Tables</button>
-            <button class="btn btn-outline-warning filter-btn" data-filter="Pending">Pending Requests</button>
-            <button class="btn btn-outline-primary filter-btn" data-filter="In Progress">In Progress</button>
-            <button class="btn btn-outline-orange filter-btn" data-filter="Under Review">Under Review</button>
-            <button class="btn btn-outline-danger filter-btn" data-filter="Needs Revision">Needs Revision</button>
-            <button class="btn btn-outline-success filter-btn" data-filter="Completed">Completed</button>
+            <button class="btn btn-outline-dark filter-btn active" data-filter="all">
+                <div class="status-label-wrapper">
+                    All Tables
+                    <span id="count-all" class="status-badge">0</span>
+                </div>
+            </button>
+            <button class="btn btn-outline-warning filter-btn" data-filter="Pending">
+                <span class="new-badge" id="new-badge-pending">NEW</span>
+                <div class="status-label-wrapper">
+                    Pending Requests
+                    <span id="count-pending" class="status-badge">0</span>
+                </div>
+            </button>
+            <button class="btn btn-outline-primary filter-btn" data-filter="In Progress">
+                <span class="new-badge" id="new-badge-in-progress">NEW</span>
+                <div class="status-label-wrapper">
+                    In Progress
+                    <span id="count-in-progress" class="status-badge">0</span>
+                </div>
+            </button>
+            <button class="btn btn-outline-orange filter-btn" data-filter="Under Review">
+                <span class="new-badge" id="new-badge-under-review">NEW</span>
+                <div class="status-label-wrapper">
+                    Under Review
+                    <span id="count-under-review" class="status-badge">0</span>
+                </div>
+            </button>
+            <button class="btn btn-outline-danger filter-btn" data-filter="Needs Revision">
+                <span class="new-badge" id="new-badge-needs-revision">NEW</span>
+                <div class="status-label-wrapper">
+                    Needs Revision
+                    <span id="count-needs-revision" class="status-badge">0</span>
+                </div>
+            </button>
+            <button class="btn btn-outline-success filter-btn" data-filter="Completed">
+                <span class="new-badge" id="new-badge-completed">NEW</span>
+                <div class="status-label-wrapper">
+                    Completed
+                    <span id="count-completed" class="status-badge">0</span>
+                </div>
+            </button>
         </div>
+
+
 
         <!-- Table 1: My Accepted Requests -->
         <h2 id="acceptedRequestsHeading">My Accepted Requests</h2>
@@ -407,6 +444,27 @@
 #pendingRequestsTable_wrapper {
     display: none;
     /* Hide initially */
+}
+
+
+
+.filter-btn {
+    position: relative;
+}
+
+
+.new-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    /* ✅ Changed from left to right */
+    background-color: red;
+    color: white;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 8px;
+    z-index: 10;
 }
 </style>
 

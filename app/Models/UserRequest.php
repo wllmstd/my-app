@@ -28,7 +28,12 @@ class UserRequest extends Model
         'Accepted_By', // New column
         'uploaded_format', // Newly added field
 
-    ];    
+    ];
+
+    // ✅ Force Laravel to recognize Accepted_By as an integer
+    protected $casts = [
+        'Accepted_By' => 'integer',
+    ];
 
     // Relationship: Each request belongs to a user
     public function user()
@@ -44,6 +49,6 @@ class UserRequest extends Model
     // Relationship: The user who accepted the request
     public function accepter()
     {
-        return $this->belongsTo(User::class, 'Accepted_By');
+        return $this->belongsTo(User::class, 'accepted_by');
     }
 }

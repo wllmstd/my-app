@@ -125,6 +125,7 @@ Route::prefix('requests')->group(function () {
     Route::post('/{id}/revise', [RequestController::class, 'requestRevision'])->name('requests.revise');
     Route::get('/{id}/details', [RequestController::class, 'getRequestWithProfiler']);
     Route::get('/{id}/full-details', [RequestController::class, 'getRequestDetails']);
+    Route::post('/requests/{id}/mark-as-done', [SupportManageController::class, 'markAsComplete'])->name('requests.markAsComplete');
 
 });
 

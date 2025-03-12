@@ -8,22 +8,24 @@ use Illuminate\Http\Request;
 use App\Models\UserRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\RequestCompletedMail;
+use App\Models\User;
 
 class RequestController extends Controller
 {
     public function index()
     {
         $userId = auth::id(); // Get the logged-in user's ID
-    
+
         $requests = UserRequest::where('Users_ID', $userId) // Get only requests from the logged-in user
             ->get();
-    
-            return view('user.usermanage', compact('requests'));
-        }
-    
-    
+
+        return view('user.usermanage', compact('requests'));
+    }
+
+
     public function destroy($id)
     {
         $request = UserRequest::findOrFail($id);
@@ -211,6 +213,21 @@ class RequestController extends Controller
                 return response()->json(['success' => false, 'message' => 'Invalid request ID.'], 400);
             }
 
+            $userRequest = UserRequest::findOrFail($id);
+
+            if (!$userRequest) {
+                return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
+            }
+
+            // Log the request details
+            Log::info("User Request Data: " . json_encode($userRequest));
+
+            // ✅ Use the relationship to get the profiler
+            $profiler = $userRequest->accepter;
+
+            Log::info("Profiler Retrieved: " . json_encode($profiler));
+
+            // Update the request status in the database
             DB::table('requests')
                 ->where('Request_ID', $id)
                 ->update([
@@ -219,11 +236,25 @@ class RequestController extends Controller
                     'feedback' => $request->input('feedback')
                 ]);
 
-            return response()->json(['success' => true, 'message' => 'Request marked as complete.']);
+            // Get the requester (TA)
+            $user = $userRequest->creator;
+
+            // Send email notification to the profiler
+            if ($profiler && $profiler->email) {
+                Mail::to($profiler->email)->send(new RequestCompletedMail($user, $userRequest, $profiler));
+                Log::info("✅ Email successfully sent to: " . $profiler->email);
+            } else {
+                Log::error("🚨 Profiler email not found. Email NOT sent.");
+            }
+
+            return response()->json(['success' => true, 'message' => 'Request marked as complete, and email notification sent.']);
         } catch (\Exception $e) {
+            Log::error("❌ Email sending failed: " . $e->getMessage());
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
+
+
 
     public function getRequestDetails($id)
     {

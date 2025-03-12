@@ -10,6 +10,7 @@ use App\Mail\RequestAcceptedMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\FileUploadedMail;
 
 
 
@@ -87,45 +88,58 @@ class SupportManageController extends Controller
     
     
     
-    public function uploadFormat(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'uploaded_format' => 'required|array',
-            'uploaded_format.*' => 'file|mimes:pdf,doc,docx|max:10240', // Max 10MB per file
-        ]);
-    
-        $userRequest = UserRequest::findOrFail($id);
-    
-        // Retrieve existing files if any
-        $existingFiles = $userRequest->uploaded_format ? json_decode($userRequest->uploaded_format, true) : [];
-    
-        // Ensure $existingFiles is an array
-        if (!is_array($existingFiles)) {
-            $existingFiles = [];
-        }
-    
-        // Handle multiple file uploads
-        $uploadedFiles = [];
-        if ($request->hasFile('uploaded_format')) {
-            foreach ($request->file('uploaded_format') as $file) {
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->storeAs('uploads', $filename, 'public');
-                $uploadedFiles[] = $filename; // Add new file
-            }
-        }
-    
-        // Merge old and new files
-        $allFiles = array_merge($existingFiles, $uploadedFiles);
-    
-        // Save to database
-        $userRequest->uploaded_format = json_encode($allFiles);
-        $userRequest->save();
-    
-        return response()->json([
-            'success' => 'Files uploaded successfully!',
-            'files' => $uploadedFiles
-        ]);
+public function uploadFormat(Request $request, $id)
+{
+    $validated = $request->validate([
+        'uploaded_format' => 'required|array',
+        'uploaded_format.*' => 'file|mimes:pdf,doc,docx|max:10240', // Max 10MB per file
+    ]);
+
+    $userRequest = UserRequest::findOrFail($id);
+
+    // Retrieve existing files if any
+    $existingFiles = $userRequest->uploaded_format ? json_decode($userRequest->uploaded_format, true) : [];
+
+    // Ensure $existingFiles is an array
+    if (!is_array($existingFiles)) {
+        $existingFiles = [];
     }
+
+    // Handle multiple file uploads
+    $uploadedFiles = [];
+    if ($request->hasFile('uploaded_format')) {
+        foreach ($request->file('uploaded_format') as $file) {
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('uploads', $filename, 'public');
+            $uploadedFiles[] = $filename;
+        }
+    }
+
+    // Merge old and new files
+    $allFiles = array_merge($existingFiles, $uploadedFiles);
+
+    // Save to database
+    $userRequest->uploaded_format = json_encode($allFiles);
+    $userRequest->save();
+
+    // Send email notification
+    $user = $userRequest->creator;  // Requester (TA)
+    $profiler = Auth::user(); // Authenticated support user uploading the file
+
+    if ($user && $user->email) {
+        Log::info("Sending email to: " . $user->email);
+        Mail::to($user->email)->send(new FileUploadedMail($user, $userRequest, $profiler, $uploadedFiles));
+        Log::info("✅ Email successfully sent to: " . $user->email);
+    } else {
+        Log::error("🚨 User email not found. Email NOT sent.");
+    }
+
+    return response()->json([
+        'success' => 'Files uploaded successfully!',
+        'files' => $uploadedFiles
+    ]);
+}
+
 
     public function deleteFile(Request $request, $id)
 {

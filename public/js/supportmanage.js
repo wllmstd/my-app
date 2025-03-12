@@ -114,6 +114,9 @@ $(document).ready(function () {
             let applicantName = button.data("applicant-name");
             let requestedFormat = button.data("requested-format");
             let existingFiles = button.data("files") || [];
+            let feedback = button.data("feedback") || "No feedback provided"; // ✅ Get Feedback
+            let status = button.data("status"); // ✅ Get status from the button
+
 
             //Debugging: Check if data attributes exist
             console.log("Request ID:", requestId);
@@ -121,6 +124,7 @@ $(document).ready(function () {
             console.log("Applicant Name:", applicantName);
             console.log("Requested Format:", requestedFormat);
             console.log("Existing Files:", existingFiles);
+
 
             // If requestId is undefined, log an error and prevent modal from opening
             if (!requestId) {
@@ -135,7 +139,15 @@ $(document).ready(function () {
             $("#requestedBy").text(requestedBy);
             $("#applicantName").text(applicantName);
             $("#requestedFormat").text(requestedFormat);
+            $("#uploadMessage").text(feedback); // ✅ Set feedback as plain text
 
+            if (status === "Needs Revision") {
+                $("#feedbackSection").removeClass("d-none"); // ✅ Show section
+                $("#uploadMessage").text(feedback);
+            } else {
+                $("#feedbackSection").addClass("d-none"); // ✅ Hide section
+            }
+            
             //Populate Existing Files
             let filesContainer = $("#existingUploadedFiles");
             filesContainer.html(""); // Clear previous content

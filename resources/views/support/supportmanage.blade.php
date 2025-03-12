@@ -99,7 +99,6 @@
                     <!-- ✅ Display Uploaded Format -->
                     <!-- Upload Button - Opens Upload Modal -->
                     <td id="uploadedFormat-{{ $request->Request_ID }}">
-                        <!-- Upload Button - Opens Upload Modal -->
                         <button
                             class="btn btn-sm {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? 'btn-success' : 'btn-secondary' }} openUploadModalBtn"
                             data-id="{{ $request->Request_ID }}"
@@ -107,14 +106,15 @@
                             data-applicant-name="{{ $request->First_Name }} {{ $request->Last_Name }}"
                             data-requested-format="{{ $request->Format }}"
                             data-files='@json(json_decode($request->uploaded_format, true) ?? [])'
+                            data-feedback="{{ $request->feedback ?? 'No feedback provided' }}"
+                            data-status="{{ $request->Status }}"
                             {{ in_array($request->Status, ['In Progress', 'Needs Revision']) ? '' : 'disabled' }}
                             data-bs-toggle="modal" data-bs-target="#uploadModal" data-bs-toggle="tooltip"
                             data-bs-placement="top" title="Upload and send the requested format">
                             <i class="bi bi-upload"></i>
                         </button>
-
-                        <!-- Upload Files -->
                     </td>
+
 
                     </td>
 
@@ -207,17 +207,19 @@
 
                 <div class="modal-body">
                     <input type="hidden" id="request_id" name="id">
-                        <!-- Requested By -->
-    <div class="mb-3 d-flex align-items-center">
-        <label class="form-label mb-0" style="white-space: nowrap;"><strong>Requested By:</strong></label>
-        <span class="ms-2" id="view_requested_by"></span>
-    </div>
+                    <!-- Requested By -->
+                    <div class="mb-3 d-flex align-items-center">
+                        <label class="form-label mb-0" style="white-space: nowrap;"><strong>Requested
+                                By:</strong></label>
+                        <span class="ms-2" id="view_requested_by"></span>
+                    </div>
 
-    <!-- Date Created -->
-    <div class="mb-3 d-flex align-items-center">
-        <label class="form-label mb-0" style="white-space: nowrap;"><strong>Date Created:</strong></label>
-        <span class="ms-2" id="view_date_created"></span>
-    </div>
+                    <!-- Date Created -->
+                    <div class="mb-3 d-flex align-items-center">
+                        <label class="form-label mb-0" style="white-space: nowrap;"><strong>Date
+                                Created:</strong></label>
+                        <span class="ms-2" id="view_date_created"></span>
+                    </div>
                     <div class="mb-3">
                         <label for="view_first_name" class="form-label">First Name</label>
                         <input type="text" class="form-control" id="view_first_name" readonly>
@@ -277,9 +279,11 @@
 
                         <div id="uploadFeedback" class="text-danger d-none">Please select at least one file.</div>
 
-                        <label for="uploadMessage" class="form-label mt-3">Message/Feedback</label>
-                        <textarea class="form-control" id="uploadMessage" name="upload_message" rows="3"
-                            placeholder="Add a message or feedback about the upload (optional)"></textarea>
+                        <div id="feedbackSection" class="mt-3 d-none">
+                            <label for="uploadMessage" class="form-label">Message/Feedback</label>
+                            <p id="uploadMessage" class="form-control-static border rounded p-2 bg-light"></p>
+                        </div>
+
                     </div>
 
                     <div class="modal-footer">

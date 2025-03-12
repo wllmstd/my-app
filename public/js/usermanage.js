@@ -420,96 +420,100 @@ $(document).ready(function () {
         },
     });
 
-    // Handle Review Submission Modal
-    $(document).on("click", ".reviewSubmissionBtn", function (event) {
-        event.preventDefault();
-        let requestId = $(this).data("id");
+    $(document).ready(function () {
+        // Handle Review Submission Modal Opening
+        $(document).on("click", ".reviewSubmissionBtn", function (event) {
+            event.preventDefault();
+            let requestId = $(this).data("id");
 
-        $.ajax({
-            url: `/requests/${requestId}/details`,
-            type: "GET",
-            success: function (data) {
-                $("#reviewSubmissionModal").data("request-id", requestId);
-                $("#reviewRequester").text(
-                    `${data.First_Name} ${data.Last_Name}`
-                );
-                $("#reviewDetails").text(data.Format);
-
-                let profilerName =
-                    data.profiler_first_name && data.profiler_last_name
-                        ? `${data.profiler_first_name} ${data.profiler_last_name}`
-                        : "Not Assigned";
-                $("#reviewProfiler").text(profilerName);
-
-                if (data.uploaded_format) {
-                    displayUploadedFiles(data.uploaded_format);
-                } else {
-                    $("#reviewUploadedFormat").html(
-                        "<p>No submitted file available</p>"
+            $.ajax({
+                url: `/requests/${requestId}/details`,
+                type: "GET",
+                success: function (data) {
+                    $("#reviewSubmissionModal").data("request-id", requestId);
+                    $("#reviewRequester").text(
+                        `${data.First_Name} ${data.Last_Name}`
                     );
-                }
-                $("#reviewSubmissionModal").modal("show");
-            },
-            error: function () {
-                alert("Failed to load request details.");
-            },
+                    $("#reviewFormat").text(data.Format);
+
+                    let profilerName =
+                        data.profiler_first_name && data.profiler_last_name
+                            ? `${data.profiler_first_name} ${data.profiler_last_name}`
+                            : "Not Assigned";
+                    $("#reviewProfiler").text(profilerName);
+
+                    if (data.uploaded_format) {
+                        displayUploadedFiles(data.uploaded_format);
+                    } else {
+                        $("#reviewUploadedFormat").html(
+                            "<p>No submitted file available</p>"
+                        );
+                    }
+
+                    $("#reviewSubmissionModal").modal("show");
+                },
+                error: function () {
+                    alert("Failed to load request details.");
+                },
+            });
         });
-    });
 
-    // Handle "Mark as Done" Click
-    $("#markAsDoneBtn").on("click", function () {
-        let requestId = $("#reviewSubmissionModal").data("request-id");
-        let feedback = $("#reviewFeedback").val();
+        // Handle "Mark as Done" Click
+        $("#markAsDoneBtn").on("click", function () {
+            let requestId = $("#reviewSubmissionModal").data("request-id");
 
-        if (!requestId) {
-            alert("Error: Missing request ID.");
-            return;
-        }
+            if (!requestId) {
+                alert("Error: Missing request ID.");
+                return;
+            }
 
-        $.post(`/requests/${requestId}/complete`, {
-            status: "Completed",
-            feedback: feedback,
-        })
-            .done(function () {
-                alert("Request marked as complete!");
-                $(`button[data-id='${requestId}']`)
-                    .closest("tr")
-                    .find("td:nth-child(2)")
-                    .text("Completed");
-                $("#reviewSubmissionModal").modal("hide");
-
-                $("#reviewSubmissionModal").on("hidden.bs.modal", function () {
+            $.post(`/requests/${requestId}/complete`, {
+                status: "Completed",
+            })
+                .done(function () {
+                    alert("Request marked as complete!");
+                    $("#reviewSubmissionModal").modal("hide");
                     location.reload();
+                })
+                .fail(function () {
+                    alert("Error updating request status.");
                 });
+        });
+
+        // Open Feedback Modal
+        $("#openFeedbackModalBtn").on("click", function () {
+            $("#reviewSubmissionModal").modal("hide"); // Hide the main modal
+            $("#feedbackModal").modal("show");
+        });
+
+        // Handle "Send for Revision" Click
+        $("#sendForRevisionBtn").on("click", function () {
+            let requestId = $("#reviewSubmissionModal").data("request-id");
+            let feedback = $("#feedbackMessage").val();
+
+            if (!requestId) {
+                alert("Error: Missing request ID.");
+                return;
+            }
+
+            if (!feedback.trim()) {
+                alert("Please provide feedback before sending.");
+                return;
+            }
+
+            $.post(`/requests/${requestId}/revise`, {
+                status: "Needs Revision",
+                feedback: feedback,
             })
-            .fail(function (xhr) {
-                console.error("AJAX Error:", xhr.responseText);
-                alert("Error updating request status.");
-            });
-    });
-
-    // Handle "Request Revision" Click
-    $("#reviseBtn").on("click", function () {
-        let requestId = $("#reviewSubmissionModal").data("request-id");
-        let feedback = $("#reviewFeedback").val();
-
-        if (!requestId) {
-            alert("Error: Missing request ID.");
-            return;
-        }
-
-        $.post(`/requests/${requestId}/revise`, {
-            status: "Needs Revision",
-            feedback: feedback,
-        })
-            .done(function () {
-                alert("Request sent back for revision.");
-                $("#reviewSubmissionModal").modal("hide");
-                location.reload();
-            })
-            .fail(function () {
-                alert("Error updating request status.");
-            });
+                .done(function () {
+                    alert("Request sent back for revision.");
+                    $("#feedbackModal").modal("hide");
+                    location.reload();
+                })
+                .fail(function () {
+                    alert("Error updating request status.");
+                });
+        });
     });
 });
 

@@ -362,35 +362,51 @@
         </div>
     </div>
 
-    <!-- Review Submission Modal -->
-    <div class="modal fade" id="reviewSubmissionModal" tabindex="-1" aria-labelledby="reviewSubmissionModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="reviewSubmissionModalLabel">Review Submission</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Profiled by:</strong> <span id="reviewProfiler"></span></p>
-                    <p><strong>Name of Applicant:</strong> <span id="reviewRequester"></span></p>
-                    <p><strong>Requested Format:</strong> <span id="reviewFormat"></span></p>
+<!-- Review Submission Modal -->
+<div class="modal fade" id="reviewSubmissionModal" tabindex="-1" aria-labelledby="reviewSubmissionModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewSubmissionModalLabel">Review Submission</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Profiled by:</strong> <span id="reviewProfiler"></span></p>
+                <p><strong>Name of Applicant:</strong> <span id="reviewRequester"></span></p>
+                <p><strong>Requested Format:</strong> <span id="reviewFormat"></span></p>
 
-                    <!-- <p><strong>Submitted File:</strong></p> -->
-                    <div id="reviewUploadedFormat" class="mt-2"></div>
+                <div id="reviewUploadedFormat" class="mt-2"></div>
 
-                    <label for="reviewFeedback">Feedback:</label>
-                    <textarea id="reviewFeedback" class="form-control" rows="3"
-                        placeholder="Provide feedback..."></textarea>
-
-                    <div class="mt-3">
-                        <button id="markAsDoneBtn" class="btn btn-success">Mark as Done</button>
-                        <button id="reviseBtn" class="btn btn-danger">Request Revision</button>
-                    </div>
+                <div class="mt-3">
+                    <button id="markAsDoneBtn" class="btn btn-success">Mark as Done</button>
+                    <button id="openFeedbackModalBtn" class="btn btn-danger">Request Revision</button>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="feedbackModalLabel">Feedback</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="feedbackMessage" class="form-control" rows="4"
+                    placeholder="Provide detailed feedback..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button id="sendForRevisionBtn" class="btn btn-danger">Send for Revision</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 </body>

@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RequestCompletedMail;
 use App\Models\User;
+use App\Mail\RequestRevisionMail;
+
 
 class RequestController extends Controller
 {
@@ -171,15 +173,65 @@ class RequestController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function requestRevision(Request $request, $id)
+    public function requestRevision($id, Request $request)
     {
-        $userRequest = UserRequest::findOrFail($id);
-        $userRequest->Status = "Needs Revision";
-        $userRequest->Feedback = $request->feedback; // Store user feedback
-        $userRequest->save();
+        try {
+            Log::info("Received revision request for ID: " . $id);
 
-        return response()->json(['success' => true]);
+            if (!$id) {
+                Log::error("Invalid request ID.");
+                return response()->json(['success' => false, 'message' => 'Invalid request ID.'], 400);
+            }
+
+            // ✅ Ensure we fetch only one request (not a collection)
+            $userRequest = UserRequest::where('Request_ID', $id)->firstOrFail();
+
+            if (!$userRequest) {
+                Log::error("❌ Request not found for ID: " . $id);
+                return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
+            }
+
+            Log::info("User Request Data: " . json_encode($userRequest));
+
+            // ✅ Ensure the profiler exists
+            $profiler = User::where('id', $userRequest->accepted_by)->first();
+            if (!$profiler) {
+                Log::error("❌ Profiler not found for request ID: " . $id);
+                return response()->json(['success' => false, 'message' => 'Profiler not found.'], 404);
+            }
+
+            // ✅ Get feedback and log it
+            $feedback = $request->input('feedback');
+            Log::info("Received Feedback: " . $feedback);
+
+            // ✅ Update request status and feedback
+            // ✅ Force update the feedback in the database
+            $userRequest->feedback = $feedback;
+            $userRequest->Status = 'Needs Revision';
+            $userRequest->Updated_Time = now();
+            $userRequest->save();
+
+            Log::info("✅ Feedback successfully saved: " . $userRequest->feedback);
+
+
+            Log::info("✅ Request updated successfully. Preparing to send email...");
+
+            // ✅ Check before sending email
+            if (!$userRequest) {
+                Log::error("🚨 UserRequest is NULL. Email NOT sent.");
+                return response()->json(['success' => false, 'message' => 'Failed to retrieve request.'], 500);
+            }
+
+            Mail::to($profiler->email)->send(new RequestRevisionMail($userRequest, $feedback));
+            Log::info("✅ Email successfully sent to: " . $profiler->email);
+
+            return response()->json(['success' => true, 'message' => 'Revision requested successfully, and email sent.']);
+        } catch (\Exception $e) {
+            Log::error("❌ Error updating request: " . $e->getMessage());
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
     }
+
 
     //Fetch the Profiler's Name 
     public function getRequestWithProfiler($id)

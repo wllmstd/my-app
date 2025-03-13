@@ -4,11 +4,11 @@
     <title>Request Completed Notification</title>
 </head>
 <body>
-    <h2>Request Marked as Completed</h2>
-
     <p>Dear {{ $profiler->first_name ?? 'User' }} {{ $profiler->last_name ?? '' }},</p>
 
-    <p>The user, {{ $user->first_name ?? 'Unknown' }} {{ $user->last_name ?? '' }}, has marked their request as completed.</p>
+    <p>The request for applicant {{ $request->First_Name ?? 'N/A' }} {{ $request->Last_Name ?? '' }}, has been successfully marked as <strong>Completed</strong>.</p>
+    
+    <p>Thank you for your attention to this request.</p>
 
     <h3>Request Details:</h3>
     <ul>
@@ -17,11 +17,11 @@
         <li><strong>Requested Format:</strong> {{ $request->Format ?? 'N/A' }}</li>
         <li><strong>Location:</strong> {{ $request->Location ?? 'N/A' }}</li>
         <li><strong>Feedback:</strong> {{ $request->feedback ?? 'No feedback provided' }}</li>
-        <li><strong>Marked as Completed By:</strong> {{ $user->first_name ?? 'Unknown' }} {{ $user->last_name ?? '' }}</li>
+        <li><strong>Date Completed:</strong> {{ $formattedDate ?? 'N/A' }}</li>
     </ul>
 
-    <p>The request has now been updated to "Completed".</p>
-
-    <p>Thank you!</p>
+    <p>Best regards,  
+        <br><strong>{{ $user->first_name ?? 'Unknown' }} {{ $user->last_name ?? '' }}</strong>  
+    </p>
 </body>
 </html>

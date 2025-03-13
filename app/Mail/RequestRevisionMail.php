@@ -16,29 +16,35 @@ class RequestRevisionMail extends Mailable
     public $userRequest;
     public $profiler;
     public $requester;
-    public $feedback; // ✅ Add feedback
+    public $feedback; 
+    public $formattedDate;
 
     public function __construct(UserRequest $userRequest, $feedback)
     {
         if (!$userRequest) {
             throw new \Exception("🚨 UserRequest is NULL in RequestRevisionMail constructor.");
         }
-
+    
         $this->userRequest = $userRequest;
         $this->profiler = User::find($userRequest->accepted_by);
         $this->requester = User::find($userRequest->Users_ID);
-        $this->feedback = $userRequest->feedback; // ✅ Store feedback
+        $this->feedback = $feedback;
+        $this->formattedDate = \Carbon\Carbon::parse($userRequest->Date_Created)->format('M d, Y, h:i A'); //Format Date
     }
+    
 
     public function build()
     {
-        return $this->subject('Revision Requested for Request #' . $this->userRequest->Request_ID)
+        return $this->from($this->requester->email, $this->requester->first_name . ' ' . $this->requester->last_name) //From Requester (TA)
+                    ->to($this->profiler->email) // Send to Support (Profiler)
+                    // ->subject('Revision Requested for Request #' . $this->userRequest->Request_ID)
+                    ->subject('Revision Requested for ' . $this->userRequest->First_Name . ' ' . $this->userRequest->Last_Name)
                     ->view('emails.requestRevision')
                     ->with([
                         'request' => $this->userRequest,
                         'profiler' => $this->profiler,
                         'requester' => $this->requester,
-                        'feedback' => $this->feedback, // ✅ Pass feedback
+                        'feedback' => $this->feedback, 
                     ]);
     }
 }

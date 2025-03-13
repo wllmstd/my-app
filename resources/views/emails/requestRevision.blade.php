@@ -8,7 +8,10 @@
 
     <p>Dear {{ $profiler->first_name }} {{ $profiler->last_name }},</p>
 
-    <p>The request submitted by <strong>{{ $requester->first_name }} {{ $requester->last_name }}</strong> has been marked for revision.</p>
+    <p>The file you submitted has been marked for revision.</p>
+
+    <h3>Feedback for Revision:</h3>
+    <p>{{ $feedback ?? 'No feedback provided' }}</p> <!-- Show fallback text if empty -->
 
     <h3>Request Details:</h3>
     <ul>
@@ -17,14 +20,15 @@
         <li><strong>Nationality:</strong> {{ $request->Nationality }}</li>
         <li><strong>Location:</strong> {{ $request->Location }}</li>
         <li><strong>Requested Format:</strong> {{ $request->Format }}</li>
-        <li><strong>Created On:</strong> {{ $request->Date_Created }}</li>
+        <li><strong>Created On:</strong> {{ $formattedDate }}</li>
     </ul>
 
-    <h3>Feedback for Revision:</h3>
-    <p>{{ $feedback }}</p> <!-- ✅ Show feedback -->
+    <p>Please review the submitted file and apply the necessary changes.</p>
 
-    <p>Please review the request and make the necessary changes.</p>
+    <p>Thank you for your attention to this request.</p>
 
-    <p>Thank you!</p>
+    <p>Best regards,  
+        <br><strong>{{ $requester->first_name }} {{ $requester->last_name }}</strong>  
+    </p>
 </body>
 </html>

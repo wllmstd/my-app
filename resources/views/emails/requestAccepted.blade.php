@@ -13,7 +13,7 @@
     <!-- <p>Your request has been accepted by
         <strong>{{ $profiler->first_name ?? 'Unknown' }} {{ $profiler->last_name ?? '' }}</strong>.
     </p> -->
-    <p>Your request has been <strong>ACCEPTED</strong> and is now <strong>IN PROGRESS</strong>.</p>
+    <p>Your request has been <strong>Accepted</strong> and is now <strong>In progress</strong>.</p>
 
     <h3>Request Details:</h3>
     <ul>
@@ -32,6 +32,7 @@
 
     <p>Best regards,
         <br><strong>{{ $profiler->first_name ?? 'Unknown' }} {{ $profiler->last_name ?? '' }}</strong>
+        <br>Support Team
     </p>
 </body>
 

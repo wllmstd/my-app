@@ -4,11 +4,9 @@
     <title>Revision Requested</title>
 </head>
 <body>
-    <h2>Revision Requested</h2>
-
     <p>Dear {{ $profiler->first_name }} {{ $profiler->last_name }},</p>
 
-    <p>The file you submitted has been marked for revision.</p>
+    <p>The file format you submitted has been marked for <strong>Revision</strong>.</p>
 
     <h3>Feedback for Revision:</h3>
     <p>{{ $feedback ?? 'No feedback provided' }}</p> <!-- Show fallback text if empty -->

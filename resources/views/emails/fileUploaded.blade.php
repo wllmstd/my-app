@@ -8,7 +8,7 @@
 <body>
     <p>Dear {{ $user->first_name ?? 'User' }} {{ $user->last_name ?? '' }},</p>
 
-    <p>The requested file format has been <strong>SUCCESSFULLY UPLOADED</strong> and is now available for <strong>REVIEW</strong></p>
+    <p>The requested file format has been <strong>Successfully Uploaded</strong> and is now available for <strong>Review</strong></p>
 
     <h3>Uploaded Files:</h3>
     <ul>

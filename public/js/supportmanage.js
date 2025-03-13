@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
     $(document).on("click", ".viewRequestBtn", function () {
         let requestId = $(this).data("id"); // ✅ Fetch ID from View button
         let firstName = $(this).attr("data-first-name");
@@ -8,11 +7,11 @@ $(document).ready(function () {
         let location = $(this).attr("data-location");
         let format = $(this).attr("data-format");
         let attachments = $(this).attr("data-attachments");
-    
+
         // ✅ Fetch Requested By & Date Created
-        let requestedBy = $(this).attr("data-requested-by"); 
+        let requestedBy = $(this).attr("data-requested-by");
         let dateCreated = $(this).attr("data-date-created");
-    
+
         // ✅ Populate Modal Fields
         $("#request_id").val(requestId);
         $("#view_first_name").val(firstName);
@@ -20,19 +19,19 @@ $(document).ready(function () {
         $("#view_nationality").val(nationality);
         $("#view_location").val(location);
         $("#view_format").val(format);
-    
+
         // ✅ Populate Requested By & Date Created
         $("#view_requested_by").text(requestedBy);
         $("#view_date_created").text(dateCreated);
-    
+
         // ✅ Assign Request ID to Accept Button (Fix)
         $(".acceptRequestBtn").attr("data-id", requestId);
-    
+
         // ✅ Handle Attachments
         let attachmentsContainer = $("#attachmentsContainer");
         let noAttachmentsText = $("#noAttachments");
         attachmentsContainer.html(""); // Clear previous attachments
-    
+
         try {
             let attachmentsArray = attachments ? JSON.parse(attachments) : [];
             if (attachmentsArray.length > 0) {
@@ -53,11 +52,11 @@ $(document).ready(function () {
             console.error("Error parsing attachments:", error);
             noAttachmentsText.text("Error loading attachments.").show();
         }
-    
+
         // ✅ Show Modal
         $("#viewRequestModal").modal("show");
     });
-    
+
     // ✅ Accept Request Button - Ensure Correct ID is Sent
     $(document).on("click", ".acceptRequestBtn", function () {
         let requestId = $(this).attr("data-id"); // ✅ Correctly fetch ID
@@ -104,7 +103,6 @@ $(document).ready(function () {
         });
     });
 
-
     // Open Upload Modal & Load Existing Files
     $(document).ready(function () {
         $(document).on("click", ".openUploadModalBtn", function () {
@@ -117,14 +115,12 @@ $(document).ready(function () {
             let feedback = button.data("feedback") || "No feedback provided"; // ✅ Get Feedback
             let status = button.data("status"); // ✅ Get status from the button
 
-
             //Debugging: Check if data attributes exist
             console.log("Request ID:", requestId);
             console.log("Requested By:", requestedBy);
             console.log("Applicant Name:", applicantName);
             console.log("Requested Format:", requestedFormat);
             console.log("Existing Files:", existingFiles);
-
 
             // If requestId is undefined, log an error and prevent modal from opening
             if (!requestId) {
@@ -147,7 +143,7 @@ $(document).ready(function () {
             } else {
                 $("#feedbackSection").addClass("d-none"); // ✅ Hide section
             }
-            
+
             //Populate Existing Files
             let filesContainer = $("#existingUploadedFiles");
             filesContainer.html(""); // Clear previous content
@@ -350,10 +346,9 @@ $(document).on("click", ".deleteFileBtn", function () {
     });
 });
 
-
 $(document).ready(function () {
     // ✅ Initialize DataTables
-    $('#userTable').DataTable({
+    $("#userTable").DataTable({
         paging: true,
         searching: true,
         ordering: true,
@@ -367,7 +362,7 @@ $(document).ready(function () {
         ordering: true,
         info: true,
         lengthMenu: [5, 10, 25, 50],
-        columnDefs: [{ orderable: false, targets: [9] }]
+        columnDefs: [{ orderable: false, targets: [9] }],
     });
 
     let pendingTable = $("#pendingRequestsTable").DataTable({
@@ -376,26 +371,30 @@ $(document).ready(function () {
         ordering: true,
         info: true,
         lengthMenu: [5, 10, 25, 50],
-        columnDefs: [{ orderable: false, targets: [8] }]
+        columnDefs: [{ orderable: false, targets: [8] }],
     });
 
     // ✅ Load last viewed counts and dismissed states from localStorage
-    let lastViewedCounts = JSON.parse(localStorage.getItem('lastViewedCounts')) || {
+    let lastViewedCounts = JSON.parse(
+        localStorage.getItem("lastViewedCounts")
+    ) || {
         all: 0,
         pending: 0,
         inProgress: 0,
         underReview: 0,
         needsRevision: 0,
-        completed: 0
+        completed: 0,
     };
 
-    let dismissedBadges = JSON.parse(localStorage.getItem('dismissedBadges')) || {
+    let dismissedBadges = JSON.parse(
+        localStorage.getItem("dismissedBadges")
+    ) || {
         all: false,
         pending: false,
         inProgress: false,
         underReview: false,
         needsRevision: false,
-        completed: false
+        completed: false,
     };
 
     // ✅ Apply filter based on saved state
@@ -427,24 +426,47 @@ $(document).ready(function () {
             $("#pendingRequestsTable_wrapper").hide();
             acceptedTable.column(1).search(filter, true, false).draw();
         }
+        setTimeout(updateStatusCounts, 300);
+
+        pendingTable.on("draw", updateStatusCounts);
+        acceptedTable.on("draw", updateStatusCounts);
 
         // ✅ Update Status Counts After Applying Filter
         updateStatusCounts();
     }
 
     function updateStatusCounts() {
-        let allCount = acceptedTable.rows().count() + pendingTable.rows().count();
-        let pendingCount = pendingTable.rows().data().toArray()
-            .filter(row => $(row[1]).text().trim() === "Pending").length;
-        let inProgressCount = acceptedTable.rows().data().toArray()
-            .filter(row => $(row[1]).text().trim() === "In Progress").length;
-        let underReviewCount = acceptedTable.rows().data().toArray()
-            .filter(row => $(row[1]).text().trim() === "Under Review").length;
-        let needsRevisionCount = acceptedTable.rows().data().toArray()
-            .filter(row => $(row[1]).text().trim() === "Needs Revision").length;
-        let completedCount = acceptedTable.rows().data().toArray()
-            .filter(row => $(row[1]).text().trim() === "Completed").length;
+        let allCount =
+            acceptedTable.rows().count() + pendingTable.rows().count();
+        let pendingCount = pendingTable
+            .rows()
+            .data()
+            .toArray()
+            .filter((row) => $(row[1]).text().trim() === "Pending").length;
+        let inProgressCount = acceptedTable
+            .rows()
+            .data()
+            .toArray()
+            .filter((row) => $(row[1]).text().trim() === "In Progress").length;
+        let underReviewCount = acceptedTable
+            .rows()
+            .data()
+            .toArray()
+            .filter((row) => $(row[1]).text().trim() === "Under Review").length;
+        let needsRevisionCount = acceptedTable
+            .rows()
+            .data()
+            .toArray()
+            .filter(
+                (row) => $(row[1]).text().trim() === "Needs Revision"
+            ).length;
+        let completedCount = acceptedTable
+            .rows()
+            .data()
+            .toArray()
+            .filter((row) => $(row[1]).text().trim() === "Completed").length;
 
+        // ✅ Update button text with counts
         // ✅ Update button text with counts
         $("#count-all").text(`(${allCount})`);
         $("#count-pending").text(`(${pendingCount})`);
@@ -453,38 +475,56 @@ $(document).ready(function () {
         $("#count-needs-revision").text(`(${needsRevisionCount})`);
         $("#count-completed").text(`(${completedCount})`);
 
-        // ✅ Handle "NEW" badges
-        if (allCount > lastViewedCounts.all && !dismissedBadges.all) {
+        // ✅ Badge Logic - Based on visible count increase
+        if (
+            parseInt($("#count-all").text().replace(/\D/g, ""), 10) >
+            lastViewedCounts.all
+        ) {
             $("#new-badge-all").show();
         } else {
             $("#new-badge-all").hide();
         }
 
-        if (pendingCount > lastViewedCounts.pending && !dismissedBadges.pending) {
+        if (
+            parseInt($("#count-pending").text().replace(/\D/g, ""), 10) >
+            lastViewedCounts.pending
+        ) {
             $("#new-badge-pending").show();
         } else {
             $("#new-badge-pending").hide();
         }
 
-        if (inProgressCount > lastViewedCounts.inProgress && !dismissedBadges.inProgress) {
+        if (
+            parseInt($("#count-in-progress").text().replace(/\D/g, ""), 10) >
+            lastViewedCounts.inProgress
+        ) {
             $("#new-badge-in-progress").show();
         } else {
             $("#new-badge-in-progress").hide();
         }
 
-        if (underReviewCount > lastViewedCounts.underReview && !dismissedBadges.underReview) {
+        if (
+            parseInt($("#count-under-review").text().replace(/\D/g, ""), 10) >
+            lastViewedCounts.underReview
+        ) {
             $("#new-badge-under-review").show();
         } else {
             $("#new-badge-under-review").hide();
         }
 
-        if (needsRevisionCount > lastViewedCounts.needsRevision && !dismissedBadges.needsRevision) {
+        if (
+            parseInt($("#count-needs-revision").text().replace(/\D/g, ""), 10) >
+            lastViewedCounts.needsRevision
+        ) {
             $("#new-badge-needs-revision").show();
         } else {
             $("#new-badge-needs-revision").hide();
         }
 
-        if (completedCount > lastViewedCounts.completed && !dismissedBadges.completed) {
+        if (
+            parseInt($("#count-completed").text().replace(/\D/g, ""), 10) >
+            lastViewedCounts.completed
+        ) {
             $("#new-badge-completed").show();
         } else {
             $("#new-badge-completed").hide();
@@ -493,50 +533,86 @@ $(document).ready(function () {
 
     $(".filter-btn").on("click", function () {
         let filter = $(this).data("filter");
-        let key = filter.replace(/\s+/g, '-').toLowerCase();
+        let key = filter.replace(/\s+/g, "-").toLowerCase();
+
+        // ✅ Save the selected filter to localStorage
+        localStorage.setItem("selectedFilter", filter);
 
         // ✅ Hide the badge when clicked
         $(`#new-badge-${key}`).hide();
         dismissedBadges[key] = true;
 
+        // ✅ Update lastViewedCounts **AFTER** badge comparison
         switch (filter) {
             case "all":
-                lastViewedCounts.all = acceptedTable.rows().count() + pendingTable.rows().count();
+                lastViewedCounts.all =
+                    acceptedTable.rows().count() + pendingTable.rows().count();
                 break;
             case "Pending":
-                lastViewedCounts.pending = pendingTable.rows().data().toArray()
-                    .filter(row => $(row[1]).text().trim() === "Pending").length;
+                lastViewedCounts.pending = pendingTable
+                    .rows()
+                    .data()
+                    .toArray()
+                    .filter(
+                        (row) => $(row[1]).text().trim() === "Pending"
+                    ).length;
                 break;
             case "In Progress":
-                lastViewedCounts.inProgress = acceptedTable.rows().data().toArray()
-                    .filter(row => $(row[1]).text().trim() === "In Progress").length;
+                lastViewedCounts.inProgress = acceptedTable
+                    .rows()
+                    .data()
+                    .toArray()
+                    .filter(
+                        (row) => $(row[1]).text().trim() === "In Progress"
+                    ).length;
                 break;
             case "Under Review":
-                lastViewedCounts.underReview = acceptedTable.rows().data().toArray()
-                    .filter(row => $(row[1]).text().trim() === "Under Review").length;
+                lastViewedCounts.underReview = acceptedTable
+                    .rows()
+                    .data()
+                    .toArray()
+                    .filter(
+                        (row) => $(row[1]).text().trim() === "Under Review"
+                    ).length;
                 break;
             case "Needs Revision":
-                lastViewedCounts.needsRevision = acceptedTable.rows().data().toArray()
-                    .filter(row => $(row[1]).text().trim() === "Needs Revision").length;
+                lastViewedCounts.needsRevision = acceptedTable
+                    .rows()
+                    .data()
+                    .toArray()
+                    .filter(
+                        (row) => $(row[1]).text().trim() === "Needs Revision"
+                    ).length;
                 break;
             case "Completed":
-                lastViewedCounts.completed = acceptedTable.rows().data().toArray()
-                    .filter(row => $(row[1]).text().trim() === "Completed").length;
+                lastViewedCounts.completed = acceptedTable
+                    .rows()
+                    .data()
+                    .toArray()
+                    .filter(
+                        (row) => $(row[1]).text().trim() === "Completed"
+                    ).length;
                 break;
         }
 
-        localStorage.setItem('lastViewedCounts', JSON.stringify(lastViewedCounts));
-        localStorage.setItem('dismissedBadges', JSON.stringify(dismissedBadges));
+        // ✅ Save state to localStorage
+        localStorage.setItem(
+            "lastViewedCounts",
+            JSON.stringify(lastViewedCounts)
+        );
+        localStorage.setItem(
+            "dismissedBadges",
+            JSON.stringify(dismissedBadges)
+        );
 
         applyFilter(filter);
     });
 
+    // ✅ Force update after table redraw
     setTimeout(updateStatusCounts, 200);
-    acceptedTable.on('draw', updateStatusCounts);
-    pendingTable.on('draw', updateStatusCounts);
+    acceptedTable.on("draw", updateStatusCounts);
+    pendingTable.on("draw", updateStatusCounts);
 });
-
-
 
 // Delete Attachment Function
 function deleteAttachment(file) {
@@ -618,7 +694,4 @@ $(".viewAttachmentsBtn").click(function () {
 
     //Initialize Bootstrap tooltips
     $('[data-bs-toggle="tooltip"]').tooltip();
-
-
-
 });

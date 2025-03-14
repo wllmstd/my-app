@@ -31,13 +31,49 @@
 
         <h2>User Requests</h2>
         <div class="mb-3">
-            <button class="btn btn-outline-dark filter-btn active" data-filter="all">All Tables</button>
-            <button class="btn btn-outline-warning filter-btn" data-filter="Pending">Pending Requests</button>
-            <button class="btn btn-outline-primary filter-btn" data-filter="In Progress">In Progress</button>
-            <button class="btn btn-outline-orange filter-btn" data-filter="Under Review">Under Review</button>
-            <button class="btn btn-outline-danger filter-btn" data-filter="Needs Revision">Needs Revision</button>
-            <button class="btn btn-outline-success filter-btn" data-filter="Completed">Completed</button>
+            <button class="btn btn-outline-dark filter-btn active" data-filter="all">
+                <div class="status-label-wrapper">
+                    All Tables
+                    <span id="count-all" class="status-badge">0</span>
+                </div>
+            </button>
+            <button class="btn btn-outline-warning filter-btn" data-filter="Pending">
+                <span class="new-badge" id="new-badge-pending">NEW</span>
+                <div class="status-label-wrapper">
+                    Pending Requests
+                    <span id="count-pending" class="status-badge">0</span>
+                </div>
+            </button>
+            <button class="btn btn-outline-primary filter-btn" data-filter="In Progress">
+                <span class="new-badge" id="new-badge-in-progress">NEW</span>
+                <div class="status-label-wrapper">
+                    In Progress
+                    <span id="count-in-progress" class="status-badge">0</span>
+                </div>
+            </button>
+            <button class="btn btn-outline-orange filter-btn" data-filter="Under Review">
+                <span class="new-badge" id="new-badge-under-review">NEW</span>
+                <div class="status-label-wrapper">
+                    Under Review
+                    <span id="count-under-review" class="status-badge">0</span>
+                </div>
+            </button>
+            <button class="btn btn-outline-danger filter-btn" data-filter="Needs Revision">
+                <span class="new-badge" id="new-badge-needs-revision">NEW</span>
+                <div class="status-label-wrapper">
+                    Needs Revision
+                    <span id="count-needs-revision" class="status-badge">0</span>
+                </div>
+            </button>
+            <button class="btn btn-outline-success filter-btn" data-filter="Completed">
+                <span class="new-badge" id="new-badge-completed">NEW</span>
+                <div class="status-label-wrapper">
+                    Completed
+                    <span id="count-completed" class="status-badge">0</span>
+                </div>
+            </button>
         </div>
+
 
         <!-- Add Request Button -->
         <div class="d-flex justify-content-end mb-3">
@@ -98,7 +134,7 @@
                         <button class="btn btn-primary btn-sm viewRequestBtn" data-id="{{ $request->Request_ID }}"
                             data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
                             data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
-                            data-format="{{ $request->Format }}" data-attachments="{{ $request->Attachment }}"     
+                            data-format="{{ $request->Format }}" data-attachments="{{ $request->Attachment }}"
                             data-date-created="{{ \Carbon\Carbon::parse($request->Date_Created)->format('M j, Y, h:i A') }}"
                             data-bs-toggle="modal" data-bs-target="#viewRequestModal" title="View request details">
                             <i class="bi bi-eye"></i>
@@ -205,7 +241,7 @@
                         <div class="mb-3 d-flex align-items-center">
                             <label class="form-label mb-0" style="white-space: nowrap;"><strong>Date
                                     Created:</strong></label>
-                                    <span class="ms-2 date-created">N/A</span>
+                            <span class="ms-2 date-created">N/A</span>
 
                         </div>
 
@@ -362,50 +398,50 @@
         </div>
     </div>
 
-<!-- Review Submission Modal -->
-<div class="modal fade" id="reviewSubmissionModal" tabindex="-1" aria-labelledby="reviewSubmissionModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reviewSubmissionModalLabel">Review Submission</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>Profiled by:</strong> <span id="reviewProfiler"></span></p>
-                <p><strong>Name of Applicant:</strong> <span id="reviewRequester"></span></p>
-                <p><strong>Requested Format:</strong> <span id="reviewFormat"></span></p>
+    <!-- Review Submission Modal -->
+    <div class="modal fade" id="reviewSubmissionModal" tabindex="-1" aria-labelledby="reviewSubmissionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reviewSubmissionModalLabel">Review Submission</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Profiled by:</strong> <span id="reviewProfiler"></span></p>
+                    <p><strong>Name of Applicant:</strong> <span id="reviewRequester"></span></p>
+                    <p><strong>Requested Format:</strong> <span id="reviewFormat"></span></p>
 
-                <div id="reviewUploadedFormat" class="mt-2"></div>
+                    <div id="reviewUploadedFormat" class="mt-2"></div>
 
-                <div class="mt-3">
-                    <button id="markAsDoneBtn" class="btn btn-success">Mark as Done</button>
-                    <button id="openFeedbackModalBtn" class="btn btn-danger">Request Revision</button>
+                    <div class="mt-3">
+                        <button id="markAsDoneBtn" class="btn btn-success">Mark as Done</button>
+                        <button id="openFeedbackModalBtn" class="btn btn-danger">Request Revision</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Feedback Modal -->
-<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="feedbackModalLabel">Feedback</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <textarea id="feedbackMessage" class="form-control" rows="4"
-                    placeholder="Provide detailed feedback..."></textarea>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button id="sendForRevisionBtn" class="btn btn-danger">Send for Revision</button>
+    <!-- Feedback Modal -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="feedbackModalLabel">Feedback</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="feedbackMessage" class="form-control" rows="4"
+                        placeholder="Provide detailed feedback..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button id="sendForRevisionBtn" class="btn btn-danger">Send for Revision</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
 
@@ -485,6 +521,23 @@
 .btn-outline-orange:hover {
     background-color: orange !important;
     color: white !important;
+}
+
+.filter-btn {
+    position: relative;
+}
+
+.new-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: red;
+    color: white;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 8px;
+    z-index: 10;
 }
 </style>
 

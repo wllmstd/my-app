@@ -10,20 +10,37 @@ $(document).ready(function () {
         ordering: true,
         info: true,
         lengthMenu: [5, 10, 25, 50],
-        order: [[7, "desc"]], // Column index 7 = Updated_Time
-        columnDefs: [
-            { orderable: false, targets: [8] }, // Disable sorting for action column
-        ],
+        order: [[7, "desc"]],
+        columnDefs: [{ orderable: false, targets: [8] }]
     });
+
+    // ✅ Load last viewed counts and dismissed states from localStorage
+    let lastViewedCounts = JSON.parse(localStorage.getItem('lastViewedCounts')) || {
+        all: 0,
+        pending: 0,
+        inProgress: 0,
+        underReview: 0,
+        needsRevision: 0,
+        completed: 0
+    };
+
+    let dismissedBadges = JSON.parse(localStorage.getItem('dismissedBadges')) || {
+        all: false,
+        pending: false,
+        inProgress: false,
+        underReview: false,
+        needsRevision: false,
+        completed: false
+    };
 
     // ✅ Preserve Filter State
     let savedFilter = localStorage.getItem("selectedFilter") || "all";
     applyFilter(savedFilter);
 
-    // ✅ Apply Filter on Click
     $(".filter-btn").on("click", function () {
         let filter = $(this).data("filter");
         localStorage.setItem("selectedFilter", filter);
+        handleBadgeDismissal(filter);
         applyFilter(filter);
     });
 
@@ -32,15 +49,137 @@ $(document).ready(function () {
         $(".filter-btn[data-filter='" + filter + "']").addClass("active");
 
         if (filter === "all") {
-            table.search("").columns().search("").draw(); // Show everything
+            table.search("").columns().search("").draw();
         } else {
-            table
-                .column(1)
-                .search("^" + filter + "$", true, false)
-                .draw(); // Exact match
+            table.column(1).search("^" + filter + "$", true, false).draw();
         }
     }
+
+    function updateStatusCounts() {
+        let allCount = table.rows().count();
+    
+        // ✅ Extract clean text from status column
+        let statuses = table.column(1).data().toArray().map(status => {
+            return $("<div>").html(status).text().trim(); // Handle HTML or plain text
+        });
+    
+        let pendingCount = statuses.filter(status => status === "Pending").length;
+        let inProgressCount = statuses.filter(status => status === "In Progress").length;
+        let underReviewCount = statuses.filter(status => status === "Under Review").length;
+        let needsRevisionCount = statuses.filter(status => status === "Needs Revision").length;
+        let completedCount = statuses.filter(status => status === "Completed").length;
+    
+        // ✅ Update button text with counts
+        $("#count-all").text(`(${allCount})`);
+        $("#count-pending").text(`(${pendingCount})`);
+        $("#count-in-progress").text(`(${inProgressCount})`);
+        $("#count-under-review").text(`(${underReviewCount})`);
+        $("#count-needs-revision").text(`(${needsRevisionCount})`);
+        $("#count-completed").text(`(${completedCount})`);
+    
+        // ✅ Badge Logic - Based on visible count increase
+        if (
+            parseInt($("#count-all").text().replace(/\D/g, ""), 10) >
+            lastViewedCounts.all
+        ) {
+            $("#new-badge-all").show();
+        } else {
+            $("#new-badge-all").hide();
+        }
+
+        if (
+            parseInt($("#count-pending").text().replace(/\D/g, ""), 10) >
+            lastViewedCounts.pending
+        ) {
+            $("#new-badge-pending").show();
+        } else {
+            $("#new-badge-pending").hide();
+        }
+
+        if (
+            parseInt($("#count-in-progress").text().replace(/\D/g, ""), 10) >
+            lastViewedCounts.inProgress
+        ) {
+            $("#new-badge-in-progress").show();
+        } else {
+            $("#new-badge-in-progress").hide();
+        }
+
+        if (
+            parseInt($("#count-under-review").text().replace(/\D/g, ""), 10) >
+            lastViewedCounts.underReview
+        ) {
+            $("#new-badge-under-review").show();
+        } else {
+            $("#new-badge-under-review").hide();
+        }
+
+        if (
+            parseInt($("#count-needs-revision").text().replace(/\D/g, ""), 10) >
+            lastViewedCounts.needsRevision
+        ) {
+            $("#new-badge-needs-revision").show();
+        } else {
+            $("#new-badge-needs-revision").hide();
+        }
+
+        if (
+            parseInt($("#count-completed").text().replace(/\D/g, ""), 10) >
+            lastViewedCounts.completed
+        ) {
+            $("#new-badge-completed").show();
+        } else {
+            $("#new-badge-completed").hide();
+        }
+    }
+    
+
+    function handleBadgeDismissal(filter) {
+        let key = filter.replace(/\s+/g, '-').toLowerCase();
+
+        // ✅ Mark badge as dismissed
+        dismissedBadges[key] = true;
+        $(`#new-badge-${key}`).hide();
+
+        // ✅ Update last viewed counts after dismissal
+        switch (filter) {
+            case "all":
+                lastViewedCounts.all = table.rows().count();
+                break;
+            case "Pending":
+                lastViewedCounts.pending = table.rows().data().toArray()
+                    .filter(row => $(row[1]).text().trim() === "Pending").length;
+                break;
+            case "In Progress":
+                lastViewedCounts.inProgress = table.rows().data().toArray()
+                    .filter(row => $(row[1]).text().trim() === "In Progress").length;
+                break;
+            case "Under Review":
+                lastViewedCounts.underReview = table.rows().data().toArray()
+                    .filter(row => $(row[1]).text().trim() === "Under Review").length;
+                break;
+            case "Needs Revision":
+                lastViewedCounts.needsRevision = table.rows().data().toArray()
+                    .filter(row => $(row[1]).text().trim() === "Needs Revision").length;
+                break;
+            case "Completed":
+                lastViewedCounts.completed = table.rows().data().toArray()
+                    .filter(row => $(row[1]).text().trim() === "Completed").length;
+                break;
+        }
+
+        // ✅ Save to localStorage
+        localStorage.setItem('lastViewedCounts', JSON.stringify(lastViewedCounts));
+        dismissedBadges.pending = false;
+        localStorage.setItem('dismissedBadges', JSON.stringify(dismissedBadges));
+    }
+
+    updateStatusCounts();
+
+    // ✅ Update counts on table redraw
+    table.on('draw', updateStatusCounts);
 });
+
 
 //Function for File Removal
 document

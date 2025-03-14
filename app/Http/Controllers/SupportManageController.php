@@ -11,24 +11,38 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\FileUploadedMail;
-
+use Carbon\Carbon;
 
 
 class SupportManageController extends Controller
 {
+
+    
     public function index()
     {
-        $userId = Auth::id();// Get logged-in user's ID
+        $userId = Auth::id(); // Get logged-in user's ID
+        $today = Carbon::today();
     
         // Get requests accepted by the logged-in profiler
         $myAcceptedRequests = UserRequest::where('Accepted_By', $userId)
-        ->orderBy('Updated_Time', 'asc') // Sort by latest accepted request
-        ->get();
+            ->where(function ($query) use ($today) {
+                $query->where('Status', '!=', 'Completed') // Show non-completed statuses
+                      ->orWhere(function ($subQuery) use ($today) {
+                          $subQuery->where('Status', 'Completed')
+                                   ->whereDate('Updated_Time', $today); // Only today's completed requests
+                      });
+            })
+            ->orderBy('Updated_Time', 'asc')
+            ->get();
+    
         // Get all requests that are still pending
-        $profiles = UserRequest::whereNull('Accepted_By')->orWhere('Status', 'Pending')->get();
+        $profiles = UserRequest::whereNull('Accepted_By')
+            ->orWhere('Status', 'Pending')
+            ->get();
     
         return view('support.supportmanage', compact('myAcceptedRequests', 'profiles'));
     }
+    
 
 
     public function acceptRequest($id)

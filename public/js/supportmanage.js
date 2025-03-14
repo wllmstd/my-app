@@ -474,6 +474,23 @@ $(document).ready(function () {
         $("#count-under-review").text(`(${underReviewCount})`);
         $("#count-needs-revision").text(`(${needsRevisionCount})`);
         $("#count-completed").text(`(${completedCount})`);
+        
+        // ✅ Badge Logic - Show how many are new
+        let newAll = allCount - lastViewedCounts.all;
+        let newPending = pendingCount - lastViewedCounts.pending;
+        let newInProgress = inProgressCount - lastViewedCounts.inProgress;
+        let newUnderReview = underReviewCount - lastViewedCounts.underReview;
+        let newNeedsRevision = needsRevisionCount - lastViewedCounts.needsRevision;
+        let newCompleted = completedCount - lastViewedCounts.completed;
+
+        // 🏷️ If there's an increase, show the count in the badge
+        $("#new-badge-all").text(newAll > 0 ? `${newAll} new` : "").toggle(newAll > 0);
+        $("#new-badge-pending").text(newPending > 0 ? `${newPending} new` : "").toggle(newPending > 0);
+        $("#new-badge-in-progress").text(newInProgress > 0 ? `${newInProgress} new` : "").toggle(newInProgress > 0);
+        $("#new-badge-under-review").text(newUnderReview > 0 ? `${newUnderReview} new` : "").toggle(newUnderReview > 0);
+        $("#new-badge-needs-revision").text(newNeedsRevision > 0 ? `${newNeedsRevision} new` : "").toggle(newNeedsRevision > 0);
+        $("#new-badge-completed").text(newCompleted > 0 ? `${newCompleted} new` : "").toggle(newCompleted > 0);
+
 
         // ✅ Badge Logic - Based on visible count increase
         if (

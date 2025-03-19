@@ -79,6 +79,8 @@ class SupportManageController extends Controller
     $updated = UserRequest::where('Request_ID', $id)->update([
         'Status' => 'In Progress',
         'Accepted_By' => $profiler->id, 
+        'Accepted_At' => now(), // ✅ Capture accepted timestamp
+
     ]);
 
     if ($updated) {

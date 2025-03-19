@@ -56,35 +56,46 @@ public function getRequestStatusCounts()
         return response()->json(['error' => 'Failed to fetch data'], 500);
     }
 }
-
-
 public function getAcceptedRequestsByDay()
 {
     try {
         $userId = auth()->id();
 
+        \Log::info("Fetching accepted requests for user ID: {$userId}");
+
         $acceptedRequests = UserRequest::select(
-                \DB::raw('DAYOFWEEK(created_at) as day_of_week'),
+                \DB::raw('DAYOFWEEK(Accepted_At) as day_of_week'),
                 \DB::raw('COUNT(*) as count')
             )
             ->where('accepted_by', $userId)
+            ->whereNotNull('Accepted_At') // ✅ Only count accepted requests
             ->groupBy('day_of_week')
-            ->get()
-            ->mapWithKeys(function ($item) {
-                // Map day_of_week (1 = Sunday) to Monday to Friday index
-                $dayMap = [1 => 6, 2 => 0, 3 => 1, 4 => 2, 5 => 3, 6 => 4, 7 => 5];
-                $index = $dayMap[$item->day_of_week] ?? null;
-                
-                if ($index !== null && $index < 5) {
-                    return [$index => $item->count];
-                }
-            });
+            ->get();
+
+        // Log raw results
+        \Log::info('Raw accepted requests:', $acceptedRequests->toArray());
+
+        $mappedRequests = $acceptedRequests->mapWithKeys(function ($item) {
+            // Map day_of_week (1 = Sunday) to Monday to Friday index
+            $dayMap = [1 => 6, 2 => 0, 3 => 1, 4 => 2, 5 => 3, 6 => 4, 7 => 5];
+            $index = $dayMap[$item->day_of_week] ?? null;
+
+            \Log::info("Mapping day_of_week: {$item->day_of_week} to index: {$index}");
+
+            if ($index !== null && $index < 5) {
+                return [$index => $item->count];
+            }
+        });
+
+        \Log::info('Mapped requests:', $mappedRequests->toArray());
 
         // Fill missing days with 0
         $formattedCounts = [];
         for ($i = 0; $i < 5; $i++) {
-            $formattedCounts[] = $acceptedRequests[$i] ?? 0;
+            $formattedCounts[] = $mappedRequests[$i] ?? 0;
         }
+
+        \Log::info('Final formatted counts:', $formattedCounts);
 
         return response()->json($formattedCounts);
     } catch (\Exception $e) {
@@ -96,6 +107,7 @@ public function getAcceptedRequestsByDay()
         return response()->json(['error' => 'Failed to fetch data'], 500);
     }
 }
+
 
 
 

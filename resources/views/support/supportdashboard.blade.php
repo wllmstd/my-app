@@ -23,7 +23,13 @@
     <!-- Include the navbar here -->
 
     <div class="container mt-4">
-        <h2 class="mb-4 text-center">Dashboard Overview</h2>
+
+        <!-- Welcome Section -->
+        <div class="welcome-box text-center mb-4 p-3 rounded">
+            <h2 class="welcome-title">Welcome, Profiler {{ auth()->user()->first_name ?? 'Admin' }}! 🌞</h2>
+            <p class="welcome-subtitle">Here’s an overview of your status and activity.</p>
+        </div>
+
         <div class="row">
             <!-- Pending Requests Card -->
             <div class="col-md-6">
@@ -82,21 +88,32 @@
         <div class="row mt-4">
             <!-- Chart 3 -->
             <div class="col-md-6">
-                <div class="chart-container">
-                    <h5 class="text-center">Accepted Requests (By Day)</h5>
-                    <canvas id="acceptedRequestsChart"></canvas>
+                <div class="stat-card equal-height d-flex flex-column">
+                    <!-- Title above the chart -->
+                    <div class="chart-title">
+                        <h5 class="text-center">Accepted Requests (By Day)</h5>
+                    </div>
+
+                    <!-- Chart container with specific class for Accepted Requests -->
+                    <div class=" chart-container-accepted-requests">
+                        <canvas id="acceptedRequestsChart"></canvas>
+                    </div>
                 </div>
             </div>
 
             <!-- Chart Container -->
-            <div class="col-md-6">
-                <div class="chart-container">
-                    <h5 class="text-center">User Status Overview</h5>
-                    <canvas id="usersChart"></canvas>
+            <div class="col-md-6 d-flex equal-height">
+                <div class="calendar-card w-100 d-flex flex-column">
+                    <div class="calendar-header">
+                        <button class="calendar-btn prev-btn">&lt;</button>
+                        <span class="calendar-month" id="calendarMonth">March 2025</span>
+                        <button class="calendar-btn next-btn">&gt;</button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid"></div>
                 </div>
             </div>
-
         </div>
+
     </div>
 
 
@@ -173,46 +190,104 @@
     });
 
 
-    document.addEventListener("DOMContentLoaded", function () {
-    fetch("{{ route('support.request.accepted.by.day') }}")
-        .then(response => response.json())
-        .then(data => {
-            let ctx = document.getElementById("acceptedRequestsChart").getContext("2d");
 
-            new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                    datasets: [{
-                        label: "Accepted Requests",
-                        data: [
-                            data.Monday,
-                            data.Tuesday,
-                            data.Wednesday,
-                            data.Thursday,
-                            data.Friday
-                        ],
-                        backgroundColor: "#4CAF50",
-                        borderColor: "#388E3C",
-                        borderWidth: 1,
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch("{{ route('support.request.accepted.by.day') }}")
+            .then(response => response.json())
+            .then(data => {
+                console.log("Chart data:", data); // ✅ Confirm data structure
+
+                let ctx = document.getElementById("acceptedRequestsChart").getContext("2d");
+
+                new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                        datasets: [{
+                            label: "Accepted Requests",
+                            data: data, // ✅ Use the array directly
+                            backgroundColor: "#4CAF50",
+                            borderColor: "#388E3C",
+                            borderWidth: 1,
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
                             }
                         }
                     }
-                }
-            });
-        })
-        .catch(error => console.error("Error fetching accepted requests by day:", error));
-});
+                });
+            })
+            .catch(error => console.error("Error fetching accepted requests by day:", error));
+    });
 
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const calendarMonth = document.getElementById('calendarMonth');
+        const calendarGrid = document.getElementById('calendarGrid');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+
+        let currentDate = new Date();
+
+        function renderCalendar() {
+            calendarGrid.innerHTML = '';
+            const month = currentDate.getMonth();
+            const year = currentDate.getFullYear();
+
+            calendarMonth.textContent = new Intl.DateTimeFormat('en-US', {
+                month: 'long',
+                year: 'numeric'
+            }).format(currentDate);
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Add empty days for the starting day of the week
+            for (let i = 0; i < firstDay; i++) {
+                calendarGrid.innerHTML += `<div class="calendar-day empty"></div>`;
+            }
+
+            // Add actual days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('calendar-day');
+                dayElement.textContent = day;
+
+                if (
+                    day === new Date().getDate() &&
+                    year === new Date().getFullYear() &&
+                    month === new Date().getMonth()
+                ) {
+                    dayElement.classList.add('today');
+                }
+
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        prevBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        renderCalendar();
+    });
     </script>
+
 
 </body>
 

@@ -31,7 +31,7 @@
                                         onerror="this.onerror=null; this.src='{{ asset('storage/profile_images/default.png') }}';">
 
                                     <div class="mt-3">
-                                        <label for="profileImageInput" class="btn btn-outline-primary">
+                                        <label for="profileImageInput" class="btn btn-outline-p">
                                             <i class="fa fa-plus"></i> Upload New
                                         </label>
                                         <input type="file" name="image" id="profileImageInput" class="d-none"

@@ -114,7 +114,7 @@
             success: function(data) {
                 var ctx = document.getElementById("departmentChart").getContext("2d");
 
-                var colors = ["#ff6384", "#36a2eb", "#ffce56"];
+                var colors = ["#dc3545", "#136efd", "#ffc107"];
                 var labels = Object.keys(data);
                 var values = Object.values(data);
 

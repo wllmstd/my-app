@@ -60,7 +60,7 @@
                             <ul class="list-unstyled" id="supportStatusDetails">
                                 <li>
                                     <span
-                                        style="background-color: #17a2b8; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
+                                        style="background-color: #136efd; ; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
                                     In Progress: <strong id="supportInProgressCount">0</strong>
                                 </li>
                                 <li>
@@ -168,7 +168,7 @@
                                     data.needs_revision || 0,
                                     data.completed || 0
                                 ],
-                                backgroundColor: ["#17a2b8", "#ffc107", "#dc3545",
+                                backgroundColor: ["#136efd", "#ffc107", "#dc3545",
                                     "#28a745"
                                 ],
                                 borderColor: "#fff",

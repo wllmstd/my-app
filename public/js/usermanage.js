@@ -731,3 +731,20 @@ $(document).on("click", ".reviewSubmissionBtn", function () {
         });
     });
 });
+
+// Handle Review Submission Modal Buttons if the request is completed
+$(document).ready(function () {
+    $(".reviewSubmissionBtn").on("click", function () {
+        let status = $(this).closest("tr").find("td:eq(1)").text().trim(); // Get the request status
+
+        // Open modal
+        $("#reviewSubmissionModal").modal("show");
+
+        // If the request is completed, disable the buttons
+        if (status === "Completed") {
+            $("#markAsDoneBtn, #openFeedbackModalBtn").prop("disabled", true);
+        } else {
+            $("#markAsDoneBtn, #openFeedbackModalBtn").prop("disabled", false);
+        }
+    });
+});

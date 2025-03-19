@@ -72,7 +72,18 @@ Route::middleware(['auth', RoleMiddleware::class . ':Admin'])->group(function ()
 // SUPPORT ROUTES (Only for Support Role)
 // ===============================
 Route::middleware(['auth', RoleMiddleware::class . ':Profiler'])->group(function () {
-    Route::get('/supportdashboard', fn() => view('support.supportdashboard'))->name('supportdashboard');
+    Route::get('/supportdashboard', [SupportDashboardController::class, 'index'])->name('supportdashboard');
+    Route::get('/pending-requests-count', [SupportDashboardController::class, 'getPendingRequestsCount']);
+    Route::get('/support/request/status-counts', [SupportDashboardController::class, 'getRequestStatusCounts'])
+    ->name('support.request.status.counts');
+    Route::get('/support/request/accepted-requests', [SupportDashboardController::class, 'getAcceptedRequestsByDay'])
+    ->name('support.request.accepted.by.day');
+
+
+
+
+    
+
     Route::prefix('supportmanage')->group(function () {
         Route::get('/', [SupportManageController::class, 'index'])->name('supportmanage');
         Route::post('/store', [SupportManageController::class, 'store'])->name('supportmanage.store');
@@ -80,6 +91,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':Profiler'])->group(function
         Route::put('/save-edited/{id}', [SupportManageController::class, 'saveEdited'])->name('supportmanage.saveEdited');
         Route::delete('/delete/{id}', [SupportManageController::class, 'destroy'])->name('supportmanage.delete');
         Route::get('/addprofile', [SupportManageController::class, 'create'])->name('support.addprofile');
+
     });
 
     Route::prefix('support/profile')->group(function () {

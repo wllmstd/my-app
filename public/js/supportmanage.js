@@ -408,9 +408,10 @@ $(document).ready(function () {
         console.log("Applying Filter:", filter);
 
         if (filter === "all") {
-            $("#acceptedRequestsTable, #pendingRequestsTable").show();
-            $("#acceptedRequestsHeading, #pendingRequestsHeading").show();
-            $(".dataTables_wrapper").show();
+            $("#acceptedRequestsTable, #acceptedRequestsHeading").show(); // ✅ Show Table 1
+            $("#pendingRequestsTable, #pendingRequestsHeading").hide(); // ✅ Hide Table 2
+            $("#acceptedRequestsTable_wrapper").show();
+            $("#pendingRequestsTable_wrapper").hide(); // ✅ Ensure Table 2 wrapper is hidden
             acceptedTable.search("").columns().search("").draw();
             pendingTable.search("").columns().search("").draw();
         } else if (filter === "Pending") {

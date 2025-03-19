@@ -29,69 +29,72 @@
 
     @include('admin.admin_navbar')
     <!-- Include the navbar here -->
-    <div class="container mt-4">
-        <!-- Add User Button -->
-        <div class="d-flex justify-content-end mb-3">
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                <i class="bi bi-person-plus"></i> Add User
-            </button>
+    <div class="scroll-container">
 
-        </div>
+        <div class="container mt-4">
+            <!-- Add User Button -->
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <i class="bi bi-person-plus"></i> Add User
+                </button>
 
-        <!-- User Management Table -->
-        <table class="table" id="userTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>User Name</th>
-                    <th>Department</th>
-                    <th>Email</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($users as $user)
-                <tr>
-                    <td>{{ $loop->iteration }}</td> <!-- Display the iteration number -->
-                    <td>
-                    <div class="d-flex align-items-center">
-    @if(auth()->user()->department == 'Admin')
-    <img src="{{ url('storage/' . $user->image) }}" 
-     onerror="this.onerror=null; this.src='{{ asset('images/default.png') }}';"
-     alt="Profile Image" class="rounded-circle me-2" width="40" height="40">
+            </div>
 
-
-    @endif
-    <span>{{ $user->first_name }} {{ $user->last_name }}</span>
-</div>
+            <!-- User Management Table -->
+            <table class="table" id="userTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>User Name</th>
+                        <th>Department</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($users as $user)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td> <!-- Display the iteration number -->
+                        <td>
+                            <div class="d-flex align-items-center">
+                                @if(auth()->user()->department == 'Admin')
+                                <img src="{{ url('storage/' . $user->image) }}"
+                                    onerror="this.onerror=null; this.src='{{ asset('images/default.png') }}';"
+                                    alt="Profile Image" class="rounded-circle me-2" width="40" height="40">
 
 
-                    </td>
-                    <td>{{ $user->department }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>
-                        <!-- Edit button that opens the Edit Modal -->
-                        <button class="btn btn-warning btn-sm" onclick="openEditModal({{ json_encode($user) }})"
-                            data-bs-toggle="modal" data-bs-target="#editUserModal">
-                            <i class="bi bi-pencil-square"></i>
-                        </button>
+                                @endif
+                                <span>{{ $user->first_name }} {{ $user->last_name }}</span>
+                            </div>
 
-                        <form action="{{ route('adminmanage.delete', $user->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" class="btn btn-danger btn-sm"
-                                onclick="openDeleteConfirmationModal({{ $user->id }})">
-                                <i class="bi bi-trash"></i>
+
+                        </td>
+                        <td>{{ $user->department }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>
+                            <!-- Edit button that opens the Edit Modal -->
+                            <button class="btn btn-warning btn-sm" onclick="openEditModal({{ json_encode($user) }})"
+                                data-bs-toggle="modal" data-bs-target="#editUserModal">
+                                <i class="bi bi-pencil-square"></i>
                             </button>
 
-                        </form>
+                            <form action="{{ route('adminmanage.delete', $user->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="btn btn-danger btn-sm"
+                                    onclick="openDeleteConfirmationModal({{ $user->id }})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </form>
 
 
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Add User Modal -->
@@ -368,8 +371,8 @@ $(document).ready(function() {
 
 
 <style>
-    /* Modern Clean Design */
-    .container {
+/* Modern Clean Design */
+.container {
     max-width: 90%;
     margin: auto;
     font-family: 'Inter', sans-serif;
@@ -389,11 +392,12 @@ h2 {
 
 /* Add User Button */
 .btn-success {
-    background:  #4CAF50;
+    background: #4CAF50;
     border: none;
     padding: 10px 18px;
     border-radius: 8px;
 }
+
 .btn-success:hover {
     background: rgb(4, 81, 8);
     border: none;
@@ -413,7 +417,8 @@ h2 {
 }
 
 /* Action Buttons */
-.btn-warning, .btn-danger {
+.btn-warning,
+.btn-danger {
     padding: 8px 12px;
     border-radius: 6px;
     font-size: 14px;
@@ -447,7 +452,10 @@ h2 {
 }
 
 /* Global Font & Styling */
-body, table, .dataTables_filter input, .dataTables_length select {
+body,
+table,
+.dataTables_filter input,
+.dataTables_length select {
     font-family: 'Poppins', sans-serif;
 }
 
@@ -467,6 +475,7 @@ body, table, .dataTables_filter input, .dataTables_length select {
     border-radius: 15px !important;
 
 }
+
 /* Styling for "Show X entries" */
 .dataTables_length label {
     font-family: 'Poppins', sans-serif;
@@ -499,16 +508,17 @@ body, table, .dataTables_filter input, .dataTables_length select {
     width: 100%;
     border-collapse: collapse;
     border-radius: 12px;
-    overflow: hidden;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     background: #1f335f;
     font-size: 14px;
 }
+
 #userTable th {
     background: #1f335f;
     color: #fff;
     text-align: center;
-    vertical-align: middle; /* Centers vertically as well */
+    vertical-align: middle;
+    /* Centers vertically as well */
 }
 
 #userTable td {
@@ -516,7 +526,8 @@ body, table, .dataTables_filter input, .dataTables_length select {
     text-align: left;
     background: #fff;
     text-align: center;
-    vertical-align: middle; /* Centers vertically as well */
+    vertical-align: middle;
+    /* Centers vertically as well */
 }
 
 
@@ -556,7 +567,7 @@ body, table, .dataTables_filter input, .dataTables_length select {
 }
 
 .dataTables_paginate .paginate_button.current {
-    background:#A3CAE9 !important;
+    background: #A3CAE9 !important;
     font-weight: bold;
 }
 
@@ -592,7 +603,8 @@ body, table, .dataTables_filter input, .dataTables_length select {
 
 /* Modal Content Styling */
 .modal-content {
-    background-color: #f4f8ff; /* Light blue background */
+    background-color: #f4f8ff;
+    /* Light blue background */
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     border: 1px solid #1f335f;
@@ -619,8 +631,9 @@ body, table, .dataTables_filter input, .dataTables_length select {
     border-radius: 50%;
     opacity: 1;
 }
+
 .btn-close:hover {
-    background-color:rgb(255, 255, 255);
+    background-color: rgb(255, 255, 255);
     opacity: 0.8;
 }
 
@@ -704,7 +717,61 @@ input[type="file"] {
 }
 
 
+/* Base Styling */
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+     Hide built-in scrollbar */
+    font-family: 'Poppins', sans-serif;
 
+
+}
+
+/* Create a scrollable container */
+.scroll-container {
+    height: 100vh;
+    overflow-y: auto;
+    padding: 10px;
+    box-sizing: border-box;
+    padding-bottom: 100px;
+    /* Extra space at the bottom */
+
+}
+
+/* Custom Scrollbar - Webkit (Chrome, Edge, Safari) */
+.scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* Light background */
+    border-radius: 10px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(31, 51, 95, 0.6);
+    /* Blue scrollbar */
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(31, 51, 95, 0.8);
+    /* Darker blue on hover */
+}
+
+/* Firefox scrollbar */
+.scroll-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(31, 51, 95, 0.6) #f1f1f1;
+}
+
+/* Hover effect for Firefox */
+.scroll-container:hover {
+    scrollbar-color: rgba(31, 51, 95, 0.8) #f1f1f1;
+}
 </style>
 
 </html>

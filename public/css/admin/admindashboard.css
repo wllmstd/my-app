@@ -1,41 +1,50 @@
-/* Ensure the body height is 100% and scrolling is handled globally */
+
+/* Base Styling */
 html, body {
-    height: 100%; 
-    overflow-y: scroll; /* Reserve scrollbar space */
+    height: 100%;
+    overflow: hidden; /* Hide built-in scrollbar */
+    font-family: 'Poppins', sans-serif;
 }
 
-/* Hide the scrollbar by default */
-body::-webkit-scrollbar {
+/* Create a scrollable container */
+.scroll-container {
+    height: 100vh;
+    overflow-y: auto;
+    padding: 10px;
+    box-sizing: border-box;
+    padding-bottom: 100px; /* Extra space at the bottom */
+
+}
+
+/* Custom Scrollbar - Webkit (Chrome, Edge, Safari) */
+.scroll-container::-webkit-scrollbar {
     width: 8px;
 }
 
-body::-webkit-scrollbar-track {
-    background: transparent; /* Transparent track */
+.scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Light background */
+    border-radius: 10px;
 }
 
-body::-webkit-scrollbar-thumb {
-    background: rgba(31, 51, 95, 0); /* Invisible thumb by default */
+.scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(31, 51, 95, 0.6); /* Blue scrollbar */
     border-radius: 10px;
     transition: background 0.3s ease;
 }
 
-/* Show scrollbar on body hover */
-body:hover::-webkit-scrollbar-thumb {
-    background: rgba(31, 51, 95, 0.6); /* Dark blue on hover */
+.scroll-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(31, 51, 95, 0.8); /* Darker blue on hover */
 }
 
-body::-webkit-scrollbar-thumb:hover {
-    background: rgba(31, 51, 95, 0.8); /* Darker blue when directly over scrollbar */
-}
-
-/* Firefox-specific scrollbar styling */
-body {
+/* Firefox scrollbar */
+.scroll-container {
     scrollbar-width: thin;
-    scrollbar-color: rgba(31, 51, 95, 0) rgba(0, 0, 0, 0);
+    scrollbar-color: rgba(31, 51, 95, 0.6) #f1f1f1;
 }
 
-body:hover {
-    scrollbar-color: rgba(31, 51, 95, 0.6) rgba(0, 0, 0, 0);
+/* Hover effect for Firefox */
+.scroll-container:hover {
+    scrollbar-color: rgba(31, 51, 95, 0.8) #f1f1f1;
 }
 
 

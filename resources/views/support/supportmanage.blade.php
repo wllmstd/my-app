@@ -28,6 +28,7 @@
 
     <!-- Include the navbar here -->
     @include('support.support_navbar')
+    <div class="scroll-container">
 
     <div class="container mt-4">
 
@@ -231,6 +232,8 @@
         </table>
 
     </div>
+    </div>
+
 
     <!-- View & Accept Request Modal -->
     <div class="modal fade" id="viewRequestModal" tabindex="-1" aria-labelledby="viewRequestModalLabel"
@@ -465,6 +468,55 @@
     font-weight: bold;
     border-radius: 8px;
     z-index: 10;
+}
+
+
+/* Base Styling */
+html, body {
+    height: 100%;
+    overflow: hidden; /* Hide built-in scrollbar */
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Create a scrollable container */
+.scroll-container {
+    height: 100vh;
+    overflow-y: auto;
+    padding: 10px;
+    box-sizing: border-box;
+    padding-bottom: 100px; /* Extra space at the bottom */
+
+}
+
+/* Custom Scrollbar - Webkit (Chrome, Edge, Safari) */
+.scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Light background */
+    border-radius: 10px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(31, 51, 95, 0.6); /* Blue scrollbar */
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(31, 51, 95, 0.8); /* Darker blue on hover */
+}
+
+/* Firefox scrollbar */
+.scroll-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(31, 51, 95, 0.6) #f1f1f1;
+}
+
+/* Hover effect for Firefox */
+.scroll-container:hover {
+    scrollbar-color: rgba(31, 51, 95, 0.8) #f1f1f1;
 }
 </style>
 

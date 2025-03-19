@@ -21,101 +21,102 @@
 
     @include('support.support_navbar')
     <!-- Include the navbar here -->
+    <div class="scroll-container">
 
-    <div class="container mt-4">
+        <div class="container mt-4">
 
-        <!-- Welcome Section -->
-        <div class="welcome-box text-center mb-4 p-3 rounded">
-            <h2 class="welcome-title">Welcome, Profiler {{ auth()->user()->first_name ?? 'Admin' }}! 🌞</h2>
-            <p class="welcome-subtitle">Here’s an overview of your status and activity.</p>
-        </div>
-
-        <div class="row">
-            <!-- Pending Requests Card -->
-            <div class="col-md-6">
-                <div class="stat-card equal-height">
-                    <i class="fas fa-clock stat-icon"></i>
-                    <div>
-                        <div class="stat-number" id="pendingRequestsCount">0</div>
-                        <div class="text-muted">Pending Requests</div>
-                    </div>
-                </div>
+            <!-- Welcome Section -->
+            <div class="welcome-box text-center mb-4 p-3 rounded">
+                <h2 class="welcome-title">Welcome, Profiler {{ auth()->user()->first_name ?? 'Admin' }}! 🌞</h2>
+                <p class="welcome-subtitle">Here’s an overview of your status and activity.</p>
             </div>
 
-            <!-- Chart 1 - Support Request Status -->
-            <!-- Chart 1 - Support Request Status -->
-            <div class="col-md-6">
-                <div class="stat-card equal-height d-flex flex-column">
-                    <!-- Title in a separate row -->
-                    <h5 class="text-center mb-3">Support Request Status</h5>
-
-                    <!-- Chart and Details in another row -->
-                    <div class="d-flex w-100" style="flex-grow: 1; align-items: center;">
-                        <!-- Chart Container -->
-                        <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
-                            <canvas id="supportStatusChart" style="max-width: 200px; max-height: 200px;"></canvas>
-                        </div>
-                        <!-- Details Container -->
-                        <div style="flex: 1; padding-left: 20px;">
-                            <ul class="list-unstyled" id="supportStatusDetails">
-                                <li>
-                                    <span
-                                        style="background-color: #136efd; ; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
-                                    In Progress: <strong id="supportInProgressCount">0</strong>
-                                </li>
-                                <li>
-                                    <span
-                                        style="background-color: #ffc107; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
-                                    Under Review: <strong id="supportUnderReviewCount">0</strong>
-                                </li>
-                                <li>
-                                    <span
-                                        style="background-color: #dc3545; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
-                                    Needs Revision: <strong id="supportNeedsRevisionCount">0</strong>
-                                </li>
-                                <li>
-                                    <span
-                                        style="background-color: #28a745; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
-                                    Completed: <strong id="supportCompletedCount">0</strong>
-                                </li>
-                            </ul>
+            <div class="row">
+                <!-- Pending Requests Card -->
+                <div class="col-md-6">
+                    <div class="stat-card equal-height">
+                        <i class="fas fa-clock stat-icon"></i>
+                        <div>
+                            <div class="stat-number" id="pendingRequestsCount">0</div>
+                            <div class="text-muted">Pending Requests</div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-        </div>
-        <div class="row mt-4">
-            <!-- Chart 3 -->
-            <div class="col-md-6">
-                <div class="stat-card equal-height d-flex flex-column">
-                    <!-- Title above the chart -->
-                    <div class="chart-title">
-                        <h5 class="text-center">Accepted Requests (By Day)</h5>
+                <!-- Chart 1 - Support Request Status -->
+                <!-- Chart 1 - Support Request Status -->
+                <div class="col-md-6">
+                    <div class="stat-card equal-height d-flex flex-column">
+                        <!-- Title in a separate row -->
+                        <h5 class="text-center mb-3">Support Request Status</h5>
+
+                        <!-- Chart and Details in another row -->
+                        <div class="d-flex w-100" style="flex-grow: 1; align-items: center;">
+                            <!-- Chart Container -->
+                            <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+                                <canvas id="supportStatusChart" style="max-width: 200px; max-height: 200px;"></canvas>
+                            </div>
+                            <!-- Details Container -->
+                            <div style="flex: 1; padding-left: 20px;">
+                                <ul class="list-unstyled" id="supportStatusDetails">
+                                    <li>
+                                        <span
+                                            style="background-color: #136efd; ; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
+                                        In Progress: <strong id="supportInProgressCount">0</strong>
+                                    </li>
+                                    <li>
+                                        <span
+                                            style="background-color: #ffc107; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
+                                        Under Review: <strong id="supportUnderReviewCount">0</strong>
+                                    </li>
+                                    <li>
+                                        <span
+                                            style="background-color: #dc3545; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
+                                        Needs Revision: <strong id="supportNeedsRevisionCount">0</strong>
+                                    </li>
+                                    <li>
+                                        <span
+                                            style="background-color: #28a745; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
+                                        Completed: <strong id="supportCompletedCount">0</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
+                </div>
 
-                    <!-- Chart container with specific class for Accepted Requests -->
-                    <div class=" chart-container-accepted-requests">
-                        <canvas id="acceptedRequestsChart"></canvas>
+            </div>
+            <div class="row mt-4">
+                <!-- Chart 3 -->
+                <div class="col-md-6">
+                    <div class="stat-card equal-height d-flex flex-column">
+                        <!-- Title above the chart -->
+                        <div class="chart-title">
+                            <h5 class="text-center">Accepted Requests (By Day)</h5>
+                        </div>
+
+                        <!-- Chart container with specific class for Accepted Requests -->
+                        <div class=" chart-container-accepted-requests">
+                            <canvas id="acceptedRequestsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="col-md-6 d-flex equal-height">
+                    <div class="calendar-card w-100 d-flex flex-column">
+                        <div class="calendar-header">
+                            <button class="calendar-btn prev-btn">&lt;</button>
+                            <span class="calendar-month" id="calendarMonth">March 2025</span>
+                            <button class="calendar-btn next-btn">&gt;</button>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Chart Container -->
-            <div class="col-md-6 d-flex equal-height">
-                <div class="calendar-card w-100 d-flex flex-column">
-                    <div class="calendar-header">
-                        <button class="calendar-btn prev-btn">&lt;</button>
-                        <span class="calendar-month" id="calendarMonth">March 2025</span>
-                        <button class="calendar-btn next-btn">&gt;</button>
-                    </div>
-                    <div class="calendar-grid" id="calendarGrid"></div>
-                </div>
-            </div>
         </div>
-
     </div>
-
 
     <script>
     async function fetchPendingRequestsCount() {

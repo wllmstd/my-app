@@ -22,73 +22,75 @@
 <body>
 
     @include('admin.admin_navbar')
+    <div class="scroll-container">
 
-    <div class="container mt-4">
+        <div class="container mt-4">
 
-        <!-- Welcome Section -->
-        <div class="welcome-box text-center mb-4 p-3 rounded">
-            <h2 class="welcome-title">Welcome, Admin {{ auth()->user()->first_name ?? 'Admin' }}! 🌞</h2>
-            <p class="welcome-subtitle">Here’s an overview of your platform’s status and activity.</p>
-        </div>
-
-
-        <div class="row">
-            <!-- Total Users Card (Same Height as Charts) -->
-            <div class="col-md-6 d-flex equal-height">
-                <div class="stat-card w-100">
-                    <i class="fa-solid fa-users stat-icon"></i>
-                    <div>
-                        <div class="stat-number" id="totalUsers">{{ $totalUsers }}</div>
-                        <p class="text-muted">Total Users</p>
-                    </div>
-                </div>
+            <!-- Welcome Section -->
+            <div class="welcome-box text-center mb-4 p-3 rounded">
+                <h2 class="welcome-title">Welcome, Admin {{ auth()->user()->first_name ?? 'Admin' }}! 🌞</h2>
+                <p class="welcome-subtitle">Here’s an overview of your platform’s status and activity.</p>
             </div>
-            <!-- Users by Department Card -->
-            <div class="col-md-6 d-flex equal-height">
-                <div class="stat-card w-100 d-flex flex-column">
-                    <!-- Header -->
-                    <h5 class="text-center mb-3">Users by Department</h5>
 
-                    <div class="d-flex w-100" style="flex-grow: 1; align-items: center;">
-                        <!-- Chart on the Left -->
-                        <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
-                            <canvas id="departmentChart" style="max-width: 200px; max-height: 200px;"></canvas>
-                        </div>
 
-                        <!-- Department Colors & Names on the Right -->
-                        <div style="flex: 1; padding-left: 20px;">
-                            <ul class="list-unstyled" id="departmentDetails"></ul>
+            <div class="row">
+                <!-- Total Users Card (Same Height as Charts) -->
+                <div class="col-md-6 d-flex equal-height">
+                    <div class="stat-card w-100">
+                        <i class="fa-solid fa-users stat-icon"></i>
+                        <div>
+                            <div class="stat-number" id="totalUsers">{{ $totalUsers }}</div>
+                            <p class="text-muted">Total Users</p>
                         </div>
                     </div>
                 </div>
-            </div>
+                <!-- Users by Department Card -->
+                <div class="col-md-6 d-flex equal-height">
+                    <div class="stat-card w-100 d-flex flex-column">
+                        <!-- Header -->
+                        <h5 class="text-center mb-3">Users by Department</h5>
 
-            <!-- Notifications & Updates -->
-            <div class="col-md-6 d-flex equal-height">
-                <div class="stat-card w-100">
-                    <h5 class="text-center mb-3">Recent Activity</h5>
-                    <ul class="list-group" id="recentActivity">
-                        <li class="list-group-item text-muted">No recent activity</li>
-                    </ul>
-                </div>
-            </div>
+                        <div class="d-flex w-100" style="flex-grow: 1; align-items: center;">
+                            <!-- Chart on the Left -->
+                            <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+                                <canvas id="departmentChart" style="max-width: 200px; max-height: 200px;"></canvas>
+                            </div>
 
-            <!-- Modern Calendar (Smaller) -->
-            <div class="col-md-6 d-flex equal-height">
-                <div class="calendar-card w-100">
-                    <div class="calendar-header">
-                        <button class="calendar-btn prev-btn">&lt;</button>
-                        <span class="calendar-month" id="calendarMonth">March 2025</span>
-                        <button class="calendar-btn next-btn">&gt;</button>
+                            <!-- Department Colors & Names on the Right -->
+                            <div style="flex: 1; padding-left: 20px;">
+                                <ul class="list-unstyled" id="departmentDetails"></ul>
+                            </div>
+                        </div>
                     </div>
-                    <div class="calendar-grid" id="calendarGrid"></div>
                 </div>
+
+                <!-- Notifications & Updates -->
+                <div class="col-md-6 d-flex equal-height">
+                    <div class="stat-card w-100">
+                        <h5 class="text-center mb-3">Recent Activity</h5>
+                        <ul class="list-group" id="recentActivity">
+                            <li class="list-group-item text-muted">No recent activity</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Modern Calendar (Smaller) -->
+                <div class="col-md-6 d-flex equal-height">
+                    <div class="calendar-card w-100">
+                        <div class="calendar-header">
+                            <button class="calendar-btn prev-btn">&lt;</button>
+                            <span class="calendar-month" id="calendarMonth">March 2025</span>
+                            <button class="calendar-btn next-btn">&gt;</button>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid"></div>
+                    </div>
+                </div>
+
+
+
             </div>
-
-
 
         </div>
-
     </div>
 
     <script>

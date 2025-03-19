@@ -7,9 +7,9 @@
 </head>
 <body>
     
-<nav class="navbar navbar-expand-lg ">
+<nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Geco Queuing System</a>
+        <a class="navbar-brand" href="{{ url('/admindashboard') }}">Geco Queuing System</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -69,6 +69,8 @@
         </div>
     </div>
 </div>
+</body>
+
 <style>
     /* Modern Navbar Styling */
 .navbar {
@@ -85,6 +87,7 @@
     font-weight: bold;
     color: #ffffff !important;
     transition: color 0.3s ease-in-out;
+    margin-left: 5rem;
 }
 
 .navbar-brand:hover {
@@ -98,6 +101,12 @@
     transition: color 0.3s ease-in-out;
     padding: 8px 15px;
     margin-left:15px;
+
+}
+
+.navbar-collapse {
+    margin-right: 5.3rem;
+
 }
 
 
@@ -210,4 +219,3 @@
     });
 });
 </script>
-</body>

@@ -24,7 +24,14 @@
     @include('admin.admin_navbar')
 
     <div class="container mt-4">
-        <h2 class="mb-4 text-center">Dashboard Overview</h2>
+
+        <!-- Welcome Section -->
+        <div class="welcome-box text-center mb-4 p-3 rounded">
+            <h2 class="welcome-title">Welcome, Admin {{ auth()->user()->first_name ?? 'Admin' }}! 🌞</h2>
+            <p class="welcome-subtitle">Here’s an overview of your platform’s status and activity.</p>
+        </div>
+
+
         <div class="row">
             <!-- Total Users Card (Same Height as Charts) -->
             <div class="col-md-6 d-flex equal-height">
@@ -56,129 +63,156 @@
                 </div>
             </div>
 
-
-
-
-            <div class="row mt-4">
-                <!-- Revenue Chart -->
-                <div class="col-md-6 d-flex equal-height">
-                    <div class="chart-container w-100">
-                        <h5 class="text-center">Revenue</h5>
-                        <canvas id="revenueChart"></canvas>
-                    </div>
-                </div>
-                <!-- Performance Chart -->
-                <div class="col-md-6 d-flex equal-height">
-                    <div class="chart-container w-100">
-                        <h5 class="text-center">Performance</h5>
-                        <canvas id="performanceChart"></canvas>
-                    </div>
+            <!-- Notifications & Updates -->
+            <div class="col-md-6 d-flex equal-height">
+                <div class="stat-card w-100">
+                    <h5 class="text-center mb-3">Recent Activity</h5>
+                    <ul class="list-group" id="recentActivity">
+                        <li class="list-group-item text-muted">No recent activity</li>
+                    </ul>
                 </div>
             </div>
+
+            <!-- Modern Calendar (Smaller) -->
+            <div class="col-md-6 d-flex equal-height">
+                <div class="calendar-card w-100">
+                    <div class="calendar-header">
+                        <button class="calendar-btn prev-btn">&lt;</button>
+                        <span class="calendar-month" id="calendarMonth">March 2025</span>
+                        <button class="calendar-btn next-btn">&gt;</button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid"></div>
+                </div>
+            </div>
+
+
+
         </div>
 
-        <script>
-        function fetchUserCount() {
-            $.ajax({
-                url: "/admin/users/count",
-                method: "GET",
-                success: function(data) {
-                    $("#totalUsers").text(data.totalUsers);
-                }
-            });
-        }
+    </div>
 
-        $(document).ready(function() {
-            setInterval(fetchUserCount, 5000);
-        });
-
-        // User Growth Chart
-        new Chart(document.getElementById("usersChart"), {
-            type: "line",
-            data: {
-                labels: ["Jan", "Feb", "Mar", "Apr", "May"],
-                datasets: [{
-                    label: "Users",
-                    data: [100, 150, 200, 300, 500],
-                    borderColor: "#28a745",
-                    fill: false
-                }]
+    <script>
+    function fetchUserCount() {
+        $.ajax({
+            url: "/admin/users/count",
+            method: "GET",
+            success: function(data) {
+                $("#totalUsers").text(data.totalUsers);
             }
         });
+    }
 
-        // Revenue Chart
-        new Chart(document.getElementById("revenueChart"), {
-            type: "doughnut",
-            data: {
-                labels: ["Product A", "Product B", "Product C"],
-                datasets: [{
-                    data: [40, 30, 30],
-                    backgroundColor: ["#ffc107", "#dc3545", "#17a2b8"]
-                }]
-            }
-        });
+    $(document).ready(function() {
+        setInterval(fetchUserCount, 5000);
+    });
 
-        // Performance Chart
-        new Chart(document.getElementById("performanceChart"), {
-            type: "pie",
-            data: {
-                labels: ["Completed", "In Progress", "Pending"],
-                datasets: [{
-                    data: [60, 25, 15],
-                    backgroundColor: ["#28a745", "#007bff", "#dc3545"]
-                }]
-            }
-        });
 
-        $(document).ready(function() {
-            $.ajax({
-                url: "/admin/users/department-count",
-                method: "GET",
-                success: function(data) {
-                    var ctx = document.getElementById("departmentChart").getContext("2d");
+    $(document).ready(function() {
+        $.ajax({
+            url: "/admin/users/department-count",
+            method: "GET",
+            success: function(data) {
+                var ctx = document.getElementById("departmentChart").getContext("2d");
 
-                    var colors = ["#ff6384", "#36a2eb", "#ffce56"];
-                    var labels = Object.keys(data);
-                    var values = Object.values(data);
+                var colors = ["#ff6384", "#36a2eb", "#ffce56"];
+                var labels = Object.keys(data);
+                var values = Object.values(data);
 
-                    // Generate the Pie Chart WITHOUT showing labels above the chart
-                    new Chart(ctx, {
-                        type: "pie",
-                        data: {
-                            labels: labels, // Labels are still needed for tooltips but won't be displayed
-                            datasets: [{
-                                data: values,
-                                backgroundColor: colors
-                            }]
-                        },
-                        options: {
-                            maintainAspectRatio: false,
-                            responsive: true,
-                            plugins: {
-                                legend: {
-                                    display: false // 🚀 THIS DISABLES THE LABELS ABOVE THE CHART!
-                                }
+                // Generate the Pie Chart WITHOUT showing labels above the chart
+                new Chart(ctx, {
+                    type: "pie",
+                    data: {
+                        labels: labels, // Labels are still needed for tooltips but won't be displayed
+                        datasets: [{
+                            data: values,
+                            backgroundColor: colors
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false // 🚀 THIS DISABLES THE LABELS ABOVE THE CHART!
                             }
                         }
-                    });
+                    }
+                });
 
-                    // 🛠 Append department names & colors in #departmentDetails (Only on the Right)
-                    var detailsHtml = " ";
-                    labels.forEach((department, index) => {
-                        detailsHtml += `
+                // 🛠 Append department names & colors in #departmentDetails (Only on the Right)
+                var detailsHtml = " ";
+                labels.forEach((department, index) => {
+                    detailsHtml += `
         <li class="department-label">
             <span style="background-color: ${colors[index]};"></span>
             ${department}: <strong style="margin-left: 8px;">${values[index]}</strong>
         </li>
     `;
-                    });
+                });
 
-                    // Append to the department details section
-                    $("#departmentDetails").html(detailsHtml);
-                }
-            });
+                // Append to the department details section
+                $("#departmentDetails").html(detailsHtml);
+            }
         });
-        </script>
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const calendarMonth = document.getElementById('calendarMonth');
+        const calendarGrid = document.getElementById('calendarGrid');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+
+        let currentDate = new Date();
+
+        function renderCalendar() {
+            calendarGrid.innerHTML = '';
+            const month = currentDate.getMonth();
+            const year = currentDate.getFullYear();
+
+            calendarMonth.textContent = new Intl.DateTimeFormat('en-US', {
+                month: 'long',
+                year: 'numeric'
+            }).format(currentDate);
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Add empty days for the starting day of the week
+            for (let i = 0; i < firstDay; i++) {
+                calendarGrid.innerHTML += `<div class="calendar-day empty"></div>`;
+            }
+
+            // Add actual days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('calendar-day');
+                dayElement.textContent = day;
+
+                if (
+                    day === new Date().getDate() &&
+                    year === new Date().getFullYear() &&
+                    month === new Date().getMonth()
+                ) {
+                    dayElement.classList.add('today');
+                }
+
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        prevBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        renderCalendar();
+    });
+    </script>
 </body>
 
 </html>

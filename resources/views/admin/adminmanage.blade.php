@@ -389,14 +389,16 @@ h2 {
 
 /* Add User Button */
 .btn-success {
-    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    background:  #4CAF50;
     border: none;
     padding: 10px 18px;
     border-radius: 8px;
 }
-
 .btn-success:hover {
-    background: #388E3C;
+    background: rgb(4, 81, 8);
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
 }
 
 
@@ -415,7 +417,6 @@ h2 {
     padding: 8px 12px;
     border-radius: 6px;
     font-size: 14px;
-    transition: 0.3s;
 }
 
 .btn-warning {
@@ -463,7 +464,36 @@ body, table, .dataTables_filter input, .dataTables_length select {
     border-radius: 8px;
     outline: none;
     transition: border-color 0.3s ease-in-out, box-shadow 0.3s;
+    border-radius: 15px !important;
+
 }
+/* Styling for "Show X entries" */
+.dataTables_length label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1f335f;
+    font-weight: 500;
+}
+
+/* Styling for the dropdown itself */
+.dataTables_length select {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1f335f;
+    padding: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+/* Styling for "Search:" label */
+.dataTables_filter label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1f335f;
+    font-weight: 500;
+}
+
 
 #userTable {
     width: 100%;
@@ -472,17 +502,21 @@ body, table, .dataTables_filter input, .dataTables_length select {
     overflow: hidden;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     background: #1f335f;
-
+    font-size: 14px;
 }
 #userTable th {
     background: #1f335f;
     color: #fff;
+    text-align: center;
+    vertical-align: middle; /* Centers vertically as well */
 }
 
 #userTable td {
     padding: 14px 16px;
     text-align: left;
     background: #fff;
+    text-align: center;
+    vertical-align: middle; /* Centers vertically as well */
 }
 
 
@@ -495,6 +529,180 @@ body, table, .dataTables_filter input, .dataTables_length select {
 #userTable tbody tr:hover {
     transform: scale(1.01);
 }
+
+/* Pagination */
+.dataTables_paginate {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.dataTables_paginate .paginate_button {
+    font-family: 'Poppins', sans-serif;
+
+    border-color: #1f335f !important;
+    color: white !important;
+    padding: 8px 12px;
+    margin: 0 5px;
+    border-radius: 15px !important;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.dataTables_paginate .paginate_button:hover {
+    background: #1f335f !important;
+    transform: scale(1.1);
+    color: white !important;
+}
+
+.dataTables_paginate .paginate_button.current {
+    background:#A3CAE9 !important;
+    font-weight: bold;
+}
+
+.dataTables_paginate .paginate_button.disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* Entries Info Styling */
+.dataTables_info {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1f335f;
+    font-weight: 500;
+    margin-top: 10px;
+    text-align: left;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+
+
+
+
+
+
+/* CSS FOR MODALS*/
+
+/* Modal Background Overlay */
+.modal-backdrop {
+    background-color: rgba(31, 51, 95, 0.8);
+}
+
+/* Modal Content Styling */
+.modal-content {
+    background-color: #f4f8ff; /* Light blue background */
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid #1f335f;
+}
+
+/* Modal Header */
+.modal-header {
+    background-color: #1f335f;
+    color: white;
+    border-bottom: 2px solid #A3CAE9;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.modal-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* Close Button */
+.btn-close {
+    background-color: #A3CAE9;
+    border-radius: 50%;
+    opacity: 1;
+}
+.btn-close:hover {
+    background-color:rgb(255, 255, 255);
+    opacity: 0.8;
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 20px;
+}
+
+/* Form Labels */
+.form-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1f335f;
+    font-weight: 500;
+}
+
+/* Form Inputs & Select */
+.form-control,
+.form-select {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    border: 1px solid #A3CAE9;
+    border-radius: 8px;
+    padding: 10px;
+    transition: border-color 0.3s ease-in-out;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #1f335f;
+    box-shadow: 0 0 10px rgba(31, 51, 95, 0.2);
+}
+
+/* Profile Image */
+#profileImage {
+    border: 2px solid #A3CAE9;
+}
+
+/* File Input Styling */
+input[type="file"] {
+    font-size: 14px;
+    color: #1f335f;
+}
+
+/* Modal Footer */
+.modal-footer {
+    background-color: #f4f8ff;
+    border-top: 1px solid #A3CAE9;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+/* Primary Button (Add User) */
+.btn-primary {
+    background-color: #1f335f;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #162847;
+}
+
+/* Secondary Button (Cancel) */
+.btn-secondary {
+    background-color: #A3CAE9;
+    color: #1f335f;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #89b5d9;
+}
+
 
 
 </style>

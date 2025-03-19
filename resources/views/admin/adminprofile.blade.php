@@ -26,8 +26,8 @@
                             <div class="col-md-4 text-center">
                                 <div class="profile-img-container">
                                     <img id="profilePreview" src="{{ asset('storage/' . Auth::user()->image) }}"
-                                        alt="Profile Image" class="rounded-circle img-fluid border" width="180"
-                                        height="180"
+                                        alt="Profile Image" class="rounded-circle img-fluid border" width="300"
+                                        height="300"
                                         onerror="this.onerror=null; this.src='{{ asset('storage/profile_images/default.png') }}';">
 
                                     <div class="mt-3">

@@ -3,6 +3,8 @@
 @section('title', 'User Profile')
 
 @section('content')
+<link rel="stylesheet" href="{{ asset('css/user/userprofile.css') }}">
+
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-10">
@@ -11,8 +13,8 @@
             @endif
 
             <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white text-center">
-                    <h4>Talent Acquisition Profile</h4>
+            <div class="card-header" style="font-weight: 900 !important;">
+                    Talent Acquisition Profile
                 </div>
                 <div class="card-body">
                     <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data">
@@ -28,7 +30,7 @@
                                         onerror="this.onerror=null; this.src='{{ asset('storage/profile_images/default.png') }}';">
 
                                     <div class="mt-3">
-                                        <label for="profileImageInput" class="btn btn-outline-primary">
+                                        <label for="profileImageInput" class="btn btn-outline-p">
                                             <i class="fa fa-plus"></i> Upload New
                                         </label>
                                         <input type="file" name="image" id="profileImageInput" class="d-none"

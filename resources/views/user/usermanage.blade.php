@@ -25,96 +25,97 @@
 
     <!-- Include the navbar here -->
     @include('user.user_navbar')
+    <div class="scroll-container">
 
-    <div class="container mt-4">
-
-
-        <h2>User Requests</h2>
-        <div class="mb-3">
-            <button class="btn btn-outline-dark filter-btn active" data-filter="all">
-                <div class="status-label-wrapper">
-                    All Tables
-                    <span id="count-all" class="status-badge">0</span>
-                </div>
-            </button>
-            <button class="btn btn-outline-warning filter-btn" data-filter="Pending">
-                <span class="new-badge" id="new-badge-pending">NEW</span>
-                <div class="status-label-wrapper">
-                    Pending Requests
-                    <span id="count-pending" class="status-badge">0</span>
-                </div>
-            </button>
-            <button class="btn btn-outline-primary filter-btn" data-filter="In Progress">
-                <span class="new-badge" id="new-badge-in-progress">NEW</span>
-                <div class="status-label-wrapper">
-                    In Progress
-                    <span id="count-in-progress" class="status-badge">0</span>
-                </div>
-            </button>
-            <button class="btn btn-outline-orange filter-btn" data-filter="Under Review">
-                <span class="new-badge" id="new-badge-under-review">NEW</span>
-                <div class="status-label-wrapper">
-                    Under Review
-                    <span id="count-under-review" class="status-badge">0</span>
-                </div>
-            </button>
-            <button class="btn btn-outline-danger filter-btn" data-filter="Needs Revision">
-                <span class="new-badge" id="new-badge-needs-revision">NEW</span>
-                <div class="status-label-wrapper">
-                    Needs Revision
-                    <span id="count-needs-revision" class="status-badge">0</span>
-                </div>
-            </button>
-            <button class="btn btn-outline-success filter-btn" data-filter="Completed">
-                <span class="new-badge" id="new-badge-completed">NEW</span>
-                <div class="status-label-wrapper">
-                    Completed
-                    <span id="count-completed" class="status-badge">0</span>
-                </div>
-            </button>
-        </div>
+        <div class="container mt-4">
 
 
-        <!-- Add Request Button -->
-        <div class="d-flex justify-content-end mb-3">
-            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addRequestModal">
-                <i class="bi bi-plus-circle"></i> Add Request
-            </button>
-        </div>
+            <h2>User Requests</h2>
+            <div class="mb-3">
+                <button class="btn btn-outline-dark filter-btn active" data-filter="all">
+                    <div class="status-label-wrapper">
+                        All Tables
+                        <span id="count-all" class="status-badge">0</span>
+                    </div>
+                </button>
+                <button class="btn btn-outline-warning filter-btn" data-filter="Pending">
+                    <span class="new-badge" id="new-badge-pending">NEW</span>
+                    <div class="status-label-wrapper">
+                        Pending Requests
+                        <span id="count-pending" class="status-badge">0</span>
+                    </div>
+                </button>
+                <button class="btn btn-outline-primary filter-btn" data-filter="In Progress">
+                    <span class="new-badge" id="new-badge-in-progress">NEW</span>
+                    <div class="status-label-wrapper">
+                        In Progress
+                        <span id="count-in-progress" class="status-badge">0</span>
+                    </div>
+                </button>
+                <button class="btn btn-outline-orange filter-btn" data-filter="Under Review">
+                    <span class="new-badge" id="new-badge-under-review">NEW</span>
+                    <div class="status-label-wrapper">
+                        Under Review
+                        <span id="count-under-review" class="status-badge">0</span>
+                    </div>
+                </button>
+                <button class="btn btn-outline-danger filter-btn" data-filter="Needs Revision">
+                    <span class="new-badge" id="new-badge-needs-revision">NEW</span>
+                    <div class="status-label-wrapper">
+                        Needs Revision
+                        <span id="count-needs-revision" class="status-badge">0</span>
+                    </div>
+                </button>
+                <button class="btn btn-outline-success filter-btn" data-filter="Completed">
+                    <span class="new-badge" id="new-badge-completed">NEW</span>
+                    <div class="status-label-wrapper">
+                        Completed
+                        <span id="count-completed" class="status-badge">0</span>
+                    </div>
+                </button>
+            </div>
 
-        <!-- Table to display requests -->
-        <table class="table table-bordered table-striped" id="requestTable">
-            <thead class="table-dark">
-                <tr>
-                    <th>#</th>
-                    <th>Status</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Nationality</th>
-                    <th>Location</th>
-                    <th>Format</th>
-                    <th>Updated Time</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($requests as $index => $request)
+
+            <!-- Add Request Button -->
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addRequestModal">
+                    <i class="bi bi-plus-circle"></i> Add Request
+                </button>
+            </div>
+
+            <!-- Table to display requests -->
+            <table class="table table-bordered table-striped" id="requestTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Status</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Nationality</th>
+                        <th>Location</th>
+                        <th>Format</th>
+                        <th>Updated Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($requests as $index => $request)
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>
                             @if($request->Status === 'Pending')
-                                <span class="badge bg-warning text-dark">{{ $request->Status }}</span>
+                            <span class="badge bg-warning text-dark">{{ $request->Status }}</span>
                             @elseif($request->Status === 'In Progress')
-                                <span class="badge bg-primary">{{ $request->Status }}</span>
+                            <span class="badge bg-primary">{{ $request->Status }}</span>
                             @elseif($request->Status === 'Under Review')
-                                <span class="badge"
-                                    style="background-color: orange; color: black;">{{ $request->Status }}</span>
+                            <span class="badge"
+                                style="background-color: orange; color: black;">{{ $request->Status }}</span>
                             @elseif($request->Status === 'Needs Revision')
-                                <span class="badge bg-danger">{{ $request->Status }}</span>
+                            <span class="badge bg-danger">{{ $request->Status }}</span>
                             @elseif($request->Status === 'Completed')
-                                <span class="badge bg-success">{{ $request->Status }}</span>
+                            <span class="badge bg-success">{{ $request->Status }}</span>
                             @else
-                                <span class="badge bg-secondary">{{ $request->Status }}</span>
+                            <span class="badge bg-secondary">{{ $request->Status }}</span>
                             @endif
                         </td>
                         <td>{{ $request->First_Name }}</td>
@@ -140,10 +141,12 @@
                                 <i class="bi bi-eye"></i>
                             </button>
 
-                            <button class="btn btn-warning btn-sm reviewSubmissionBtn" data-id="{{ $request->Request_ID }}"
-                                data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
+                            <button class="btn btn-warning btn-sm reviewSubmissionBtn"
+                                data-id="{{ $request->Request_ID }}" data-first-name="{{ $request->First_Name }}"
+                                data-last-name="{{ $request->Last_Name }}"
                                 data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
-                                data-format="{{ $request->Format }}" data-uploaded-format="{{ $request->uploaded_format }}"
+                                data-format="{{ $request->Format }}"
+                                data-uploaded-format="{{ $request->uploaded_format }}"
                                 data-profiler="{{ $request->Profiler_Name }}"
                                 title="Check if the submitted file meets the requested format">
                                 <i class="bi bi-file-earmark-check"></i>
@@ -158,11 +161,13 @@
 
                         </td>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                    @endforeach
+                </tbody>
+            </table>
 
+        </div>
     </div>
+
 
     <!-- Add Request Modal -->
     <div class="modal fade" id="addRequestModal" tabindex="-1" aria-labelledby="addRequestModalLabel"
@@ -294,21 +299,21 @@
                         <div id="existingAttachments">
                             <h6>Existing Attachments:</h6>
                             @php
-                                $attachments = json_decode($request->Attachment, true);
+                            $attachments = json_decode($request->Attachment, true);
                             @endphp
                             @if (!empty($attachments))
-                                @foreach ($attachments as $file)
-                                    <div class="d-flex align-items-center border p-2 mb-1 rounded">
-                                        <a href="{{ asset('storage/attachments/' . $file) }}" target="_blank"
-                                            class="me-auto">{{ $file }}</a>
-                                        <<button type="button" class="btn btn-sm btn-danger delete-attachment-btn"
-                                            data-request-id="{{ $request->Request_ID }}" data-file-name="{{ $file }}">
-                                            <i class="bi bi-trash"></i>
-                                            </button>
-                                    </div>
-                                @endforeach
+                            @foreach ($attachments as $file)
+                            <div class="d-flex align-items-center border p-2 mb-1 rounded">
+                                <a href="{{ asset('storage/attachments/' . $file) }}" target="_blank"
+                                    class="me-auto">{{ $file }}</a>
+                                <<button type="button" class="btn btn-sm btn-danger delete-attachment-btn"
+                                    data-request-id="{{ $request->Request_ID }}" data-file-name="{{ $file }}">
+                                    <i class="bi bi-trash"></i>
+                                    </button>
+                            </div>
+                            @endforeach
                             @else
-                                <p>No attachments found.</p>
+                            <p>No attachments found.</p>
                             @endif
                         </div>
 
@@ -417,12 +422,13 @@
                     <div id="reviewUploadedFormat" class="mt-2"></div>
 
                     <div class="mt-3">
-                        <button id="markAsDoneBtn" class="btn btn-success" @if($request->Status === 'Completed') disabled
-                        @endif>
+                        <button id="markAsDoneBtn" class="btn btn-success" @if($request->Status === 'Completed')
+                            disabled
+                            @endif>
                             Mark as Done
                         </button>
                         <button id="openFeedbackModalBtn" class="btn btn-danger" @if($request->Status === 'Completed')
-                        disabled @endif>
+                            disabled @endif>
                             Request Revision
                         </button>
                     </div>
@@ -457,105 +463,157 @@
 </body>
 
 <style>
-    .viewRequestBtn:hover {
-        background-color: #0b5ed7;
-        /* Darker blue */
-        transition: background-color 0.2s ease-in-out;
-    }
+.viewRequestBtn:hover {
+    background-color: #0b5ed7;
+    /* Darker blue */
+    transition: background-color 0.2s ease-in-out;
+}
 
-    .reviewSubmissionBtn:hover {
-        background-color: #d39e00;
-        /* Darker yellow */
-        transition: background-color 0.2s ease-in-out;
-    }
+.reviewSubmissionBtn:hover {
+    background-color: #d39e00;
+    /* Darker yellow */
+    transition: background-color 0.2s ease-in-out;
+}
 
-    .deleteRequestBtn:hover {
-        background-color: #bb2d3b;
-        /* Darker red */
-        transition: background-color 0.2s ease-in-out;
-    }
+.deleteRequestBtn:hover {
+    background-color: #bb2d3b;
+    /* Darker red */
+    transition: background-color 0.2s ease-in-out;
+}
 
-    .filter-btn {
-        border-radius: 50px;
-        /* Make buttons more circular */
-        padding: 6px 14px;
-    }
+.filter-btn {
+    border-radius: 50px;
+    /* Make buttons more circular */
+    padding: 6px 14px;
+}
 
-    .filter-btn {
-        border-radius: 50px;
-        /* Make buttons more circular */
-        padding: 6px 14px;
-    }
+.filter-btn {
+    border-radius: 50px;
+    /* Make buttons more circular */
+    padding: 6px 14px;
+}
 
-    .filter-btn.active {
-        color: white !important;
-    }
+.filter-btn.active {
+    color: white !important;
+}
 
-    /* Add specific colors when active */
-    .filter-btn.active[data-filter="Pending"] {
-        background-color: #ffc107 !important;
-        /* Yellow */
-        border-color: #ffc107 !important;
-    }
+/* Add specific colors when active */
+.filter-btn.active[data-filter="Pending"] {
+    background-color: #ffc107 !important;
+    /* Yellow */
+    border-color: #ffc107 !important;
+}
 
-    .filter-btn.active[data-filter="In Progress"] {
-        background-color: #0d6efd !important;
-        /* Blue */
-        border-color: #0d6efd !important;
-    }
+.filter-btn.active[data-filter="In Progress"] {
+    background-color: #0d6efd !important;
+    /* Blue */
+    border-color: #0d6efd !important;
+}
 
-    .filter-btn.active[data-filter="Under Review"] {
-        background-color: orange !important;
-        /* Orange */
-        border-color: orange !important;
-    }
+.filter-btn.active[data-filter="Under Review"] {
+    background-color: orange !important;
+    /* Orange */
+    border-color: orange !important;
+}
 
-    .filter-btn.active[data-filter="Needs Revision"] {
-        background-color: #dc3545 !important;
-        /* Red */
-        border-color: #dc3545 !important;
-    }
+.filter-btn.active[data-filter="Needs Revision"] {
+    background-color: #dc3545 !important;
+    /* Red */
+    border-color: #dc3545 !important;
+}
 
-    .filter-btn.active[data-filter="Completed"] {
-        background-color: #198754 !important;
-        /* Green */
-        border-color: #198754 !important;
-    }
+.filter-btn.active[data-filter="Completed"] {
+    background-color: #198754 !important;
+    /* Green */
+    border-color: #198754 !important;
+}
 
-    .btn-outline-orange {
-        color: orange !important;
-        border-color: orange !important;
-    }
+.btn-outline-orange {
+    color: orange !important;
+    border-color: orange !important;
+}
 
-    .btn-outline-orange:hover {
-        background-color: orange !important;
-        color: white !important;
-    }
+.btn-outline-orange:hover {
+    background-color: orange !important;
+    color: white !important;
+}
 
-    .filter-btn {
-        position: relative;
-    }
+.filter-btn {
+    position: relative;
+}
 
-    .new-badge {
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        background-color: red;
-        color: white;
-        padding: 2px 6px;
-        font-size: 10px;
-        font-weight: bold;
-        border-radius: 8px;
-        z-index: 10;
-    }
+.new-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: red;
+    color: white;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 8px;
+    z-index: 10;
+}
+
+
+
+/* Base Styling */
+html, body {
+    height: 100%;
+    overflow: hidden; /* Hide built-in scrollbar */
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Create a scrollable container */
+.scroll-container {
+    height: 100vh;
+    overflow-y: auto;
+    padding: 10px;
+    box-sizing: border-box;
+    padding-bottom: 100px; /* Extra space at the bottom */
+
+}
+
+/* Custom Scrollbar - Webkit (Chrome, Edge, Safari) */
+.scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Light background */
+    border-radius: 10px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(31, 51, 95, 0.6); /* Blue scrollbar */
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(31, 51, 95, 0.8); /* Darker blue on hover */
+}
+
+/* Firefox scrollbar */
+.scroll-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(31, 51, 95, 0.6) #f1f1f1;
+}
+
+/* Hover effect for Firefox */
+.scroll-container:hover {
+    scrollbar-color: rgba(31, 51, 95, 0.8) #f1f1f1;
+}
+
+
 </style>
 
 </html>
 
 @if (session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
+<div class="alert alert-success">
+    {{ session('success') }}
+</div>
 @endif
 
 <script src="{{ asset('js/usermanage.js') }}"></script>

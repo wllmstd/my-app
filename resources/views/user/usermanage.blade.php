@@ -99,63 +99,65 @@
             </thead>
             <tbody>
                 @foreach ($requests as $index => $request)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>
-                        @if($request->Status === 'Pending')
-                        <span class="badge bg-warning text-dark">{{ $request->Status }}</span>
-                        @elseif($request->Status === 'In Progress')
-                        <span class="badge bg-primary">{{ $request->Status }}</span>
-                        @elseif($request->Status === 'Under Review')
-                        <span class="badge"
-                            style="background-color: orange; color: black;">{{ $request->Status }}</span>
-                        @elseif($request->Status === 'Needs Revision')
-                        <span class="badge bg-danger">{{ $request->Status }}</span>
-                        @elseif($request->Status === 'Completed')
-                        <span class="badge bg-success">{{ $request->Status }}</span>
-                        @else
-                        <span class="badge bg-secondary">{{ $request->Status }}</span>
-                        @endif
-                    </td>
-                    <td>{{ $request->First_Name }}</td>
-                    <td>{{ $request->Last_Name }}</td>
-                    <td>{{ $request->Nationality }}</td>
-                    <td>{{ $request->Location }}</td>
-                    <td>{{ $request->Format }}</td>
-                    <td data-order="{{ \Carbon\Carbon::parse($request->Updated_Time)->timestamp }}">
-                        {{ \Carbon\Carbon::parse($request->Updated_Time)->format('M j, Y, h:i A') }}
-                        <br>
-                        <small class="text-muted">
-                            ({{ \Carbon\Carbon::parse($request->Updated_Time)->diffForHumans() }})
-                        </small>
-                    </td>
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>
+                            @if($request->Status === 'Pending')
+                                <span class="badge bg-warning text-dark">{{ $request->Status }}</span>
+                            @elseif($request->Status === 'In Progress')
+                                <span class="badge bg-primary">{{ $request->Status }}</span>
+                            @elseif($request->Status === 'Under Review')
+                                <span class="badge"
+                                    style="background-color: orange; color: black;">{{ $request->Status }}</span>
+                            @elseif($request->Status === 'Needs Revision')
+                                <span class="badge bg-danger">{{ $request->Status }}</span>
+                            @elseif($request->Status === 'Completed')
+                                <span class="badge bg-success">{{ $request->Status }}</span>
+                            @else
+                                <span class="badge bg-secondary">{{ $request->Status }}</span>
+                            @endif
+                        </td>
+                        <td>{{ $request->First_Name }}</td>
+                        <td>{{ $request->Last_Name }}</td>
+                        <td>{{ $request->Nationality }}</td>
+                        <td>{{ $request->Location }}</td>
+                        <td>{{ $request->Format }}</td>
+                        <td data-order="{{ \Carbon\Carbon::parse($request->Updated_Time)->timestamp }}">
+                            {{ \Carbon\Carbon::parse($request->Updated_Time)->format('M j, Y, h:i A') }}
+                            <br>
+                            <small class="text-muted">
+                                ({{ \Carbon\Carbon::parse($request->Updated_Time)->diffForHumans() }})
+                            </small>
+                        </td>
 
-                    <td>
-                        <button class="btn btn-primary btn-sm viewRequestBtn" data-id="{{ $request->Request_ID }}"
-                            data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
-                            data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
-                            data-format="{{ $request->Format }}" data-attachments="{{ $request->Attachment }}"
-                            data-date-created="{{ \Carbon\Carbon::parse($request->Date_Created)->format('M j, Y, h:i A') }}"
-                            data-bs-toggle="modal" data-bs-target="#viewRequestModal" title="View request details">
-                            <i class="bi bi-eye"></i>
-                        </button>
+                        <td>
+                            <button class="btn btn-primary btn-sm viewRequestBtn" data-id="{{ $request->Request_ID }}"
+                                data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
+                                data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
+                                data-format="{{ $request->Format }}" data-attachments="{{ $request->Attachment }}"
+                                data-date-created="{{ \Carbon\Carbon::parse($request->Date_Created)->format('M j, Y, h:i A') }}"
+                                data-bs-toggle="modal" data-bs-target="#viewRequestModal" title="View request details">
+                                <i class="bi bi-eye"></i>
+                            </button>
+
+                            <button class="btn btn-warning btn-sm reviewSubmissionBtn" data-id="{{ $request->Request_ID }}"
+                                data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
+                                data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
+                                data-format="{{ $request->Format }}" data-uploaded-format="{{ $request->uploaded_format }}"
+                                data-profiler="{{ $request->Profiler_Name }}"
+                                title="Check if the submitted file meets the requested format">
+                                <i class="bi bi-file-earmark-check"></i>
+                            </button>
 
 
-                        <button class="btn btn-warning btn-sm reviewSubmissionBtn" data-id="{{ $request->Request_ID }}"
-                            data-first-name="{{ $request->First_Name }}" data-last-name="{{ $request->Last_Name }}"
-                            data-nationality="{{ $request->Nationality }}" data-location="{{ $request->Location }}"
-                            data-format="{{ $request->Format }}" data-uploaded-format="{{ $request->uploaded_format }}"
-                            data-profiler="{{ $request->Profiler_Name }}"
-                            title="Check if the submitted file meets the requested format">
-                            <i class="bi bi-file-earmark-check"></i>
-                        </button>
+                            <button class="btn btn-danger btn-sm deleteRequestBtn" data-id="{{ $request->Request_ID }}"
+                                data-bs-toggle="modal" data-bs-target="#deleteModal" title="Delete this request"
+                                @if($request->Status === 'Completed') disabled @endif>
+                                <i class="bi bi-trash"></i>
+                            </button>
 
-                        <button class="btn btn-danger btn-sm deleteRequestBtn" data-id="{{ $request->Request_ID }}"
-                            data-bs-toggle="modal" data-bs-target="#deleteModal" title="Delete this request">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
@@ -292,21 +294,21 @@
                         <div id="existingAttachments">
                             <h6>Existing Attachments:</h6>
                             @php
-                            $attachments = json_decode($request->Attachment, true);
+                                $attachments = json_decode($request->Attachment, true);
                             @endphp
                             @if (!empty($attachments))
-                            @foreach ($attachments as $file)
-                            <div class="d-flex align-items-center border p-2 mb-1 rounded">
-                                <a href="{{ asset('storage/attachments/' . $file) }}" target="_blank"
-                                    class="me-auto">{{ $file }}</a>
-                                <<button type="button" class="btn btn-sm btn-danger delete-attachment-btn"
-                                    data-request-id="{{ $request->Request_ID }}" data-file-name="{{ $file }}">
-                                    <i class="bi bi-trash"></i>
-                                    </button>
-                            </div>
-                            @endforeach
+                                @foreach ($attachments as $file)
+                                    <div class="d-flex align-items-center border p-2 mb-1 rounded">
+                                        <a href="{{ asset('storage/attachments/' . $file) }}" target="_blank"
+                                            class="me-auto">{{ $file }}</a>
+                                        <<button type="button" class="btn btn-sm btn-danger delete-attachment-btn"
+                                            data-request-id="{{ $request->Request_ID }}" data-file-name="{{ $file }}">
+                                            <i class="bi bi-trash"></i>
+                                            </button>
+                                    </div>
+                                @endforeach
                             @else
-                            <p>No attachments found.</p>
+                                <p>No attachments found.</p>
                             @endif
                         </div>
 
@@ -415,9 +417,16 @@
                     <div id="reviewUploadedFormat" class="mt-2"></div>
 
                     <div class="mt-3">
-                        <button id="markAsDoneBtn" class="btn btn-success">Mark as Done</button>
-                        <button id="openFeedbackModalBtn" class="btn btn-danger">Request Revision</button>
+                        <button id="markAsDoneBtn" class="btn btn-success" @if($request->Status === 'Completed') disabled
+                        @endif>
+                            Mark as Done
+                        </button>
+                        <button id="openFeedbackModalBtn" class="btn btn-danger" @if($request->Status === 'Completed')
+                        disabled @endif>
+                            Request Revision
+                        </button>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -448,105 +457,105 @@
 </body>
 
 <style>
-.viewRequestBtn:hover {
-    background-color: #0b5ed7;
-    /* Darker blue */
-    transition: background-color 0.2s ease-in-out;
-}
+    .viewRequestBtn:hover {
+        background-color: #0b5ed7;
+        /* Darker blue */
+        transition: background-color 0.2s ease-in-out;
+    }
 
-.reviewSubmissionBtn:hover {
-    background-color: #d39e00;
-    /* Darker yellow */
-    transition: background-color 0.2s ease-in-out;
-}
+    .reviewSubmissionBtn:hover {
+        background-color: #d39e00;
+        /* Darker yellow */
+        transition: background-color 0.2s ease-in-out;
+    }
 
-.deleteRequestBtn:hover {
-    background-color: #bb2d3b;
-    /* Darker red */
-    transition: background-color 0.2s ease-in-out;
-}
+    .deleteRequestBtn:hover {
+        background-color: #bb2d3b;
+        /* Darker red */
+        transition: background-color 0.2s ease-in-out;
+    }
 
-.filter-btn {
-    border-radius: 50px;
-    /* Make buttons more circular */
-    padding: 6px 14px;
-}
+    .filter-btn {
+        border-radius: 50px;
+        /* Make buttons more circular */
+        padding: 6px 14px;
+    }
 
-.filter-btn {
-    border-radius: 50px;
-    /* Make buttons more circular */
-    padding: 6px 14px;
-}
+    .filter-btn {
+        border-radius: 50px;
+        /* Make buttons more circular */
+        padding: 6px 14px;
+    }
 
-.filter-btn.active {
-    color: white !important;
-}
+    .filter-btn.active {
+        color: white !important;
+    }
 
-/* Add specific colors when active */
-.filter-btn.active[data-filter="Pending"] {
-    background-color: #ffc107 !important;
-    /* Yellow */
-    border-color: #ffc107 !important;
-}
+    /* Add specific colors when active */
+    .filter-btn.active[data-filter="Pending"] {
+        background-color: #ffc107 !important;
+        /* Yellow */
+        border-color: #ffc107 !important;
+    }
 
-.filter-btn.active[data-filter="In Progress"] {
-    background-color: #0d6efd !important;
-    /* Blue */
-    border-color: #0d6efd !important;
-}
+    .filter-btn.active[data-filter="In Progress"] {
+        background-color: #0d6efd !important;
+        /* Blue */
+        border-color: #0d6efd !important;
+    }
 
-.filter-btn.active[data-filter="Under Review"] {
-    background-color: orange !important;
-    /* Orange */
-    border-color: orange !important;
-}
+    .filter-btn.active[data-filter="Under Review"] {
+        background-color: orange !important;
+        /* Orange */
+        border-color: orange !important;
+    }
 
-.filter-btn.active[data-filter="Needs Revision"] {
-    background-color: #dc3545 !important;
-    /* Red */
-    border-color: #dc3545 !important;
-}
+    .filter-btn.active[data-filter="Needs Revision"] {
+        background-color: #dc3545 !important;
+        /* Red */
+        border-color: #dc3545 !important;
+    }
 
-.filter-btn.active[data-filter="Completed"] {
-    background-color: #198754 !important;
-    /* Green */
-    border-color: #198754 !important;
-}
+    .filter-btn.active[data-filter="Completed"] {
+        background-color: #198754 !important;
+        /* Green */
+        border-color: #198754 !important;
+    }
 
-.btn-outline-orange {
-    color: orange !important;
-    border-color: orange !important;
-}
+    .btn-outline-orange {
+        color: orange !important;
+        border-color: orange !important;
+    }
 
-.btn-outline-orange:hover {
-    background-color: orange !important;
-    color: white !important;
-}
+    .btn-outline-orange:hover {
+        background-color: orange !important;
+        color: white !important;
+    }
 
-.filter-btn {
-    position: relative;
-}
+    .filter-btn {
+        position: relative;
+    }
 
-.new-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: red;
-    color: white;
-    padding: 2px 6px;
-    font-size: 10px;
-    font-weight: bold;
-    border-radius: 8px;
-    z-index: 10;
-}
+    .new-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background-color: red;
+        color: white;
+        padding: 2px 6px;
+        font-size: 10px;
+        font-weight: bold;
+        border-radius: 8px;
+        z-index: 10;
+    }
 </style>
 
 </html>
 
 @if (session('success'))
-<div class="alert alert-success">
-    {{ session('success') }}
-</div>
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
 @endif
 
 <script src="{{ asset('js/usermanage.js') }}"></script>

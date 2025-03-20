@@ -214,7 +214,6 @@ $(document).ready(function () {
     });
 });
 
-// ✅ Upload Files and Show Confirmation Modal
 // ✅ Upload Files and Show Forward Confirmation Modal
 $("#uploadForm").on("submit", function (e) {
     e.preventDefault();
@@ -374,6 +373,17 @@ $(document).ready(function () {
         columnDefs: [{ orderable: false, targets: [8] }],
     });
 
+        // ✅ Initialize Completed Requests Table
+    let completedTable = $('#completedRequestsTable').DataTable({
+            paging: true,
+            searching: true,
+            lengthChange: true,
+            pageLength: 5,
+            ordering: true,
+            lengthMenu: [5, 10, 25, 50],
+        });
+    
+
     // ✅ Load last viewed counts and dismissed states from localStorage
     let lastViewedCounts = JSON.parse(
         localStorage.getItem("lastViewedCounts")
@@ -407,28 +417,52 @@ $(document).ready(function () {
 
         console.log("Applying Filter:", filter);
 
-        if (filter === "all") {
-            $("#acceptedRequestsTable, #acceptedRequestsHeading").show(); // ✅ Show Table 1
-            $("#pendingRequestsTable, #pendingRequestsHeading").hide(); // ✅ Hide Table 2
-            $("#acceptedRequestsTable_wrapper").show();
-            $("#pendingRequestsTable_wrapper").hide(); // ✅ Ensure Table 2 wrapper is hidden
-            acceptedTable.search("").columns().search("").draw();
-            pendingTable.search("").columns().search("").draw();
-        } else if (filter === "Pending") {
-            $("#acceptedRequestsTable, #acceptedRequestsHeading").hide();
-            $("#pendingRequestsTable, #pendingRequestsHeading").show();
-            $("#acceptedRequestsTable_wrapper").hide();
-            $("#pendingRequestsTable_wrapper").show();
-            pendingTable.column(1).search(filter, true, false).draw();
-        } else {
-            $("#acceptedRequestsTable, #acceptedRequestsHeading").show();
-            $("#pendingRequestsTable, #pendingRequestsHeading").hide();
-            $("#acceptedRequestsTable_wrapper").show();
-            $("#pendingRequestsTable_wrapper").hide();
-            acceptedTable.column(1).search(filter, true, false).draw();
-        }
-        setTimeout(updateStatusCounts, 300);
+        
+    if (filter === "all") {
+        $("#acceptedRequestsTable, #acceptedRequestsHeading").show(); 
+        $("#pendingRequestsTable, #pendingRequestsHeading").hide(); 
+        $("#completedRequestsTable, #completedRequestsHeading").hide(); 
 
+        $("#acceptedRequestsTable_wrapper").show();
+        $("#pendingRequestsTable_wrapper").hide();
+        $("#completedRequestsTable_wrapper").hide();
+
+        acceptedTable.search("").columns().search("").draw();
+        pendingTable.search("").columns().search("").draw();
+        completedTable.search("").columns().search("").draw();
+    } else if (filter === "Pending") {
+        $("#acceptedRequestsTable, #acceptedRequestsHeading").hide();
+        $("#pendingRequestsTable, #pendingRequestsHeading").show(); 
+        $("#completedRequestsTable, #completedRequestsHeading").hide(); 
+
+        $("#acceptedRequestsTable_wrapper").hide();
+        $("#pendingRequestsTable_wrapper").show();
+        $("#completedRequestsTable_wrapper").hide();
+
+        pendingTable.column(1).search(filter, true, false).draw();
+    } else if (filter === "Completed") {
+        $("#acceptedRequestsTable, #acceptedRequestsHeading").hide(); 
+        $("#pendingRequestsTable, #pendingRequestsHeading").hide(); 
+        $("#completedRequestsTable, #completedRequestsHeading").show(); 
+
+        $("#acceptedRequestsTable_wrapper").hide();
+        $("#pendingRequestsTable_wrapper").hide();
+        $("#completedRequestsTable_wrapper").show();
+
+        completedTable.draw(); // ✅ No need to search, just refresh the table
+    } else {
+        $("#acceptedRequestsTable, #acceptedRequestsHeading").show(); 
+        $("#pendingRequestsTable, #pendingRequestsHeading").hide(); 
+        $("#completedRequestsTable, #completedRequestsHeading").hide(); 
+
+        $("#acceptedRequestsTable_wrapper").show();
+        $("#pendingRequestsTable_wrapper").hide();
+        $("#completedRequestsTable_wrapper").hide();
+
+        acceptedTable.column(1).search(filter, true, false).draw();
+    }
+
+    setTimeout(updateStatusCounts, 300);
         pendingTable.on("draw", updateStatusCounts);
         acceptedTable.on("draw", updateStatusCounts);
 
@@ -461,7 +495,7 @@ $(document).ready(function () {
             .filter(
                 (row) => $(row[1]).text().trim() === "Needs Revision"
             ).length;
-        let completedCount = acceptedTable
+        let completedCount = completedTable
             .rows()
             .data()
             .toArray()
@@ -603,7 +637,7 @@ $(document).ready(function () {
                     ).length;
                 break;
             case "Completed":
-                lastViewedCounts.completed = acceptedTable
+                lastViewedCounts.completed = completedTable
                     .rows()
                     .data()
                     .toArray()

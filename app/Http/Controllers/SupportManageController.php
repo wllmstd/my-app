@@ -20,16 +20,15 @@ class SupportManageController extends Controller
     
     public function index()
     {
-        $userId = Auth::id(); // Get logged-in user's ID
-        $today = Carbon::today();
+        $userId = Auth::id();
     
-        // Get requests accepted by the logged-in profiler
+        // Get requests accepted by the logged-in profiler (excluding old completed ones for "all")
         $myAcceptedRequests = UserRequest::where('Accepted_By', $userId)
-            ->where(function ($query) use ($today) {
-                $query->where('Status', '!=', 'Completed') // Show non-completed statuses
-                      ->orWhere(function ($subQuery) use ($today) {
-                          $subQuery->where('Status', 'Completed')
-                                   ->whereDate('Updated_Time', $today); // Only today's completed requests
+            ->where(function ($query) {
+                $query->where('Status', '!=', 'Completed')
+                      ->orWhere(function ($query) {
+                          $query->where('Status', 'Completed')
+                                ->whereDate('Updated_Time', now()->toDateString()); // Only today's completed
                       });
             })
             ->orderBy('Updated_Time', 'asc')
@@ -40,7 +39,12 @@ class SupportManageController extends Controller
             ->orWhere('Status', 'Pending')
             ->get();
     
-        return view('support.supportmanage', compact('myAcceptedRequests', 'profiles'));
+        // ✅ Get all completed requests for Completed Table
+        $completedRequests = UserRequest::where('Status', 'Completed')
+            ->orderBy('Updated_Time', 'desc')
+            ->get();
+    
+        return view('support.supportmanage', compact('myAcceptedRequests', 'profiles', 'completedRequests'));
     }
     
 

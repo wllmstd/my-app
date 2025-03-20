@@ -229,7 +229,62 @@
                 </tbody>
             </table>
 
+
+
+            <!-- Table 3: Completed Requests -->
+            <h2 id="completedRequestsHeading" style="display: none;">Completed Requests</h2>
+            <table id="completedRequestsTable" class="table table-bordered table-striped" style="display: none;">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Status</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Nationality</th>
+                        <th>Location</th>
+                        <th>Format</th>
+                        <th>Attachments</th>
+                        <th>Date Accepted</th>
+                        <th>Submit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($completedRequests as $index => $request)
+                    <tr class="completed-row" data-status="{{ $request->Status }}">
+                        <td>{{ $index + 1 }}</td>
+                        <td>
+                            @if($request->Status === 'Completed')
+                            <span class="badge bg-success">{{ $request->Status }}</span>
+                            @else
+                            <span class="badge bg-secondary">{{ $request->Status }}</span>
+                            @endif
+                        </td>
+                        <td>{{ $request->First_Name }}</td>
+                        <td>{{ $request->Last_Name }}</td>
+                        <td>{{ $request->Nationality }}</td>
+                        <td>{{ $request->Location }}</td>
+                        <td>{{ $request->Format }}</td>
+                        <td>
+                            <button class="btn btn-info btn-sm viewAttachmentsBtn"
+                                data-attachments='@json(json_decode($request->Attachment, true))' data-bs-toggle="modal"
+                                data-bs-target="#attachmentsModal" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="View Attachments">
+                                <i class="bi bi-paperclip"></i>
+                            </button>
+                        </td>
+                        <td>{{ $request->Updated_Time }}</td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="bi bi-upload"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
+
+    </div>
     </div>
 
 
@@ -381,148 +436,148 @@
 </body>
 
 <style>
-    .filter-btn {
-        border-radius: 50px;
-        /* Make buttons more circular */
-        padding: 6px 14px;
-    }
+.filter-btn {
+    border-radius: 50px;
+    /* Make buttons more circular */
+    padding: 6px 14px;
+}
 
-    .filter-btn {
-        border-radius: 50px;
-        /* Make buttons more circular */
-        padding: 6px 14px;
-    }
+.filter-btn {
+    border-radius: 50px;
+    /* Make buttons more circular */
+    padding: 6px 14px;
+}
 
-    .filter-btn.active {
-        color: white !important;
-    }
+.filter-btn.active {
+    color: white !important;
+}
 
-    /* Add specific colors when active */
-    .filter-btn.active[data-filter="Pending"] {
-        background-color: #ffc107 !important;
-        /* Yellow */
-        border-color: #ffc107 !important;
-    }
+/* Add specific colors when active */
+.filter-btn.active[data-filter="Pending"] {
+    background-color: #ffc107 !important;
+    /* Yellow */
+    border-color: #ffc107 !important;
+}
 
-    .filter-btn.active[data-filter="In Progress"] {
-        background-color: #0d6efd !important;
-        /* Blue */
-        border-color: #0d6efd !important;
-    }
+.filter-btn.active[data-filter="In Progress"] {
+    background-color: #0d6efd !important;
+    /* Blue */
+    border-color: #0d6efd !important;
+}
 
-    .filter-btn.active[data-filter="Under Review"] {
-        background-color: orange !important;
-        /* Orange */
-        border-color: orange !important;
-    }
+.filter-btn.active[data-filter="Under Review"] {
+    background-color: orange !important;
+    /* Orange */
+    border-color: orange !important;
+}
 
-    .filter-btn.active[data-filter="Needs Revision"] {
-        background-color: #dc3545 !important;
-        /* Red */
-        border-color: #dc3545 !important;
-    }
+.filter-btn.active[data-filter="Needs Revision"] {
+    background-color: #dc3545 !important;
+    /* Red */
+    border-color: #dc3545 !important;
+}
 
-    .filter-btn.active[data-filter="Completed"] {
-        background-color: #198754 !important;
-        /* Green */
-        border-color: #198754 !important;
-    }
+.filter-btn.active[data-filter="Completed"] {
+    background-color: #198754 !important;
+    /* Green */
+    border-color: #198754 !important;
+}
 
-    .btn-outline-orange {
-        color: orange !important;
-        border-color: orange !important;
-    }
+.btn-outline-orange {
+    color: orange !important;
+    border-color: orange !important;
+}
 
-    .btn-outline-orange:hover {
-        background-color: orange !important;
-        color: white !important;
-    }
+.btn-outline-orange:hover {
+    background-color: orange !important;
+    color: white !important;
+}
 
-    #acceptedRequestsTable,
-    #pendingRequestsTable,
-    #acceptedRequestsHeading,
-    #pendingRequestsHeading,
-    #acceptedRequestsTable_wrapper,
-    #pendingRequestsTable_wrapper {
-        display: none;
-        /* Hide initially */
-    }
-
-
-
-    .filter-btn {
-        position: relative;
-    }
+#acceptedRequestsTable,
+#pendingRequestsTable,
+#acceptedRequestsHeading,
+#pendingRequestsHeading,
+#acceptedRequestsTable_wrapper,
+#pendingRequestsTable_wrapper {
+    display: none;
+    /* Hide initially */
+}
 
 
-    .new-badge {
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        /* ✅ Changed from left to right */
-        background-color: red;
-        color: white;
-        padding: 2px 6px;
-        font-size: 10px;
-        font-weight: bold;
-        border-radius: 8px;
-        z-index: 10;
-    }
+
+.filter-btn {
+    position: relative;
+}
 
 
-    /* Base Styling */
-    html,
-    body {
-        height: 100%;
-        overflow: hidden;
-        /* Hide built-in scrollbar */
-        font-family: 'Poppins', sans-serif;
-    }
+.new-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    /* ✅ Changed from left to right */
+    background-color: red;
+    color: white;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 8px;
+    z-index: 10;
+}
 
-    /* Create a scrollable container */
-    .scroll-container {
-        height: 100vh;
-        overflow-y: auto;
-        padding: 10px;
-        box-sizing: border-box;
-        padding-bottom: 100px;
-        /* Extra space at the bottom */
 
-    }
+/* Base Styling */
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+    /* Hide built-in scrollbar */
+    font-family: 'Poppins', sans-serif;
+}
 
-    /* Custom Scrollbar - Webkit (Chrome, Edge, Safari) */
-    .scroll-container::-webkit-scrollbar {
-        width: 8px;
-    }
+/* Create a scrollable container */
+.scroll-container {
+    height: 100vh;
+    overflow-y: auto;
+    padding: 10px;
+    box-sizing: border-box;
+    padding-bottom: 100px;
+    /* Extra space at the bottom */
 
-    .scroll-container::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        /* Light background */
-        border-radius: 10px;
-    }
+}
 
-    .scroll-container::-webkit-scrollbar-thumb {
-        background: rgba(31, 51, 95, 0.6);
-        /* Blue scrollbar */
-        border-radius: 10px;
-        transition: background 0.3s ease;
-    }
+/* Custom Scrollbar - Webkit (Chrome, Edge, Safari) */
+.scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
 
-    .scroll-container::-webkit-scrollbar-thumb:hover {
-        background: rgba(31, 51, 95, 0.8);
-        /* Darker blue on hover */
-    }
+.scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* Light background */
+    border-radius: 10px;
+}
 
-    /* Firefox scrollbar */
-    .scroll-container {
-        scrollbar-width: thin;
-        scrollbar-color: rgba(31, 51, 95, 0.6) #f1f1f1;
-    }
+.scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(31, 51, 95, 0.6);
+    /* Blue scrollbar */
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
 
-    /* Hover effect for Firefox */
-    .scroll-container:hover {
-        scrollbar-color: rgba(31, 51, 95, 0.8) #f1f1f1;
-    }
+.scroll-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(31, 51, 95, 0.8);
+    /* Darker blue on hover */
+}
+
+/* Firefox scrollbar */
+.scroll-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(31, 51, 95, 0.6) #f1f1f1;
+}
+
+/* Hover effect for Firefox */
+.scroll-container:hover {
+    scrollbar-color: rgba(31, 51, 95, 0.8) #f1f1f1;
+}
 </style>
 
 </html>

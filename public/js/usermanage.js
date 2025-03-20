@@ -250,7 +250,10 @@ $(document).ready(function () {
         let format = $(this).attr("data-format");
         let attachments = $(this).attr("data-attachments");
         let dateCreated = $(this).data("date-created");
+        let status = $(this).closest("tr").find("td:eq(1)").text().trim(); // Get status from table
 
+        // Debugging: Ensure status is correctly fetched
+        console.log("Opening View & Edit Modal. Status:", status);
 
         // Populate Form Fields
         $("#request_id").val(requestId);
@@ -263,12 +266,12 @@ $(document).ready(function () {
 
         // Get requested by name from the button data attributes
         let requestedBy = $(this).attr("data-requested-by");
-
-        // Debugging: Ensure requestedBy has a value
-        console.log("Requested By:", requestedBy);
-
-        // Populate the "Created By" field
         $("#requestedBy").text(requestedBy ? requestedBy : "Unknown User");
+
+        // Allow editing only if status is "Pending" or "Under Review"
+        let isEditable = ["Pending", "Under Review"].includes(status);
+        
+        $("#viewRequestModal input, #viewRequestModal select").prop("disabled", !isEditable);
 
         // Populate Existing Attachments
         let attachmentsHtml = "<h6>Existing Attachments:</h6>";
@@ -282,30 +285,32 @@ $(document).ready(function () {
                 <div class="d-flex align-items-center border p-2 mb-1 rounded">
                     <a href="${fileUrl}" target="_blank" class="me-auto">${fileName}</a>
                     <button type="button" class="btn btn-sm btn-danger delete-attachment-btn"
-                        data-request-id="${requestId}" data-file-name="${file}">
+                        data-request-id="${requestId}" data-file-name="${file}"
+                        ${!isEditable ? "disabled" : ""}>
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>`;
             });
 
-            // Disable file upload if an attachment exists
-            $("#edit_attachments").prop("disabled", true);
+            // Disable file upload if editing is not allowed
+            $("#edit_attachments").prop("disabled", !isEditable);
         } else {
             attachmentsHtml += "<p>No attachments found.</p>";
-            $("#edit_attachments").prop("disabled", false);
+            $("#edit_attachments").prop("disabled", !isEditable);
         }
 
         $("#existingAttachments").html(attachmentsHtml);
-    });
 
-    // Prevent file selection if disabled
-    $("#edit_attachments").on("change", function () {
-        if ($(this).prop("disabled")) {
-            alert(
-                "You can only have one attachment. Please remove the existing file before uploading a new one."
-            );
-            $(this).val(""); // Clear the selected file
-        }
+        // Prevent file selection if disabled
+        $("#edit_attachments").off("change").on("change", function () {
+            if ($(this).prop("disabled")) {
+                alert("You can only have one attachment. Please remove the existing file before uploading a new one.");
+                $(this).val(""); // Clear the selected file
+            }
+        });
+
+        // Open modal
+        $("#viewRequestModal").modal("show");
     });
 
     // Handle File Deletion
@@ -326,15 +331,11 @@ $(document).ready(function () {
                         alert("Attachment deleted successfully!");
 
                         // Remove the deleted attachment from UI
-                        $(`button[data-file-name='${fileName}']`)
-                            .closest("div")
-                            .remove();
+                        $(`button[data-file-name='${fileName}']`).closest("div").remove();
 
                         // Check if there are remaining attachments
                         if ($("#existingAttachments").children().length === 1) {
-                            $("#existingAttachments").html(
-                                "<p>No attachments found.</p>"
-                            );
+                            $("#existingAttachments").html("<p>No attachments found.</p>");
                         }
 
                         // Enable file upload input since the attachment is deleted
@@ -380,153 +381,6 @@ $(document).ready(function () {
                 alert("Failed to update the request. Please try again.");
             },
         });
-    });
-
-    // Function to Delete an Attachment
-    function deleteAttachment(requestId, fileName) {
-        if (confirm("Are you sure you want to delete this attachment?")) {
-            $.ajax({
-                url: `/requests/${requestId}/delete-attachment`,
-                type: "POST",
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr("content"), // ✅ Ensure correct CSRF token
-                    file_name: fileName,
-                },
-                success: function (response) {
-                    if (response.success) {
-                        alert("Attachment deleted successfully!");
-
-                        // Remove the deleted attachment from UI
-                        $(`button[data-file-name='${fileName}']`)
-                            .closest("div")
-                            .remove();
-
-                        // Check if there are remaining attachments
-                        if ($("#existingAttachments").children().length === 1) {
-                            $("#existingAttachments").html(
-                                "<p>No attachments found.</p>"
-                            );
-                        }
-
-                        // ✅ Enable file upload input since the attachment is deleted
-                        $("#edit_attachments").prop("disabled", false);
-                    } else {
-                        alert("Failed to delete attachment.");
-                    }
-                },
-                error: function (xhr) {
-                    console.error("Error deleting file:", xhr.responseText);
-                    alert("An error occurred. Please try again.");
-                },
-            });
-        }
-    }
-
-    $(document).ready(function () {
-        // Handle File Deletion
-        $(".delete-file-btn").on("click", function () {
-            let fileToDelete = $(this).data("file");
-            let deletedFilesInput = $("#deletedFilesInput");
-
-            // Add file to deleted files array
-            let deletedFiles = deletedFilesInput.val()
-                ? JSON.parse(deletedFilesInput.val())
-                : [];
-            deletedFiles.push(fileToDelete);
-            deletedFilesInput.val(JSON.stringify(deletedFiles));
-
-            // Remove the file from the UI
-            $(this).closest("div").remove();
-        });
-    });
-
-    //Delete Request
-    let deleteId = null;
-
-    // Capture request ID when delete button is clicked
-    $(document).on("click", ".deleteRequestBtn", function () {
-        deleteId = $(this).data("id");
-    });
-
-    // Confirm deletion and send AJAX request
-    $("#confirmDelete").on("click", function () {
-        if (deleteId) {
-            $.ajax({
-                url: "/requests/delete/" + deleteId, // Ensure this matches your Laravel route
-                type: "DELETE",
-                headers: {
-                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                        "content"
-                    ), // ✅ Fix: Ensure CSRF token is included
-                },
-                success: function (response) {
-                    // Hide the delete modal after deletion
-                    $("#deleteModal").modal("hide");
-
-                    // Reload the page after a short delay to reflect changes
-                    setTimeout(() => {
-                        location.reload();
-                    }, 10); // Adjust delay if needed
-                },
-                error: function (xhr, status, error) {
-                    alert("Error deleting request: " + error);
-                },
-            });
-        }
-    });
-});
-
-// Store the request ID and file name globally
-let deleteRequestId = null;
-let deleteFileName = null;
-
-// Function to switch from the View Modal to the Delete Confirmation Modal
-function deleteAttachment(requestId, fileName) {
-    deleteRequestId = requestId;
-    deleteFileName = fileName;
-
-    $("#viewRequestModal").modal("hide"); // Hide the view modal
-    setTimeout(() => {
-        $("#deleteAttachmentModal").modal("show"); // Show delete modal after transition
-    }, 300); // Small delay for smooth transition
-}
-
-// Handle Cancel - Switch Back to the View Modal
-$("#deleteAttachmentModal").on("hidden.bs.modal", function () {
-    if (!deleteConfirmed) {
-        $("#viewRequestModal").modal("show"); // Reopen view modal if not deleted
-    }
-});
-
-// Handle Confirm Delete
-let deleteConfirmed = false;
-$("#confirmDeleteBtn").on("click", function () {
-    deleteConfirmed = true; // Mark as confirmed
-
-    // ✅ Save the current filter before making the request
-    let currentFilter = localStorage.getItem("selectedFilter") || "all";
-
-    $.ajax({
-        url: `/requests/${deleteRequestId}/delete-attachment`,
-        type: "POST",
-        headers: {
-            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"), // ✅ Fix: Ensure CSRF token is included
-        },
-        data: {
-            file_name: deleteFileName,
-        },
-        success: function (response) {
-            $("#deleteAttachmentModal").modal("hide"); // Close delete modal
-
-            // ✅ Restore the selected filter after reloading
-            setTimeout(() => {
-                localStorage.setItem("selectedFilter", currentFilter);
-                location.reload();
-            }, 500);
-        },
-        error: function (xhr) {
-            alert("Error deleting attachment: " + xhr.responseJSON.error);
-        },
     });
 });
 

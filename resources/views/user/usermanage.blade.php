@@ -102,7 +102,7 @@
                     @foreach ($requests as $index => $request)
                     <tr>
                         <td>{{ $index + 1 }}</td>
-                        <td>
+                        <td data-status="{{ $request->Status }}">
                             @if($request->Status === 'Pending')
                             <span class="badge bg-warning text-dark">{{ $request->Status }}</span>
                             @elseif($request->Status === 'In Progress')

@@ -57,18 +57,18 @@ $(document).ready(function () {
 
     function updateStatusCounts() {
         let allCount = table.rows().count();
-    
+
         // ✅ Extract clean text from status column
         let statuses = table.column(1).data().toArray().map(status => {
             return $("<div>").html(status).text().trim(); // Handle HTML or plain text
         });
-    
+
         let pendingCount = statuses.filter(status => status === "Pending").length;
         let inProgressCount = statuses.filter(status => status === "In Progress").length;
         let underReviewCount = statuses.filter(status => status === "Under Review").length;
         let needsRevisionCount = statuses.filter(status => status === "Needs Revision").length;
         let completedCount = statuses.filter(status => status === "Completed").length;
-    
+
         // ✅ Update button text with counts
         $("#count-all").text(`(${allCount})`);
         $("#count-pending").text(`(${pendingCount})`);
@@ -77,22 +77,22 @@ $(document).ready(function () {
         $("#count-needs-revision").text(`(${needsRevisionCount})`);
         $("#count-completed").text(`(${completedCount})`);
 
-                // ✅ Badge Logic - Show how many are new
-                let newAll = allCount - lastViewedCounts.all;
-                let newPending = pendingCount - lastViewedCounts.pending;
-                let newInProgress = inProgressCount - lastViewedCounts.inProgress;
-                let newUnderReview = underReviewCount - lastViewedCounts.underReview;
-                let newNeedsRevision = needsRevisionCount - lastViewedCounts.needsRevision;
-                let newCompleted = completedCount - lastViewedCounts.completed;
-        
-                // 🏷️ If there's an increase, show the count in the badge
-                $("#new-badge-all").text(newAll > 0 ? `${newAll} new` : "").toggle(newAll > 0);
-                $("#new-badge-pending").text(newPending > 0 ? `${newPending} new` : "").toggle(newPending > 0);
-                $("#new-badge-in-progress").text(newInProgress > 0 ? `${newInProgress} new` : "").toggle(newInProgress > 0);
-                $("#new-badge-under-review").text(newUnderReview > 0 ? `${newUnderReview} new` : "").toggle(newUnderReview > 0);
-                $("#new-badge-needs-revision").text(newNeedsRevision > 0 ? `${newNeedsRevision} new` : "").toggle(newNeedsRevision > 0);
-                $("#new-badge-completed").text(newCompleted > 0 ? `${newCompleted} new` : "").toggle(newCompleted > 0);
-    
+        // ✅ Badge Logic - Show how many are new
+        let newAll = allCount - lastViewedCounts.all;
+        let newPending = pendingCount - lastViewedCounts.pending;
+        let newInProgress = inProgressCount - lastViewedCounts.inProgress;
+        let newUnderReview = underReviewCount - lastViewedCounts.underReview;
+        let newNeedsRevision = needsRevisionCount - lastViewedCounts.needsRevision;
+        let newCompleted = completedCount - lastViewedCounts.completed;
+
+        // 🏷️ If there's an increase, show the count in the badge
+        $("#new-badge-all").text(newAll > 0 ? `${newAll} new` : "").toggle(newAll > 0);
+        $("#new-badge-pending").text(newPending > 0 ? `${newPending} new` : "").toggle(newPending > 0);
+        $("#new-badge-in-progress").text(newInProgress > 0 ? `${newInProgress} new` : "").toggle(newInProgress > 0);
+        $("#new-badge-under-review").text(newUnderReview > 0 ? `${newUnderReview} new` : "").toggle(newUnderReview > 0);
+        $("#new-badge-needs-revision").text(newNeedsRevision > 0 ? `${newNeedsRevision} new` : "").toggle(newNeedsRevision > 0);
+        $("#new-badge-completed").text(newCompleted > 0 ? `${newCompleted} new` : "").toggle(newCompleted > 0);
+
         // ✅ Badge Logic - Based on visible count increase
         if (
             parseInt($("#count-all").text().replace(/\D/g, ""), 10) >
@@ -148,7 +148,7 @@ $(document).ready(function () {
             $("#new-badge-completed").hide();
         }
     }
-    
+
 
     function handleBadgeDismissal(filter) {
         let key = filter.replace(/\s+/g, '-').toLowerCase();
@@ -216,8 +216,8 @@ document
             );
             fileDiv.innerHTML = `
                 <span class="me-auto">${file.name} (${(
-                file.size / 1024
-            ).toFixed(2)} KB)</span>
+                    file.size / 1024
+                ).toFixed(2)} KB)</span>
                 <button type="button" class="btn btn-sm btn-danger" onclick="removeFile(${index})">
                     <i class="bi bi-x"></i>
                 </button>
@@ -580,15 +580,15 @@ $(document).ready(function () {
         $(document).on("click", ".reviewSubmissionBtn", function (event) {
             event.preventDefault();
             let requestId = $(this).data("id");
+            let row = $(this).closest("tr");
+            let status = row.find("td[data-status]").data("status"); // Use data attribute
 
             $.ajax({
                 url: `/requests/${requestId}/details`,
                 type: "GET",
                 success: function (data) {
                     $("#reviewSubmissionModal").data("request-id", requestId);
-                    $("#reviewRequester").text(
-                        `${data.First_Name} ${data.Last_Name}`
-                    );
+                    $("#reviewRequester").text(`${data.First_Name} ${data.Last_Name}`);
                     $("#reviewFormat").text(data.Format);
 
                     let profilerName =
@@ -600,10 +600,14 @@ $(document).ready(function () {
                     if (data.uploaded_format) {
                         displayUploadedFiles(data.uploaded_format);
                     } else {
-                        $("#reviewUploadedFormat").html(
-                            "<p>No submitted file available</p>"
-                        );
+                        $("#reviewUploadedFormat").html("<p>No submitted file available</p>");
                     }
+
+                    // ✅ Enable/Disable buttons based on status
+                    const isUnderReview = (status === "Under Review");
+                    $("#markAsDoneBtn, #openFeedbackModalBtn")
+                        .prop("disabled", !isUnderReview)
+                        .toggleClass("disabled", !isUnderReview);
 
                     $("#reviewSubmissionModal").modal("show");
                 },
@@ -612,63 +616,63 @@ $(document).ready(function () {
                 },
             });
         });
+    });
 
-        // Handle "Mark as Done" Click
-        $("#markAsDoneBtn").on("click", function () {
-            let requestId = $("#reviewSubmissionModal").data("request-id");
+    // Handle "Mark as Done" Click
+    $("#markAsDoneBtn").on("click", function () {
+        let requestId = $("#reviewSubmissionModal").data("request-id");
 
-            if (!requestId) {
-                alert("Error: Missing request ID.");
-                return;
-            }
+        if (!requestId) {
+            alert("Error: Missing request ID.");
+            return;
+        }
 
-            $.post(`/requests/${requestId}/complete`, {
-                status: "Completed",
+        $.post(`/requests/${requestId}/complete`, {
+            status: "Completed",
+        })
+            .done(function () {
+                alert("Request marked as complete!");
+                $("#reviewSubmissionModal").modal("hide");
+                location.reload();
             })
-                .done(function () {
-                    alert("Request marked as complete!");
-                    $("#reviewSubmissionModal").modal("hide");
-                    location.reload();
-                })
-                .fail(function () {
-                    alert("Error updating request status.");
-                });
-        });
+            .fail(function () {
+                alert("Error updating request status.");
+            });
+    });
 
-        // Open Feedback Modal
-        $("#openFeedbackModalBtn").on("click", function () {
-            $("#reviewSubmissionModal").modal("hide"); // Hide the main modal
-            $("#feedbackModal").modal("show");
-        });
+    // Open Feedback Modal
+    $("#openFeedbackModalBtn").on("click", function () {
+        $("#reviewSubmissionModal").modal("hide"); // Hide the main modal
+        $("#feedbackModal").modal("show");
+    });
 
-        // Handle "Send for Revision" Click
-        $("#sendForRevisionBtn").on("click", function () {
-            let requestId = $("#reviewSubmissionModal").data("request-id");
-            let feedback = $("#feedbackMessage").val();
+    // Handle "Send for Revision" Click
+    $("#sendForRevisionBtn").on("click", function () {
+        let requestId = $("#reviewSubmissionModal").data("request-id");
+        let feedback = $("#feedbackMessage").val();
 
-            if (!requestId) {
-                alert("Error: Missing request ID.");
-                return;
-            }
+        if (!requestId) {
+            alert("Error: Missing request ID.");
+            return;
+        }
 
-            if (!feedback.trim()) {
-                alert("Please provide feedback before sending.");
-                return;
-            }
+        if (!feedback.trim()) {
+            alert("Please provide feedback before sending.");
+            return;
+        }
 
-            $.post(`/requests/${requestId}/revise`, {
-                status: "Needs Revision",
-                feedback: feedback,
+        $.post(`/requests/${requestId}/revise`, {
+            status: "Needs Revision",
+            feedback: feedback,
+        })
+            .done(function () {
+                alert("Request sent back for revision.");
+                $("#feedbackModal").modal("hide");
+                location.reload();
             })
-                .done(function () {
-                    alert("Request sent back for revision.");
-                    $("#feedbackModal").modal("hide");
-                    location.reload();
-                })
-                .fail(function () {
-                    alert("Error updating request status.");
-                });
-        });
+            .fail(function () {
+                alert("Error updating request status.");
+            });
     });
 });
 
@@ -734,17 +738,35 @@ $(document).on("click", ".reviewSubmissionBtn", function () {
 
 // Handle Review Submission Modal Buttons if the request is completed
 $(document).ready(function () {
-    $(".reviewSubmissionBtn").on("click", function () {
-        let status = $(this).closest("tr").find("td:eq(1)").text().trim(); // Get the request status
+    function updateButtonsBasedOnStatus(status) {
+        let disableButtons = ["Pending", "In Progress", "Needs Revision", "Completed"].includes(status);
 
+        $("#markAsDoneBtn, #openFeedbackModalBtn").prop("disabled", disableButtons);
+        console.log("Status:", status, "| Buttons Disabled:", disableButtons);
+    }
+
+    // When clicking the Review Submission button, get the status and update buttons
+    $(".reviewSubmissionBtn").on("click", function () {
+        let status = $(this).closest("tr").find("td:eq(1)").text().trim(); // Get status from the table
+        console.log("Opening modal. Status:", status);
+    
+        // Set the status inside the modal to ensure consistency
+        $("#reviewSubmissionModal").find(".status-text").text(status);
+    
         // Open modal
         $("#reviewSubmissionModal").modal("show");
+    
+        // Update buttons based on status
+        updateButtonsBasedOnStatus(status);
+    });    
 
-        // If the request is completed, disable the buttons
-        if (status === "Completed") {
-            $("#markAsDoneBtn, #openFeedbackModalBtn").prop("disabled", true);
-        } else {
-            $("#markAsDoneBtn, #openFeedbackModalBtn").prop("disabled", false);
-        }
+    // Ensure buttons stay correct when modal is reopened
+    $("#reviewSubmissionModal").on("shown.bs.modal", function () {
+        let status = $("#reviewSubmissionModal").find(".status-text").text().trim(); // Get status from modal content
+
+        console.log("Modal opened. Status:", status);
+
+        updateButtonsBasedOnStatus(status);
     });
 });
+

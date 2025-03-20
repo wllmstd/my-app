@@ -14,6 +14,19 @@ $(document).ready(function () {
         columnDefs: [{ orderable: false, targets: [8] }]
     });
 
+        // Initialize DataTable for completed requests (Table 2)
+    let table2 = $("#completedRequestsTable").DataTable({
+        paging: true,             // Enable pagination
+        searching: true,          // Enable search
+        ordering: true,           // Enable column ordering
+        info: true,               // Show table info
+        lengthMenu: [5, 10, 25, 50], // Set page length options
+        order: [[7, "desc"]],     // Order by "Updated Time" column descending
+        autoWidth: false // ✅ Prevent automatic resizing
+
+    });
+
+
     // ✅ Load last viewed counts and dismissed states from localStorage
     let lastViewedCounts = JSON.parse(localStorage.getItem('lastViewedCounts')) || {
         all: 0,
@@ -47,13 +60,27 @@ $(document).ready(function () {
     function applyFilter(filter) {
         $(".filter-btn").removeClass("active");
         $(".filter-btn[data-filter='" + filter + "']").addClass("active");
-
+    
         if (filter === "all") {
             table.search("").columns().search("").draw();
+            $("#requestTable").show(); 
+            $("#requestTable_wrapper").show(); // ✅ Show table 1 pagination
+            $("#completedRequestsTable").hide(); 
+            $("#completedRequestsTable_wrapper").hide(); // ✅ Hide table 2 pagination
+        } else if (filter === "Completed") {
+            $("#requestTable").hide(); 
+            $("#requestTable_wrapper").hide(); // ✅ Hide table 1 pagination
+            $("#completedRequestsTable").show(); 
+            $("#completedRequestsTable_wrapper").show(); // ✅ Show table 2 pagination
         } else {
             table.column(1).search("^" + filter + "$", true, false).draw();
+            $("#requestTable").show(); 
+            $("#requestTable_wrapper").show(); // ✅ Show table 1 pagination
+            $("#completedRequestsTable").hide(); 
+            $("#completedRequestsTable_wrapper").hide(); // ✅ Hide table 2 pagination
         }
     }
+    
 
     function updateStatusCounts() {
         let allCount = table.rows().count();
@@ -67,7 +94,7 @@ $(document).ready(function () {
         let inProgressCount = statuses.filter(status => status === "In Progress").length;
         let underReviewCount = statuses.filter(status => status === "Under Review").length;
         let needsRevisionCount = statuses.filter(status => status === "Needs Revision").length;
-        let completedCount = statuses.filter(status => status === "Completed").length;
+        let completedCount = table2.rows().count(); // ✅ Use table2 instead of completedTable
 
         // ✅ Update button text with counts
         $("#count-all").text(`(${allCount})`);
@@ -179,7 +206,7 @@ $(document).ready(function () {
                     .filter(row => $(row[1]).text().trim() === "Needs Revision").length;
                 break;
             case "Completed":
-                lastViewedCounts.completed = table.rows().data().toArray()
+                lastViewedCounts.completed = table2.rows().data().toArray()
                     .filter(row => $(row[1]).text().trim() === "Completed").length;
                 break;
         }
@@ -189,6 +216,7 @@ $(document).ready(function () {
         dismissedBadges.pending = false;
         localStorage.setItem('dismissedBadges', JSON.stringify(dismissedBadges));
     }
+    
 
     updateStatusCounts();
 

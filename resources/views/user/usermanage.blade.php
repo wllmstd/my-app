@@ -165,6 +165,97 @@
                 </tbody>
             </table>
 
+
+            <!-- Table 3: Completed Requests -->
+            <h2 id="completedRequestsHeading" style="display: none;">Completed Requests</h2>
+            <table id="completedRequestsTable" class="table table-bordered table-striped" style="display: none;">
+                <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Status</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Nationality</th>
+                                <th>Location</th>
+                                <th>Format</th>
+                                <th>Updated Time</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($completedRequests as $index => $request)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td data-status="{{ $request->Status }}">
+                                    @if($request->Status === 'Pending')
+                                    <span class="badge bg-warning text-dark">{{ $request->Status }}</span>
+                                    @elseif($request->Status === 'In Progress')
+                                    <span class="badge bg-primary">{{ $request->Status }}</span>
+                                    @elseif($request->Status === 'Under Review')
+                                    <span class="badge"
+                                        style="background-color: orange; color: black;">{{ $request->Status }}</span>
+                                    @elseif($request->Status === 'Needs Revision')
+                                    <span class="badge bg-danger">{{ $request->Status }}</span>
+                                    @elseif($request->Status === 'Completed')
+                                    <span class="badge bg-success">{{ $request->Status }}</span>
+                                    @else
+                                    <span class="badge bg-secondary">{{ $request->Status }}</span>
+                                    @endif
+                                </td>
+                                <td>{{ $request->First_Name }}</td>
+                                <td>{{ $request->Last_Name }}</td>
+                                <td>{{ $request->Nationality }}</td>
+                                <td>{{ $request->Location }}</td>
+                                <td>{{ $request->Format }}</td>
+                                <td data-order="{{ \Carbon\Carbon::parse($request->Updated_Time)->timestamp }}">
+                                    {{ \Carbon\Carbon::parse($request->Updated_Time)->format('M j, Y, h:i A') }}
+                                    <br>
+                                    <small class="text-muted">
+                                        ({{ \Carbon\Carbon::parse($request->Updated_Time)->diffForHumans() }})
+                                    </small>
+                                </td>
+                                <td>
+                                    <!-- View Button -->
+                                    <button class="btn btn-primary btn-sm viewRequestBtn"
+                                        data-id="{{ $request->Request_ID }}"
+                                        data-first-name="{{ $request->First_Name }}"
+                                        data-last-name="{{ $request->Last_Name }}"
+                                        data-nationality="{{ $request->Nationality }}"
+                                        data-location="{{ $request->Location }}" data-format="{{ $request->Format }}"
+                                        data-attachments="{{ $request->Attachment }}"
+                                        data-date-created="{{ \Carbon\Carbon::parse($request->Date_Created)->format('M j, Y, h:i A') }}"
+                                        data-bs-toggle="modal" data-bs-target="#viewRequestModal"
+                                        title="View request details">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+
+                                    <!-- Review Button -->
+                                    <button class="btn btn-warning btn-sm reviewSubmissionBtn"
+                                        data-id="{{ $request->Request_ID }}"
+                                        data-first-name="{{ $request->First_Name }}"
+                                        data-last-name="{{ $request->Last_Name }}"
+                                        data-nationality="{{ $request->Nationality }}"
+                                        data-location="{{ $request->Location }}" data-format="{{ $request->Format }}"
+                                        data-uploaded-format="{{ $request->uploaded_format }}"
+                                        data-profiler="{{ $request->Profiler_Name }}"
+                                        title="Check if the submitted file meets the requested format">
+                                        <i class="bi bi-file-earmark-check"></i>
+                                    </button>
+
+                                    <!-- Delete Button -->
+                                    <button class="btn btn-danger btn-sm deleteRequestBtn"
+                                        data-id="{{ $request->Request_ID }}" data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal" title="Delete this request" @if($request->Status
+                                        === 'Completed') disabled @endif>
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+
         </div>
     </div>
 
@@ -558,9 +649,11 @@
 
 
 /* Base Styling */
-html, body {
+html,
+body {
     height: 100%;
-    overflow: hidden; /* Hide built-in scrollbar */
+    overflow: hidden;
+    /* Hide built-in scrollbar */
     font-family: 'Poppins', sans-serif;
 }
 
@@ -570,7 +663,8 @@ html, body {
     overflow-y: auto;
     padding: 10px;
     box-sizing: border-box;
-    padding-bottom: 100px; /* Extra space at the bottom */
+    padding-bottom: 100px;
+    /* Extra space at the bottom */
 
 }
 
@@ -580,18 +674,21 @@ html, body {
 }
 
 .scroll-container::-webkit-scrollbar-track {
-    background: #f1f1f1; /* Light background */
+    background: #f1f1f1;
+    /* Light background */
     border-radius: 10px;
 }
 
 .scroll-container::-webkit-scrollbar-thumb {
-    background: rgba(31, 51, 95, 0.6); /* Blue scrollbar */
+    background: rgba(31, 51, 95, 0.6);
+    /* Blue scrollbar */
     border-radius: 10px;
     transition: background 0.3s ease;
 }
 
 .scroll-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(31, 51, 95, 0.8); /* Darker blue on hover */
+    background: rgba(31, 51, 95, 0.8);
+    /* Darker blue on hover */
 }
 
 /* Firefox scrollbar */
@@ -604,8 +701,6 @@ html, body {
 .scroll-container:hover {
     scrollbar-color: rgba(31, 51, 95, 0.8) #f1f1f1;
 }
-
-
 </style>
 
 </html>

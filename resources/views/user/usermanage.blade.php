@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" defer></script>
+    <link rel="icon" type="image/png" href="{{ asset('storage/images/gecologo.png') }}" sizes="512x512">
+
 
 </head>
 
@@ -29,59 +31,50 @@
 
         <div class="container mt-4">
 
+        <div class="filter-container">
+                <!-- Toggle Button (Always Visible) -->
+                <button id="toggle-btn" class="btn btn-outline-secondary">☰ Filters</button>
 
-            <h2>User Requests</h2>
-            <div class="mb-3">
-                <button class="btn btn-outline-dark filter-btn active" data-filter="all">
-                    <div class="status-label-wrapper">
-                        All Tables
-                        <span id="count-all" class="status-badge">0</span>
-                    </div>
-                </button>
-                <button class="btn btn-outline-warning filter-btn" data-filter="Pending">
-                    <span class="new-badge" id="new-badge-pending">NEW</span>
-                    <div class="status-label-wrapper">
-                        Pending Requests
-                        <span id="count-pending" class="status-badge">0</span>
-                    </div>
-                </button>
-                <button class="btn btn-outline-primary filter-btn" data-filter="In Progress">
-                    <span class="new-badge" id="new-badge-in-progress">NEW</span>
-                    <div class="status-label-wrapper">
-                        In Progress
-                        <span id="count-in-progress" class="status-badge">0</span>
-                    </div>
-                </button>
-                <button class="btn btn-outline-orange filter-btn" data-filter="Under Review">
-                    <span class="new-badge" id="new-badge-under-review">NEW</span>
-                    <div class="status-label-wrapper">
-                        Under Review
-                        <span id="count-under-review" class="status-badge">0</span>
-                    </div>
-                </button>
-                <button class="btn btn-outline-danger filter-btn" data-filter="Needs Revision">
-                    <span class="new-badge" id="new-badge-needs-revision">NEW</span>
-                    <div class="status-label-wrapper">
-                        Needs Revision
-                        <span id="count-needs-revision" class="status-badge">0</span>
-                    </div>
-                </button>
-                <button class="btn btn-outline-success filter-btn" data-filter="Completed">
-                    <span class="new-badge" id="new-badge-completed">NEW</span>
-                    <div class="status-label-wrapper">
-                        Completed
-                        <span id="count-completed" class="status-badge">0</span>
-                    </div>
-                </button>
+                <!-- Filter Buttons (Initially Hidden) -->
+                <div id="filter-buttons" class="filter-buttons">
+                    <button class="btn btn-outline-dark filter-btn active" data-filter="all">
+                        <div class="status-label-wrapper">
+                            All Tables <span id="count-all" class="status-badge">0</span>
+                        </div>
+                    </button>
+                    <button class="btn btn-outline-warning filter-btn" data-filter="Pending">
+                        <span class="new-badge" id="new-badge-pending">NEW</span>
+                        <div class="status-label-wrapper">
+                            Pending Requests <span id="count-pending" class="status-badge">0</span>
+                        </div>
+                    </button>
+                    <button class="btn btn-outline-primary filter-btn" data-filter="In Progress">
+                        <span class="new-badge" id="new-badge-in-progress">NEW</span>
+                        <div class="status-label-wrapper">
+                            In Progress <span id="count-in-progress" class="status-badge">0</span>
+                        </div>
+                    </button>
+                    <button class="btn btn-outline-orange filter-btn" data-filter="Under Review">
+                        <span class="new-badge" id="new-badge-under-review">NEW</span>
+                        <div class="status-label-wrapper">
+                            Under Review <span id="count-under-review" class="status-badge">0</span>
+                        </div>
+                    </button>
+                    <button class="btn btn-outline-danger filter-btn" data-filter="Needs Revision">
+                        <span class="new-badge" id="new-badge-needs-revision">NEW</span>
+                        <div class="status-label-wrapper">
+                            Needs Revision <span id="count-needs-revision" class="status-badge">0</span>
+                        </div>
+                    </button>
+                    <button class="btn btn-outline-success filter-btn" data-filter="Completed">
+                        <span class="new-badge" id="new-badge-completed">NEW</span>
+                        <div class="status-label-wrapper">
+                            Completed <span id="count-completed" class="status-badge">0</span>
+                        </div>
+                    </button>
+                </div>
             </div>
 
-
-            <!-- Add Request Button -->
-            <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addRequestModal">
-                    <i class="bi bi-plus-circle"></i> Add Request
-                </button>
-            </div>
 
             <!-- Table to display requests -->
             <table class="table table-bordered table-striped" id="requestTable">
@@ -166,7 +159,8 @@
             </table>
 
 
-            <!-- Table 3: Completed Requests -->
+            <!-- Table 2: Completed Requests -->
+             
             <h2 id="completedRequestsHeading" style="display: none;">Completed Requests</h2>
             <table id="completedRequestsTable" class="table table-bordered table-striped" style="display: none;">
                 <thead class="table-dark">
@@ -588,7 +582,14 @@
     color: white !important;
 }
 
+
 /* Add specific colors when active */
+.filter-btn.active[data-filter="all"] {
+    background-color: #343a40 !important;
+    /* Yellow */
+    border-color: #343a40 !important;
+}
+
 .filter-btn.active[data-filter="Pending"] {
     background-color: #ffc107 !important;
     /* Yellow */
@@ -700,6 +701,481 @@ body {
 /* Hover effect for Firefox */
 .scroll-container:hover {
     scrollbar-color: rgba(31, 51, 95, 0.8) #f1f1f1;
+}
+
+
+/* Global Font & Styling */
+body,
+table,
+.dataTables_filter input,
+.dataTables_length select {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Search Bar */
+.dataTables_filter {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.dataTables_filter input {
+    width: 250px;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s;
+    border-radius: 15px !important;
+
+}
+
+/* Styling for "Show X entries" */
+.dataTables_length label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1f335f;
+    font-weight: 500;
+}
+
+/* Styling for the dropdown itself */
+.dataTables_length select {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1f335f;
+    padding: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+/* Styling for "Search:" label */
+.dataTables_filter label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1f335f;
+    font-weight: 500;
+}
+
+
+#requestTable,
+#completedRequestsTable {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    background: #1f335f;
+    font-size: 12px;
+}
+
+#requestTable th,
+#completedRequestsTable th {
+    background: #1f335f;
+    color: #fff;
+    text-align: center;
+    vertical-align: middle;
+    /* Centers vertically as well */
+}
+
+
+#requestTable td,
+#completedRequestsTable td {
+    padding: 14px 16px;
+    text-align: left;
+    background: #fff;
+    text-align: center;
+    vertical-align: middle;
+    /* Centers vertically as well */
+}
+
+
+/* Row Styling */
+#requestTable tr,
+#completedRequestsTable tbody tr {
+    transition: background 0.3s, transform 0.2s ease-in-out;
+}
+
+#requestTable tr,
+#completedRequestsTable tr {
+    height: 70px;
+    /* Adjust this for more spacing */
+}
+
+#requestTable td,
+#completedRequestsTable td {
+    padding: 20px 16px;
+    /* Increase top & bottom padding */
+}
+
+
+/* Pagination */
+.dataTables_paginate {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.dataTables_paginate .paginate_button {
+    font-family: 'Poppins', sans-serif;
+
+    border-color: #1f335f !important;
+    color: white !important;
+    padding: 8px 12px;
+    margin: 0 5px;
+    border-radius: 15px !important;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.dataTables_paginate .paginate_button:hover {
+    background: #1f335f !important;
+    transform: scale(1.1);
+    color: white !important;
+}
+
+.dataTables_paginate .paginate_button.current {
+    background: #A3CAE9 !important;
+    font-weight: bold;
+}
+
+.dataTables_paginate .paginate_button.disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* Entries Info Styling */
+.dataTables_info {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1f335f;
+    font-weight: 500;
+    margin-top: 10px;
+    text-align: left;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+
+
+
+
+
+
+/* CSS FOR MODALS*/
+
+/* Modal Background Overlay */
+.modal-backdrop {
+    background-color: rgba(31, 51, 95, 0.8);
+}
+
+/* Modal Content Styling */
+.modal-content {
+    background-color: #f4f8ff;
+    /* Light blue background */
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid #fff;
+}
+
+/* Modal Header */
+.modal-header {
+    background-color: #1f335f;
+    color: white;
+    border-bottom: 2px solid #A3CAE9;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.modal-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* Close Button */
+.btn-close {
+    background-color: #A3CAE9;
+    border-radius: 50%;
+    opacity: 1;
+}
+
+.btn-close:hover {
+    background-color: rgb(255, 255, 255);
+    opacity: 0.8;
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 20px;
+}
+
+/* Form Labels */
+.form-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #1f335f;
+    font-weight: 500;
+}
+
+/* Form Inputs & Select */
+.form-control,
+.form-select {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    border: 1px solid #A3CAE9;
+    border-radius: 8px;
+    padding: 10px;
+    transition: border-color 0.3s ease-in-out;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #1f335f;
+    box-shadow: 0 0 10px rgba(31, 51, 95, 0.2);
+}
+
+/* Profile Image */
+#profileImage {
+    border: 2px solid #A3CAE9;
+}
+
+/* File Input Styling */
+input[type="file"] {
+    font-size: 14px;
+    color: #1f335f;
+}
+
+/* Modal Footer */
+.modal-footer {
+    background-color: #f4f8ff;
+    border-top: 1px solid #A3CAE9;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+
+/* Filter Button Container */
+.mb-3 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    /* Reduce space between buttons */
+    justify-content: left;
+    align-items: center;
+}
+
+/* Filter Buttons - Smaller & More Compact */
+.filter-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    /* Reduce space inside the button */
+    min-width: 120px;
+    /* Decrease width */
+    padding: 6px 10px;
+    /* Reduce padding for a smaller look */
+    border-radius: 6px;
+    /* Slightly smaller rounded corners */
+    font-size: 12px;
+    /* Reduce font size */
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+    border: 2px solid transparent;
+    text-align: center;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Keep button colors consistent */
+.btn-outline-dark {
+    border-color: #343a40;
+    color: #343a40;
+}
+
+.btn-outline-warning {
+    border-color: #ffc107;
+    color: #856404;
+}
+
+.btn-outline-primary {
+    border-color: #007bff;
+    color: #0056b3;
+}
+
+.btn-outline-orange {
+    border-color: #fd7e14;
+    color: #b45309;
+}
+
+.btn-outline-danger {
+    border-color: #dc3545;
+    color: #721c24;
+}
+
+.btn-outline-success {
+    border-color: #28a745;
+    color: #155724;
+}
+
+
+.btn-outline-dark {
+    color: #343a40 !important;
+    border-color: #343a40 !important;
+}
+
+.btn-outline-dark:hover {
+    background-color: #343a40 !important;
+    color: white !important;
+}
+
+.btn-outline-warning {
+    color: #343a40 !important;
+    border-color: #ffc107 !important;
+}
+
+.btn-outline-warning:hover {
+    background-color: #ffc107 !important;
+    color: white !important;
+}
+
+.btn-outline-primary {
+    color: #343a40 !important;
+    border-color: #007bff !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+.btn-outline-orange {
+    color: #343a40 !important;
+    border-color: orange !important;
+}
+
+.btn-outline-orange:hover {
+    background-color: orange !important;
+    color: white !important;
+}
+
+.btn-outline-danger {
+    color: #343a40 !important;
+    border-color: #dc3545 !important;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.btn-outline-success {
+    color: #343a40 !important;
+    border-color: #28a745 !important;
+}
+
+.btn-outline-success:hover {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+
+/* Hover Effect */
+.filter-btn:hover {
+    transform: translateY(-2px);
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Active State */
+.filter-btn.active {
+    background-color: rgba(31, 51, 95, 0.15);
+    border-width: 2px;
+}
+
+/* Status Badge - Smaller & Neater */
+.status-badge {
+    padding: 2px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* New Badge - Stylish Floating */
+.new-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: red;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 6px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .filter-btn {
+        min-width: 120px;
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .status-badge {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    .new-badge {
+        font-size: 9px;
+        padding: 2px 5px;
+    }
+}
+
+
+/* Table Styling */
+.table {
+    width: 100%;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Flex container for toggle button and filters */
+.filter-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Toggle Button */
+#toggle-btn {
+    min-width: 100px;
+    padding: 8px 12px;
+    margin-bottom: 30px;
+}
+
+/* Filter Buttons (Initially Hidden) */
+.filter-buttons {
+    display: none;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 30px;
+
+}
+
+/* Show filters when active */
+.filter-buttons.show {
+    display: flex;
+}
+
+/* Filter Button Styles */
+.filter-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    min-width: 120px;
+    border-radius: 6px;
 }
 </style>
 

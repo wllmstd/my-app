@@ -136,7 +136,7 @@ class RequestController extends Controller
             'Users_ID' => Auth::id(),
         ]);
 
-        return redirect()->route('requests.index')->with('success', 'Request added successfully.');
+        return redirect()->route('usermanage')->with('success', 'Request added successfully.');
     }
 
     //Deletes attachments from the request

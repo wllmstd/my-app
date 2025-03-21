@@ -59,8 +59,13 @@
                                             style="background-color: #ffc107; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
                                         Pending: <strong id="pendingCount">0</strong></li>
                                     <li><span
-                                            style="background-color: #17a2b8; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
+                                            style="background-color: #136efd; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
+
                                         In Progress: <strong id="inProgressCount">0</strong></li>
+
+                                    <li><span
+                                            style="background-color:rgb(255, 170, 0); width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
+                                        Under Review: <strong id="underReviewCount">0</strong></li>
                                     <li><span
                                             style="background-color: #28a745; width: 15px; height: 15px; display: inline-block; border-radius: 50%;"></span>
                                         Completed: <strong id="completedCount">0</strong></li>
@@ -72,7 +77,8 @@
 
                 <!-- Format Distribution Card -->
                 <div class="col-md-6 d-flex equal-height">
-                    <div class="stat-card format-distribution w-100 d-flex flex-column align-items-center justify-content-between">
+                    <div
+                        class="stat-card format-distribution w-100 d-flex flex-column align-items-center justify-content-between">
                         <h5 class="mb-3">Format Distribution</h5>
                         <canvas id="formatChart" class="chart-canvas"></canvas>
                     </div>
@@ -121,16 +127,17 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(data => {
             document.getElementById("pendingCount").textContent = data.pending;
             document.getElementById("inProgressCount").textContent = data.in_progress;
+            document.getElementById("underReviewCount").textContent = data.under_review;
             document.getElementById("completedCount").textContent = data.completed;
 
             let ctx = document.getElementById("statusChart").getContext("2d");
             new Chart(ctx, {
                 type: "pie",
                 data: {
-                    labels: ["Pending", "In Progress", "Completed"],
+                    labels: ["Pending", "In Progress", "Under Review","Completed"],
                     datasets: [{
-                        data: [data.pending, data.in_progress, data.completed],
-                        backgroundColor: ["#ffc107", "#136efd", "#28a745"],
+                        data: [data.pending, data.in_progress, data.under_review, data.completed],
+                        backgroundColor: ["#ffc107", "#136efd", "rgb(255, 170, 0)", "#28a745"],
                         borderColor: "#fff",
                         borderWidth: 2
                     }]

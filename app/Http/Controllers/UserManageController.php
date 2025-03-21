@@ -13,21 +13,30 @@ class UserManageController extends Controller
     {
         $userId = Auth::id(); 
         
+        // ✅ Table 1: Non-completed requests + only today's completed requests
         $requests = UserRequest::where('Users_ID', $userId)
-        ->where(function ($query) {
-            $query->where('Status', '!=', 'Completed') // ✅ Include all non-completed requests
-                ->orWhere(function ($query) {
-                    $query->where('Status', 'Completed') // ✅ Include completed requests, but only today's
-                        ->whereDate('Updated_Time', now()->toDateString());
-                });
-        })
-        ->get();    
-    // Table 2: All completed requests (all time)
-    $completedRequests = UserRequest::where('Users_ID', $userId)
-        ->where('Status', 'Completed')
-        ->get();
+            ->where(function ($query) {
+                $query->where('Status', '!=', 'Completed') // ✅ Include all non-completed requests
+                    ->orWhere(function ($query) {
+                        $query->where('Status', 'Completed') // ✅ Include today's completed requests
+                            ->whereDate('Updated_Time', now()->toDateString());
+                    });
+            })
+            ->get();    
+    
+        // ✅ Table 2: Fetch all completed requests (all-time)
+        $completedRequests = UserRequest::where('Users_ID', $userId)
+            ->where('Status', 'Completed')
+            ->orderBy('Updated_Time', 'desc')
+            ->get();
+    
+        // ✅ Ensure variable is always defined to prevent errors
+        if ($completedRequests->isEmpty()) {
+            $completedRequests = collect(); // Assign an empty collection instead of null
+        }
     
         return view('user.usermanage', compact('requests', 'completedRequests'));
     }
+    
     
 }

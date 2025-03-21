@@ -26,13 +26,15 @@ class UserDashboardController extends Controller
 
     public function getRequestStatusCounts()
     {
-        $statusCounts = UserRequest::selectRaw("Status, COUNT(*) as count")
-            ->groupBy('Status')
-            ->pluck('count', 'Status');
+        $statusCounts = UserRequest::where('Users_ID', Auth::id()) // ✅ Filter by logged-in user
+        ->selectRaw("Status, COUNT(*) as count")
+        ->groupBy('Status')
+        ->pluck('count', 'Status');
     
         return response()->json([
             'pending' => $statusCounts['Pending'] ?? 0,
             'in_progress' => $statusCounts['In Progress'] ?? 0,
+            'under_review' => $statusCounts['Under Review'] ?? 0,
             'completed' => $statusCounts['Completed'] ?? 0
         ]);
     }
@@ -40,7 +42,8 @@ class UserDashboardController extends Controller
 
     public function getFormatCounts()
 {
-    $formatCounts = UserRequest::selectRaw("Format, COUNT(*) as count")
+    $formatCounts = UserRequest::where('Users_ID', Auth::id()) // ✅ Filter by logged-in user
+        ->selectRaw("Format, COUNT(*) as count")
         ->groupBy('Format')
         ->pluck('count', 'Format');
 

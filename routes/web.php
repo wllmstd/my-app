@@ -149,6 +149,7 @@ Route::prefix('user')->group(function () {
     Route::get('/request-status-counts', [UserDashboardController::class, 'getRequestStatusCounts'])->name('user.request.status.counts');
     Route::get('/format-counts', [UserDashboardController::class, 'getFormatCounts'])->name('user.request.format.counts');
     Route::get('/attachments-count', [UserDashboardController::class, 'getTotalAttachments'])->name('user.request.attachments.count');
+
 });
 
 // ===============================

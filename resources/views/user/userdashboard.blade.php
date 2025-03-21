@@ -19,7 +19,7 @@
 
     <!-- Bootstrap JS (Required for Modal) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="icon" type="image/png" href="{{ asset('storage/images/gecologo.png') }}" sizes="512x512">
+    <link rel="icon" type="image/png" src="{{ asset('images/gecologo.png') }}" sizes="512x512">
 
 </head>
 

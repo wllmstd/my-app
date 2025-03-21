@@ -10,7 +10,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center" href="{{ url('/userdashboard') }}">
-                <img src="{{ asset('storage/images/geco_navbar.png') }}" alt="GECO Logo" class="me-2"
+                <img src="{{ asset('images/gecologo.png') }}" alt="GECO Logo" class="me-2"
                     style="height: 40px; border-radius: 10px;">
                 <span>GECO Queueing System</span>
             </a>

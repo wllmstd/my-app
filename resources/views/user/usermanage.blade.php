@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" defer></script>
-    <link rel="icon" type="image/png" src="{{ asset('images/gecologo.png') }}" sizes="512x512">
+    <link rel="icon" type="image/png" href="{{ asset('images/gecologo.png') }}" sizes="512x512">
 
 
 </head>

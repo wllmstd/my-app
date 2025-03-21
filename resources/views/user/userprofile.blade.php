@@ -8,8 +8,11 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-10">
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}
+                <button type="button" class="custom-close" data-bs-dismiss="alert" aria-label="Close">&times;</button>
+
+            </div>
             @endif
 
             <div class="card shadow-lg">
@@ -65,6 +68,25 @@
                                         value="{{ $user->department }}" required>
                                 </div>
 
+                                <div class="mt-3">
+                                    <label for="password">New Password</label>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input type="password" name="password" id="password" class="form-control"
+                                                placeholder="Enter new password" autocomplete="new-password"
+                                                onfocus="this.value=''" onblur="if(this.value===''){ this.value=''; }">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <input type="password" name="password_confirmation"
+                                                id="password_confirmation" class="form-control"
+                                                placeholder="Confirm new password">
+                                        </div>
+                                    </div>
+                                    <small id="passwordMatchError" class="text-danger d-none">Passwords do not
+                                        match.</small>
+                                </div>
+
                                 <div class="text-center mt-4">
                                     <button type="submit" class="btn btn-primary w-50">Update Profile</button>
                                 </div>
@@ -84,6 +106,23 @@ document.getElementById('profileImageInput').addEventListener('change', function
         document.getElementById('profilePreview').src = reader.result;
     };
     reader.readAsDataURL(event.target.files[0]);
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    let password = document.getElementById("password");
+    let confirmPassword = document.getElementById("password_confirmation");
+    let errorText = document.getElementById("passwordMatchError");
+
+    function validatePasswords() {
+        if (password.value !== confirmPassword.value && confirmPassword.value !== "") {
+            errorText.classList.remove("d-none");
+        } else {
+            errorText.classList.add("d-none");
+        }
+    }
+
+    password.addEventListener("input", validatePasswords);
+    confirmPassword.addEventListener("input", validatePasswords);
 });
 </script>
 

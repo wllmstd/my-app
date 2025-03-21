@@ -14,6 +14,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" type="image/png" href="{{ asset('storage/images/gecologo.png') }}" sizes="512x512">
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- DataTables CSS -->
@@ -32,51 +34,49 @@
 
         <div class="container mt-4">
             <div class="filter-container">
-                <div class="filter-container">
-                    <!-- Toggle Button (Always Visible) -->
-                    <button id="toggle-btn" class="btn btn-outline-secondary">☰ Filters</button>
+                <!-- Toggle Button (Always Visible) -->
+                <button id="toggle-btn" class="btn btn-outline-secondary">☰ Filters</button>
 
-                    <!-- Filter Buttons (Initially Hidden) -->
-                    <div id="filter-buttons" class="filter-buttons">
-                        <button class="btn btn-outline-dark filter-btn active" data-filter="all">
-                            <div class="status-label-wrapper">
-                                All Tables <span id="count-all" class="status-badge">0</span>
-                            </div>
-                        </button>
-                        <button class="btn btn-outline-warning filter-btn" data-filter="Pending">
-                            <span class="new-badge" id="new-badge-pending">NEW</span>
-                            <div class="status-label-wrapper">
-                                Pending Requests <span id="count-pending" class="status-badge">0</span>
-                            </div>
-                        </button>
-                        <button class="btn btn-outline-primary filter-btn" data-filter="In Progress">
-                            <span class="new-badge" id="new-badge-in-progress">NEW</span>
-                            <div class="status-label-wrapper">
-                                In Progress <span id="count-in-progress" class="status-badge">0</span>
-                            </div>
-                        </button>
-                        <button class="btn btn-outline-orange filter-btn" data-filter="Under Review">
-                            <span class="new-badge" id="new-badge-under-review">NEW</span>
-                            <div class="status-label-wrapper">
-                                Under Review <span id="count-under-review" class="status-badge">0</span>
-                            </div>
-                        </button>
-                        <button class="btn btn-outline-danger filter-btn" data-filter="Needs Revision">
-                            <span class="new-badge" id="new-badge-needs-revision">NEW</span>
-                            <div class="status-label-wrapper">
-                                Needs Revision <span id="count-needs-revision" class="status-badge">0</span>
-                            </div>
-                        </button>
-                        <button class="btn btn-outline-success filter-btn" data-filter="Completed">
-                            <span class="new-badge" id="new-badge-completed">NEW</span>
-                            <div class="status-label-wrapper">
-                                Completed <span id="count-completed" class="status-badge">0</span>
-                            </div>
-                        </button>
-                    </div>
+                <!-- Filter Buttons (Initially Hidden) -->
+                <div id="filter-buttons" class="filter-buttons">
+                    <button class="btn btn-outline-dark filter-btn active" data-filter="all">
+                        <div class="status-label-wrapper">
+                            All Tables <span id="count-all" class="status-badge">0</span>
+                        </div>
+                    </button>
+                    <button class="btn btn-outline-warning filter-btn" data-filter="Pending">
+                        <span class="new-badge" id="new-badge-pending">NEW</span>
+                        <div class="status-label-wrapper">
+                            Pending Requests <span id="count-pending" class="status-badge">0</span>
+                        </div>
+                    </button>
+                    <button class="btn btn-outline-primary filter-btn" data-filter="In Progress">
+                        <span class="new-badge" id="new-badge-in-progress">NEW</span>
+                        <div class="status-label-wrapper">
+                            In Progress <span id="count-in-progress" class="status-badge">0</span>
+                        </div>
+                    </button>
+                    <button class="btn btn-outline-orange filter-btn" data-filter="Under Review">
+                        <span class="new-badge" id="new-badge-under-review">NEW</span>
+                        <div class="status-label-wrapper">
+                            Under Review <span id="count-under-review" class="status-badge">0</span>
+                        </div>
+                    </button>
+                    <button class="btn btn-outline-danger filter-btn" data-filter="Needs Revision">
+                        <span class="new-badge" id="new-badge-needs-revision">NEW</span>
+                        <div class="status-label-wrapper">
+                            Needs Revision <span id="count-needs-revision" class="status-badge">0</span>
+                        </div>
+                    </button>
+                    <button class="btn btn-outline-success filter-btn" data-filter="Completed">
+                        <span class="new-badge" id="new-badge-completed">NEW</span>
+                        <div class="status-label-wrapper">
+                            Completed <span id="count-completed" class="status-badge">0</span>
+                        </div>
+                    </button>
                 </div>
-
             </div>
+
 
 
 
@@ -379,11 +379,11 @@
 
                         <!-- Feedback Section (Hidden by Default) -->
                         <div id="feedbackSection" class=" d-none">
-                            <b>Message/Feedback</b> 
-                            <p id="uploadMessage" class="form-control-static rounded p-2 bg-white" 
-   style="background-color: white; padding: 3px; border: 1px solid #a3cae9;">
-</p>
-                                                </div>
+                            <b>Message/Feedback</b>
+                            <p id="uploadMessage" class="form-control-static rounded p-2 bg-white"
+                                style="background-color: white; padding: 3px; border: 1px solid #a3cae9;">
+                            </p>
+                        </div>
 
                         <!-- File Upload -->
                         <div class="mb-3">
@@ -593,10 +593,12 @@ body {
     scrollbar-color: rgba(31, 51, 95, 0.8) #f1f1f1;
 }
 
-#feedbackSection h6, 
+#feedbackSection h6,
 #feedbackSection p {
-    display: block; /* Ensures they stack */
-    width: 100%; /* Optional: Makes them full-width */
+    display: block;
+    /* Ensures they stack */
+    width: 100%;
+    /* Optional: Makes them full-width */
 }
 
 

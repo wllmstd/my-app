@@ -18,36 +18,42 @@ class SupportProfileController extends Controller
 
     // Update Profile Information
     public function update(Request $request)
-{
-    $user = Auth::user();
-
-    // Validate request
-    $request->validate([
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email,' . $user->id,
-        'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048', // Ensure correct image types
-    ]);
-
-    // Handle profile image upload
-    if ($request->hasFile('image')) {
-        // Delete old image if it exists
-        if ($user->image && Storage::exists('public/' . $user->image)) {
-            Storage::delete('public/' . $user->image);
+    {
+        $user = Auth::user();
+    
+        // Validate request
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048', 
+        ]);
+    
+        // Update profile image if uploaded
+        if ($request->hasFile('image')) {
+            if ($user->image && Storage::exists('public/' . $user->image)) {
+                Storage::delete('public/' . $user->image);
+            }
+            $imagePath = $request->file('image')->store('profile_images', 'public');
+            $user->image = $imagePath;
         }
-
-        // Store new image
-        $imagePath = $request->file('image')->store('profile_images', 'public');
-        $user->image = $imagePath;
+    
+        // ✅ Update user details
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+        $user->email = $request->email;
+    
+        // ✅ Only update password if provided
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+    
+        $user->save();
+    
+        return redirect()->route('support.supportprofile')->with('success', 'Profile updated successfully.');
     }
-
-    // Update other profile details
-    $user->first_name = $request->first_name;
-    $user->last_name = $request->last_name;
-    $user->email = $request->email;
-    $user->save();
-
-    return redirect()->route('support.supportprofile')->with('success', 'Profile updated successfully.');
-}
+    
+    
 
 }

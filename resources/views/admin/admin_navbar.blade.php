@@ -9,7 +9,11 @@
     
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{{ url('/admindashboard') }}">Geco Queuing System</a>
+    <a class="navbar-brand d-flex align-items-center" href="{{ url('/userdashboard') }}">
+                <img src="{{ asset('storage/images/geco_navbar.png') }}" alt="GECO Logo" class="me-2"
+                    style="height: 40px; border-radius: 10px;">
+                <span>GECO Queueing System</span>
+            </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>

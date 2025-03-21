@@ -274,3 +274,16 @@ label {
     }
 }
 
+
+.custom-close {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+}

@@ -1,4 +1,69 @@
 $(document).ready(function () {
+    let filters = document.getElementById("filter-buttons");
+
+    // Function to expand filters
+    function expandFilters() {
+        filters.style.display = "flex";
+        filters.style.opacity = "0";
+        filters.style.maxWidth = "900px";
+
+        let opacity = 0;
+        let slide = -20;
+        function animateExpand() {
+            if (opacity >= 1) {
+                filters.style.opacity = "1";
+                filters.style.transform = "translateX(0)";
+                localStorage.setItem("filtersOpen", "true");
+                return;
+            }
+            opacity += 0.1;
+            slide += 2;
+            filters.style.opacity = opacity;
+            filters.style.transform = `translateX(${slide}px)`;
+            requestAnimationFrame(animateExpand);
+        }
+        animateExpand();
+    }
+
+    // Function to collapse filters
+    function collapseFilters() {
+        let opacity = 1;
+        let slide = 0;
+        function animateCollapse() {
+            if (opacity <= 0) {
+                filters.style.maxWidth = "0px";
+                filters.style.display = "none";
+                localStorage.setItem("filtersOpen", "false");
+                return;
+            }
+            opacity -= 0.1;
+            slide -= 2;
+            filters.style.opacity = opacity;
+            filters.style.transform = `translateX(${slide}px)`;
+            requestAnimationFrame(animateCollapse);
+        }
+        animateCollapse();
+    }
+
+    // Toggle button click event
+    document.getElementById("toggle-btn").addEventListener("click", function () {
+        let isOpen = filters.style.maxWidth !== "0px" && filters.style.maxWidth !== "";
+        if (!isOpen) {
+            expandFilters();
+        } else {
+            collapseFilters();
+        }
+    });
+
+    // Restore state on page load
+    if (localStorage.getItem("filtersOpen") === "true") {
+        expandFilters();
+    } else {
+        filters.style.display = "none";
+        filters.style.maxWidth = "0px";
+    }
+
+    
     $(document).on("click", ".viewRequestBtn", function () {
         let requestId = $(this).data("id"); // ✅ Fetch ID from View button
         let firstName = $(this).attr("data-first-name");
